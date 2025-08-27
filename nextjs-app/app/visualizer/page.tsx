@@ -9,6 +9,11 @@ interface Node {
   ion_class?: string;
   supermodel?: number;
   icg?: boolean;
+  num_of_identicals?: number;
+  original_model?: {
+    ion_class?: string;
+    ICG?: boolean;
+  };
   x?: number;
   y?: number;
   fx?: number | null;
@@ -18,12 +23,21 @@ interface Node {
 interface Link {
   source: string | Node;
   target: string | Node;
-  value: number;
+  value?: number;
+  weight?: number;
 }
 
 interface NetworkData {
   nodes: Node[];
   links: Link[];
+}
+
+// Calculate node radius based on num_of_identicals (from original implementation)
+function calculateNodeRadius(node: Node): number {
+  const numIdenticals = node.num_of_identicals || 1;
+  const radius = (0.2375 * Math.log(numIdenticals) / Math.log(1.09) + 1.325 + 
+                  0.3925 * Math.log(numIdenticals) / Math.log(1.35) + 3) / 2;
+  return radius;
 }
 
 export default function Visualizer() {
@@ -51,13 +65,14 @@ export default function Visualizer() {
           const processedData: NetworkData = {
             nodes: data.nodes.map((node: any) => ({
               ...node,
-              ion_class: node.ion_class || node.ion_channel_class || 'Other',
-              icg: node.icg || false,
+              ion_class: node.ion_class || node.original_model?.ion_class || node.ion_channel_class || 'Other',
+              icg: node.icg || node.original_model?.ICG || false,
               supermodel: node.supermodel || undefined,
+              num_of_identicals: node.num_of_identicals || 1,
             })),
             links: data.links.map((link: any) => ({
               ...link,
-              value: link.value || link.weight || 95
+              weight: link.weight || link.value || 95
             }))
           };
           
@@ -130,11 +145,11 @@ export default function Visualizer() {
     const filteredLinks = networkData.links.filter(link => {
       const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
       const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-      return nodeIds.has(sourceId) && nodeIds.has(targetId) && link.value >= similarityScore;
+      const linkWeight = link.weight || link.value || 0;
+      return nodeIds.has(sourceId) && nodeIds.has(targetId) && linkWeight >= similarityScore;
     });
 
     // Create force simulation with better containment
-    const nodeRadius = 8;
     const padding = 20; // Padding from edges
     
     const simulation = d3.forceSimulation(filteredNodes)
@@ -148,26 +163,29 @@ export default function Visualizer() {
       .force('center', d3.forceCenter(width / 2, height / 2).strength(0.05))
       .force('x', d3.forceX(width / 2).strength(0.1))
       .force('y', d3.forceY(height / 2).strength(0.1))
-      .force('collision', d3.forceCollide().radius(nodeRadius + 5).strength(0.7))
+      .force('collision', d3.forceCollide()
+        .radius((d: any) => calculateNodeRadius(d) + 3)
+        .strength(0.7))
       .velocityDecay(0.3);
 
-    // Create links
+    // Create links (using CSS for styling, matching original)
     const link = g.append('g')
       .attr('class', 'links')
       .selectAll('line')
       .data(filteredLinks)
       .enter().append('line')
-      .attr('stroke', '#999')
-      .attr('stroke-opacity', 0.6)
-      .attr('stroke-width', (d: any) => Math.sqrt(d.value - 70));
+      .attr('class', 'graph-link')
+      .attr('stroke', '#aaa')
+      .attr('stroke-opacity', 0.8);
 
-    // Create nodes
+    // Create nodes with dynamic radius based on num_of_identicals
     const node = g.append('g')
       .attr('class', 'nodes')
       .selectAll('circle')
       .data(filteredNodes)
       .enter().append('circle')
-      .attr('r', 8)
+      .attr('r', (d: Node) => calculateNodeRadius(d))
+      .attr('class', 'graph-node')
       .attr('fill', (d: Node) => {
         const colors: { [key: string]: string } = {
           'K': '#3b82f6',
@@ -204,10 +222,11 @@ export default function Visualizer() {
 
     // Simulation tick with boundary constraints
     simulation.on('tick', () => {
-      // Apply boundary constraints to nodes
+      // Apply boundary constraints to nodes with their actual radius
       filteredNodes.forEach((d: any) => {
-        d.x = Math.max(nodeRadius + padding, Math.min(width - nodeRadius - padding, d.x));
-        d.y = Math.max(nodeRadius + padding, Math.min(height - nodeRadius - padding, d.y));
+        const actualRadius = calculateNodeRadius(d);
+        d.x = Math.max(actualRadius + padding, Math.min(width - actualRadius - padding, d.x));
+        d.y = Math.max(actualRadius + padding, Math.min(height - actualRadius - padding, d.y));
       });
 
       link
@@ -229,8 +248,9 @@ export default function Visualizer() {
     }
 
     function dragged(event: any, d: any) {
-      d.fx = Math.max(nodeRadius + padding, Math.min(width - nodeRadius - padding, event.x));
-      d.fy = Math.max(nodeRadius + padding, Math.min(height - nodeRadius - padding, event.y));
+      const actualRadius = calculateNodeRadius(d);
+      d.fx = Math.max(actualRadius + padding, Math.min(width - actualRadius - padding, event.x));
+      d.fy = Math.max(actualRadius + padding, Math.min(height - actualRadius - padding, event.y));
     }
 
     function dragended(event: any, d: any) {
