@@ -24,3 +24,71 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Diff styles matching original implementation */
+.diff-container table.diff {
+  font-family: 'Courier New', Courier, monospace;
+  border: medium;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.diff-container .diff_header {
+  background-color: #e0e0e0;
+}
+
+.diff-container td.diff_header {
+  text-align: right;
+  font-weight: bold;
+  padding: 2px 4px;
+}
+
+.diff-container .diff_next {
+  background-color: #c0c0c0;
+}
+
+.diff-container .diff_add {
+  background-color: #aaffaa;
+}
+
+.diff-container .diff_chg {
+  background-color: #ffff77;
+}
+
+.diff-container .diff_sub {
+  background-color: #ffaaaa;
+}
+
+.diff-container td {
+  padding: 1px 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  vertical-align: top;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Source and selected node styles */
+.source-node {
+  fill: #ffd700 !important;
+  stroke: #215885 !important;
+  stroke-width: 2 !important;
+}
+
+.selected-node {
+  fill: #00BFFF !important;
+  stroke: #215885 !important;
+  stroke-width: 2 !important;
+}
+
+.graph-node {
+  fill: #00BFFF;
+  stroke: #aaa;
+  stroke-width: 1;
+  z-index: 99999;
+}
+
+.graph-link {
+  stroke: #aaa;
+  stroke-opacity: 0.8;
+}

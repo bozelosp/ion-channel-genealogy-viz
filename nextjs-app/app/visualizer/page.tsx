@@ -228,6 +228,101 @@ function sortAndPositionGroups(
   return nodeIdToLocation;
 }
 
+// Source code fetching function
+async function fetchSourceCode(nodeIds: string[], networkData: NetworkData, fetchedFiles: {[key: string]: {source_code: string}}): Promise<{[key: string]: {source_code: string}}> {
+  const baseUrl = "http://ion-channels.s3-website-eu-west-1.amazonaws.com/static/modelDB/";
+  const updatedFetchedFiles = { ...fetchedFiles };
+
+  for (const nodeId of nodeIds) {
+    // Find the node data corresponding to the current node ID
+    const nodeData = networkData.nodes.find(node => node.id === nodeId);
+    if (!nodeData) {
+      console.warn(`Node with ID ${nodeId} not found.`);
+      continue;
+    }
+
+    const uniqueId = (nodeData as any).original_model?.unique_modelDB_mod_id;
+    if (!uniqueId) {
+      console.warn(`No unique_modelDB_mod_id found for node ${nodeId}`);
+      continue;
+    }
+
+    // Check if the files for this node have already been fetched
+    if (!updatedFetchedFiles[nodeId]) {
+      const sourceCodePath = `${baseUrl}source_code/${uniqueId}.mod`;
+
+      try {
+        const response = await fetch(sourceCodePath);
+        const sourceCode = await response.text();
+        updatedFetchedFiles[nodeId] = { source_code: sourceCode };
+      } catch (error) {
+        console.error(`Error fetching file for node ${nodeId}:`, error);
+      }
+    }
+  }
+
+  return updatedFetchedFiles;
+}
+
+// Generate diff HTML from local API
+async function generateDiffHtml(sourceCode: string, targetCode: string): Promise<string> {
+  try {
+    const diffUrl = `/api/generate-diff?string1=${encodeURIComponent(sourceCode)}&string2=${encodeURIComponent(targetCode)}`;
+    const response = await fetch(diffUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const diffHtml = await response.text();
+    return diffHtml;
+  } catch (error) {
+    console.error('Diff generation error:', error);
+    return '<div class="p-4 bg-red-50 border border-red-200 rounded-lg"><p class="text-red-700">Error generating diff: ' + (error instanceof Error ? error.message : 'Unknown error') + '</p></div>';
+  }
+}
+
+// Handle diff creation and display
+async function handleDiff(sourceIds: string[], targetIds: string[], fetchedFiles: {[key: string]: {source_code: string}}): Promise<string[]> {
+  const diffBoxes: string[] = [];
+
+  for (const sourceId of sourceIds) {
+    const sourceCode = fetchedFiles[sourceId]?.source_code;
+    if (!sourceCode) {
+      console.warn(`Source code for node ${sourceId} is not fetched.`);
+      continue;
+    }
+
+    for (const targetId of targetIds) {
+      const targetCode = fetchedFiles[targetId]?.source_code;
+      if (!targetCode) {
+        console.warn(`Target code for node ${targetId} is not fetched.`);
+        continue;
+      }
+
+      const diffHtml = await generateDiffHtml(sourceCode, targetCode);
+      diffBoxes.push(diffHtml);
+    }
+  }
+
+  return diffBoxes;
+}
+
+// Extend subgraph by connected nodes
+function extendSubgraphByConnectedNodes(linkData: Link[], subgraphNodeIds: string[]): string[] {
+  const extended = [...subgraphNodeIds];
+  
+  linkData.forEach(link => {
+    const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+    const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+    
+    if (subgraphNodeIds.includes(sourceId) || subgraphNodeIds.includes(targetId)) {
+      if (!extended.includes(sourceId)) extended.push(sourceId);
+      if (!extended.includes(targetId)) extended.push(targetId);
+    }
+  });
+  
+  return [...new Set(extended)]; // Remove duplicates
+}
+
 export default function Visualizer() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
@@ -242,6 +337,14 @@ export default function Visualizer() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [containerDimensions, setContainerDimensions] = useState<{width: number, height: number}>({width: 0, height: 0});
+  
+  // Source code comparison states
+  const [sourceNodeIds, setSourceNodeIds] = useState<string[]>([]);
+  const [targetNodeIds, setTargetNodeIds] = useState<string[]>([]);
+  const [fetchedFiles, setFetchedFiles] = useState<{[key: string]: {source_code: string}}>({});
+  const [diffBoxes, setDiffBoxes] = useState<string[]>([]);
+  const [currentDiffIndex, setCurrentDiffIndex] = useState<number>(0);
+  const [showDiffView, setShowDiffView] = useState<boolean>(false);
   
   // Check for mobile device and handle resize
   useEffect(() => {
@@ -267,6 +370,35 @@ export default function Visualizer() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Keyboard event handler for shortcuts
+  useEffect(() => {
+    const handleKeyPress = async (event: KeyboardEvent) => {
+      if (event.code === 'KeyD' && sourceNodeIds.length > 0 && targetNodeIds.length > 0) {
+        // Generate diff when 'D' key is pressed
+        if (Object.keys(fetchedFiles).length > 0) {
+          const diffBoxes = await handleDiff(sourceNodeIds, targetNodeIds, fetchedFiles);
+          setDiffBoxes(diffBoxes);
+          setCurrentDiffIndex(0);
+          setShowDiffView(true);
+        }
+      } else if (event.code === 'ArrowLeft' && showDiffView) {
+        // Navigate to previous diff
+        setCurrentDiffIndex(prev => Math.max(0, prev - 1));
+      } else if (event.code === 'ArrowRight' && showDiffView) {
+        // Navigate to next diff
+        setCurrentDiffIndex(prev => Math.min(diffBoxes.length - 1, prev + 1));
+      } else if (event.code === 'Escape') {
+        // Close diff view
+        setShowDiffView(false);
+        setDiffBoxes([]);
+        setCurrentDiffIndex(0);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [sourceNodeIds, targetNodeIds, fetchedFiles, showDiffView, diffBoxes]);
 
   // Load data on mount
   useEffect(() => {
@@ -441,20 +573,112 @@ export default function Visualizer() {
       .attr('class', 'graph-node')
       .attr('fill', '#00BFFF')  // DeepSkyBlue - matching original
       .attr('stroke', '#aaa')
-      .on('click', function(event: any, d: any) {
-        // Reset all nodes to default color
-        node.attr('fill', '#00BFFF')
-            .attr('stroke', '#aaa')
-            .classed('selected-node', false);
-        
-        // Highlight clicked node (matching original CSS classes)
-        d3.select(this)
-          .attr('fill', '#ffd700')  // Gold color for selected
-          .attr('stroke', '#215885')
-          .attr('stroke-width', 2)
-          .classed('selected-node', true);
-        
-        setSelectedNode(d);
+      .on('click', async function(event: any, d: any) {
+        const currentNode = d3.select(this);
+
+        if (event.shiftKey) {
+          // Shift+Click: Select subgraph and find source node
+          let subgraphNodeIds = [d.id];
+          
+          let previousSize = -1;
+          let currentSize = 1;
+          
+          // Expand subgraph until no new nodes are added
+          while (previousSize !== currentSize) {
+            previousSize = currentSize;
+            subgraphNodeIds = extendSubgraphByConnectedNodes(filteredLinks, subgraphNodeIds);
+            currentSize = subgraphNodeIds.length;
+          }
+          
+          // Reset all node classes
+          node.classed('selected-node', false).classed('source-node', false)
+              .attr('fill', '#00BFFF').attr('stroke', '#aaa').attr('stroke-width', 1);
+          
+          // Get nodes in subgraph
+          const nodesInSubgraph = node.filter((nodeData: any) => subgraphNodeIds.includes(nodeData.id));
+          nodesInSubgraph.classed('selected-node', true)
+                         .attr('stroke', '#215885')
+                         .attr('stroke-width', 2);
+          
+          // Find the earliest year among nodes in subgraph
+          const subgraphData = nodesInSubgraph.data();
+          const yearsInSubgraph = subgraphData.map((nodeData: any) => 
+            nodeData.original_model?.Year || 2023
+          );
+          const earliestYear = Math.min(...yearsInSubgraph);
+          
+          // Filter nodes by earliest year
+          let originalNodes = subgraphData.filter((nodeData: any) => 
+            (nodeData.original_model?.Year || 2023) === earliestYear
+          );
+          
+          // If multiple nodes have same earliest year, choose by smallest modelDB_dir
+          if (originalNodes.length > 1) {
+            const modelDBDirs = originalNodes.map((nodeData: any) => 
+              parseInt(nodeData.original_model?.modelDB_dir || '999999')
+            );
+            const smallestModelDBDir = Math.min(...modelDBDirs);
+            originalNodes = originalNodes.filter((nodeData: any) => 
+              parseInt(nodeData.original_model?.modelDB_dir || '999999') === smallestModelDBDir
+            );
+          }
+          
+          // Mark source node(s)
+          const sourceIds = originalNodes.map((nodeData: any) => nodeData.id);
+          node.filter((nodeData: any) => sourceIds.includes(nodeData.id))
+              .classed('source-node', true)
+              .attr('fill', '#ffd700')
+              .attr('stroke', '#215885')
+              .attr('stroke-width', 2);
+          
+          // Set state for diff generation
+          const newSourceIds = sourceIds;
+          const newTargetIds = subgraphNodeIds.filter(id => !sourceIds.includes(id));
+          
+          setSourceNodeIds(newSourceIds);
+          setTargetNodeIds(newTargetIds);
+          
+          // Fetch source code for all nodes in subgraph
+          if (networkData) {
+            const allNodeIds = [...newSourceIds, ...newTargetIds];
+            const updatedFetchedFiles = await fetchSourceCode(allNodeIds, networkData, fetchedFiles);
+            setFetchedFiles(updatedFetchedFiles);
+          }
+          
+        } else if (event.ctrlKey || event.metaKey) {
+          // Ctrl/Cmd+Click: Toggle source node
+          const isSourceNode = currentNode.classed('source-node');
+          
+          if (isSourceNode) {
+            currentNode.classed('source-node', false)
+                       .attr('fill', '#00BFFF')
+                       .attr('stroke', '#aaa')
+                       .attr('stroke-width', 1);
+          } else {
+            currentNode.classed('source-node', true)
+                       .attr('fill', '#ffd700')
+                       .attr('stroke', '#215885')
+                       .attr('stroke-width', 2);
+          }
+          
+        } else {
+          // Regular click: Toggle selected node
+          const isSelectedNode = currentNode.classed('selected-node');
+          
+          if (isSelectedNode) {
+            currentNode.classed('selected-node', false)
+                       .attr('fill', '#00BFFF')
+                       .attr('stroke', '#aaa')
+                       .attr('stroke-width', 1);
+            setSelectedNode(null);
+          } else {
+            currentNode.classed('selected-node', true)
+                       .attr('fill', '#00BFFF')
+                       .attr('stroke', '#215885')
+                       .attr('stroke-width', 2);
+            setSelectedNode(d);
+          }
+        }
       })
       .call(d3.drag<any, any>()
         .on('start', dragstarted)
@@ -711,6 +935,20 @@ export default function Visualizer() {
                 </div>
               </div>
             </div>
+
+            {/* Keyboard Shortcuts */}
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                Keyboard Shortcuts
+              </h3>
+              <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Shift+Click</kbd> Select subgraph</div>
+                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Ctrl+Click</kbd> Toggle source node</div>
+                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">D</kbd> Generate code diff</div>
+                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">←/→</kbd> Navigate diffs</div>
+                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd> Close diff view</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -725,6 +963,60 @@ export default function Visualizer() {
           </div>
         </div>
       </div>
+
+      {/* Diff View Overlay */}
+      {showDiffView && diffBoxes.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            {/* Diff Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Source Code Comparison
+                </h3>
+                <span className="text-sm text-slate-500 dark:text-slate-400">
+                  {currentDiffIndex + 1} / {diffBoxes.length}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentDiffIndex(Math.max(0, currentDiffIndex - 1))}
+                  disabled={currentDiffIndex === 0}
+                  className="px-3 py-1.5 text-sm rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setCurrentDiffIndex(Math.min(diffBoxes.length - 1, currentDiffIndex + 1))}
+                  disabled={currentDiffIndex === diffBoxes.length - 1}
+                  className="px-3 py-1.5 text-sm rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => setShowDiffView(false)}
+                  className="px-3 py-1.5 text-sm rounded-md bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {/* Diff Content */}
+            <div className="p-4 overflow-auto max-h-[calc(90vh-80px)]">
+              <div 
+                className="diff-container prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: diffBoxes[currentDiffIndex] }}
+                style={{ 
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  lineHeight: '1.4'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
