@@ -1,0 +1,50 @@
+NEURON {
+    SUFFIX caldyn_ms
+    USEION cal READ ical, cali WRITE cali VALENCE 2
+    RANGE pump, cainf, taur, drive, depth
+}
+
+UNITS {
+    (molar) = (1/liter) 
+    (mM) = (millimolar)
+    (um) = (micron)
+    (mA) = (milliamp)
+    (msM) = (ms mM)
+    FARADAY = (faraday) (coulomb)
+}
+
+PARAMETER {
+    drive = 10000 (1)
+    depth = 0.2  (um)
+    cainf = 70e-6 (mM)
+    taur = 43 (ms)
+    kt = 1e-4 (mM/ms)
+    kd = 1e-4 (mM)
+    pump = 0.02
+}
+
+STATE { cali (mM) }
+
+INITIAL { cali = cainf }
+
+ASSIGNED {
+    ical (mA/cm2)
+    drive_channel (mM/ms)
+    drive_pump (mM/ms)
+}
+    
+BREAKPOINT {
+    SOLVE state METHOD cnexp
+}
+
+
+DERIVATIVE state { 
+    
+    
+    drive_channel = -drive*ical/(2*FARADAY*depth)
+    drive_pump    = -kt*(cali-cainf)/(cali+kd)
+    
+    if (drive_channel <= 0.) { drive_channel = 0. }
+    
+    cali' = drive_channel + pump*drive_pump + (cainf-cali)/taur
+}

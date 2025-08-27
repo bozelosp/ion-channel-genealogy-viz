@@ -1,0 +1,1 @@
+NEURON{SUFFIXgsynRANGEcond}ASSIGNED{cond}

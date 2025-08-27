@@ -1,0 +1,1 @@
+NEURON{SUFFIXbrainPOINTERbPointer}ASSIGNED{bPointer}STATE{a}BREAKPOINT{SOLVEstatesMETHODderivimplicitif((a<0)&&(a*(1-a)-bPointer<0)){a=0}}INITIAL{a=1.0}DERIVATIVEstates{a'=a*(1-a)-bPointer}

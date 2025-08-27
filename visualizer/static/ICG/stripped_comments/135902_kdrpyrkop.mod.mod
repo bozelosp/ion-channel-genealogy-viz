@@ -1,0 +1,56 @@
+NEURON {
+	SUFFIX KdrPyrKop
+	USEION k READ ek WRITE ik
+	RANGE gmax
+}
+	
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(mS) = (millisiemens)
+}
+
+PARAMETER {
+    gmax =  10.0 (mS/cm2)
+    
+}
+    
+ASSIGNED {
+    ek      (mV)
+    v       (mV)
+    ik      (mA/cm2)
+	ninf    (1)
+	taon    (ms)
+}
+
+STATE { n }
+
+INITIAL { 
+    rates(v)
+    n  = ninf
+}
+
+BREAKPOINT {
+
+	SOLVE states METHOD cnexp
+	
+	ik = (1e-3) * gmax * n * (v-ek)
+}
+
+
+DERIVATIVE states { 
+
+    rates(v)
+    n' = (ninf-n)/taon
+}
+
+PROCEDURE rates(v(mV)) { LOCAL an, bn
+
+    an = exp(-0.11(/mV)*(v-13.0))
+    bn = exp(-0.08(/mV)*(v-13.0))
+    
+    ninf = 1.0/(1.0+an)
+    taon = max(2.0,50.0*bn/(1.0+an))*1.0(ms)
+}
+
+INCLUDE "custom_code/inc_files/135902_aux_fun.inc"

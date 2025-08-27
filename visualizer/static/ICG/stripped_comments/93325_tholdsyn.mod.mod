@@ -1,0 +1,70 @@
+NEURON {
+	POINT_PROCESS tholdsyn
+	NONSPECIFIC_CURRENT i
+	RANGE i, G1_weight, G1_eRev, G1_opentc, G1_closetc, G2_weight, G2_eRev, G2_opentc, G2_closetc, G3_weight, G3_eRev, G3_opentc, G3_closetc, G1_A, G2_A, G3_A
+	}
+
+UNITS {
+	(nA) = (nanoamp)
+	(mV) = (millivolt)
+	(S) = (microsiemens)
+}
+
+PARAMETER  {
+	G1_weight = 0.0375 (1)
+	G1_eRev = -80 (mV)
+	G1_opentc = 10 (ms)
+	G1_closetc = 25 (ms)
+	G2_weight = 0.0030 (1)
+	G2_eRev = -80 (mV)
+	G2_opentc = 100 (ms)
+	G2_closetc = 250 (ms)
+	G3_weight = 0.0004 (1)
+	G3_eRev = -80 (mV)
+	G3_opentc = 750 (ms)
+	G3_closetc = 2000 (ms)
+	G1_A (1)
+	G2_A (1)
+	G3_A (1)
+	}
+
+ASSIGNED {
+	i	(nA)
+	v	(mV)
+	}
+
+STATE { G1_act (S) G1_open (S) G2_act (S) G2_open (S) G3_act (S) G3_open (S) }
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	G1_A = (1)/((4)*(exp((-3.15)/(G1_closetc/G1_opentc)))+(1))
+	G2_A = (1)/((4)*(exp((-3.15)/(G2_closetc/G2_opentc)))+(1))
+	G3_A = (1)/((4)*(exp((-3.15)/(G3_closetc/G3_opentc)))+(1))
+	i = (G1_weight * G1_open * (v - G1_eRev) * G1_A) + (G2_weight * G2_open * (v - G2_eRev) * G2_A) + (G3_weight * G3_open * (v - G3_eRev) * G3_A)
+	}	
+
+INITIAL {
+	G1_act = 0 (S)
+	G1_open = 0 (S)
+	G2_act = 0 (S)
+	G2_open = 0 (S)
+	G3_act = 0 (S)
+	G3_open = 0 (S)
+
+
+}
+
+DERIVATIVE states {
+	G1_act'= -G1_act/G1_opentc
+	G1_open' = G1_act/G1_opentc - G1_open/G1_closetc
+	G2_act'= -G2_act/G2_opentc
+	G2_open' = G2_act/G2_opentc - G2_open/G2_closetc
+	G3_act'= -G3_act/G3_opentc
+	G3_open' = G3_act/G3_opentc - G3_open/G3_closetc
+}	
+
+NET_RECEIVE(weight (microsiemens)) {
+		state_discontinuity(G1_act, G1_act+1 (S))
+		state_discontinuity(G2_act, G2_act+1 (S))
+		state_discontinuity(G3_act, G3_act+1 (S))
+}

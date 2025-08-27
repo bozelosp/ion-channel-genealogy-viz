@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSsinstimRANGEdel,dur,amp,baseamp,i,freqNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)PI=(pi)(1)}PARAMETER{freq=5(Hz)del=0(ms)dur=1e10(ms)amp=0(nA)baseamp=0(nA)}ASSIGNED{i(nA)}BREAKPOINT{if(t>del&&t<dur+del){i=-baseamp-sin(2*PI*freq*(t-del)/1000.)*amp}else{i=0.0}}

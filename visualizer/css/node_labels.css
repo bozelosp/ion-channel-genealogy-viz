@@ -1,0 +1,14 @@
+.graph-node.no-label {
+	stroke: none;
+}
+
+.node-label {
+    display: none;
+	text-anchor: middle;
+	fill: #ffc42c;
+	font-family: Arial;
+	font-size: 18px;
+	font-weight: bold;
+	word-wrap: break-word;
+	text-shadow: 0.15px 0.15px 3px #ffc42c;
+}

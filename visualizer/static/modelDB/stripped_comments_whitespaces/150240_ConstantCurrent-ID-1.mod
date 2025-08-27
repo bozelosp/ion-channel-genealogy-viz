@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSConstantCurrentRANGEEnabledRANGEAmplitudeELECTRODE_CURRENTI}UNITS{}PARAMETER{Enabled=0Amplitude=0(nA)}ASSIGNED{I(nA)}INITIAL{}PROCEDUREUpdateParameters(){}BREAKPOINT{if(Enabled==1){I=Amplitude}else{I=0}}

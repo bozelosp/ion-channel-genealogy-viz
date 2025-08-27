@@ -1,0 +1,1 @@
+NEURON{SUFFIXdistsRANGEmainbif,nSyn,normprim}ASSIGNED{mainbifnSynnormprim}

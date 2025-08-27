@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSNMDARANGEB}PARAMETER{mg=1.(mM)Cdur=1.(ms)Alpha=4.(/msmM)Beta=0.0067(/ms)Erev=0.(mV)Deadtime=1(ms)GMAX=1(umho)DELAY=0}ASSIGNED{B}INCLUDE"sns.inc"BREAKPOINT{rates(v)g=g*Bi=i*B}PROCEDURErates(v(mV)){TABLEBDEPENDmgFROM-100TO80WITH180B=1/(1+exp(0.062(/mV)*-v)*(mg/3.57(mM)))}

@@ -1,0 +1,88 @@
+NEURON {
+	SUFFIX nattxs
+	
+	USEION na READ ena WRITE ina
+        RANGE gbar
+}
+
+UNITS {
+	(S) = (siemens)
+	(mV) = (millivolts)
+	(mA) = (milliamp)
+}
+
+PARAMETER {
+	gbar = 1.8e-6 
+	
+
+	A_am = 17.235 (/ms) 
+	B_am = 7.58 (mV)
+	C_am = -11.47 (mV)
+
+	A_ah = 0.23688 (/ms) 
+	B_ah = 115 (mV)
+	C_ah = 46.33 (mV)
+
+	A_bm = 17.235 (/ms) 
+	B_bm = 66.2 (mV)
+	C_bm = 19.8 (mV)
+
+	A_bh = 10.8 (/ms)   
+	B_bh = -11.8 (mV)
+	C_bh = -11.998 (mV)
+}
+
+ASSIGNED {
+        ena (mV)
+	v	(mV) 
+	ina	(mA/cm2)
+	g	(S/cm2)
+	tau_h	(ms)
+	tau_m	(ms)
+	minf
+	hinf
+}
+
+STATE { m h }
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	g = gbar * m^3 * h
+	ina = g * (v-ena)
+}
+
+INITIAL {
+	
+	m = alpham(v)/(alpham(v)+betam(v))
+	h = alphah(v)/(alphah(v)+betah(v))
+}
+
+DERIVATIVE states {
+	rates(v)
+	m' = (minf - m)/tau_m
+	h' = (hinf - h)/tau_h
+}
+
+FUNCTION alpham(Vm (mV)) (/ms) {
+	alpham=A_am/(1+exp((Vm+B_am)/C_am))
+}
+
+FUNCTION alphah(Vm (mV)) (/ms) {
+	alphah=A_ah*exp(-(Vm+B_ah)/C_ah)
+}
+
+FUNCTION betam(Vm (mV)) (/ms) {
+	betam=A_bm/(1+exp((Vm+B_bm)/C_bm))
+}
+
+FUNCTION betah(Vm (mV)) (/ms) {
+	betah=A_bh/(1+exp((Vm+B_bh)/C_bh))
+}
+
+FUNCTION rates(Vm (mV)) (/ms) {
+	tau_m = 1.0 / (alpham(Vm) + betam(Vm))
+	minf = alpham(Vm) * tau_m
+
+	tau_h = 1.0 / (alphah(Vm) + betah(Vm))
+	hinf = alphah(Vm) * tau_h
+}

@@ -1,0 +1,44 @@
+#node-groups-box {
+	background-color: none;
+	overflow-y: scroll;
+	position: absolute;
+	right: 10px;
+	border-radius: 6px;
+	top: 282px;
+	width: 354px;
+	height: var(--element-height);
+}
+
+#group-summary-container {
+    /* Add any specific styles for the new container here, if needed */
+}
+
+.group-summary-box {
+	background-color: rgba(0, 0, 0, 0.6);
+	text-align: left;
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 17px;
+	padding: 12px;
+	border-radius: 6px;
+	margin-bottom: 8px;
+	backdrop-filter: blur(3.25px);
+	background: linear-gradient(rgba(0, 0, 0, 0.515), rgba(0, 0, 0, 0.2));
+}
+
+.group-summary-box-title {
+	color: #ffc42c;
+}
+
+.group-summary-box-node-count {
+	color: #ffffff;
+	margin-top: 9px;
+	display: inline-block;
+}
+
+/* 
+<div id="node-groups-box" style="height: 786px;">
+    <div class="group-summary-box" id="group-summary-box-1" y="286"><span class="group-title">Ca</span><br><span class="node-count">130 nodes</span></div>
+    <div class="group-summary-box" id="group-summary-box-2" y="492"><span class="group-title">Ih</span><br><span class="node-count">60 nodes</span></div>
+    <div class="group-summary-box" id="group-summary-box-3" y="698"><span class="group-title">KCa</span><br><span class="node-count">69 nodes</span></div>
+</div> */

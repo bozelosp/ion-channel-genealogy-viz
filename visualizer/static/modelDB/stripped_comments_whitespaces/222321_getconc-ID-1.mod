@@ -1,0 +1,1 @@
+NEURON{SUFFIXgetconcUSEIONnaWRITEnai,naoUSEIONkWRITEki,koUSEIONcaWRITEcai,caoUSEIONclWRITEcli,cloPOINTERnaip,naop,kip,kop,caip,caop,clip,clop}ASSIGNED{naipnaopkipkopcaipcaopclipclop}STATE{nainaokikocaicaocliclo}BREAKPOINT{nai=naipnao=naopki=kipko=kopcai=caipcao=caopcli=clipclo=clop}INITIAL{at_time(t){nai=naipnao=naopki=kipko=kopcai=caipcao=caopcli=clipclo=clop}}

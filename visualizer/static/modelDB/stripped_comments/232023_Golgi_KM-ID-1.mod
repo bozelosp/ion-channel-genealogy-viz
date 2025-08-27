@@ -1,0 +1,96 @@
+NEURON {
+	SUFFIX Golgi_KM
+	USEION k READ ek WRITE ik
+	RANGE Q10_diff,Q10_channel,gbar_Q10, fix_celsius
+	RANGE gbar, ik, g
+	
+	
+	
+	RANGE n, n_inf, tau_n, tcorr, ic
+}
+
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+}
+
+PARAMETER {
+	Aalpha_n = 0.0033 (/ms)
+	Kalpha_n = 40 (mV)
+	V0alpha_n = -30 (mV)
+
+	Abeta_n = 0.0033 (/ms)
+	Kbeta_n = -20 (mV)
+	V0beta_n = -30 (mV)
+
+	V0_ninf = -35 (mV)
+	B_ninf =  6 (mV)
+
+	gbar= 0.001 (mho/cm2)
+	ek   (mV)
+    fix_celsius = 37 (degC)
+	Q10_diff	= 1.5
+	Q10_channel	= 3
+}
+
+STATE {
+	n
+}
+
+ASSIGNED {
+	v (mV)
+	ik (mA/cm2)
+	n_inf
+	tau_n (ms)
+	g (mho/cm2)
+	alpha_n (/ms)
+	beta_n (/ms)
+	tcorr (1)
+	gbar_Q10 (mho/cm2)
+	ic
+}
+
+INITIAL {
+	gbar_Q10 = gbar*(Q10_diff^((fix_celsius-23)/10))
+	rate(v)
+	n = n_inf
+}
+
+BREAKPOINT {
+	SOLVE states METHOD derivimplicit
+	g = gbar_Q10*n
+	ik = g*(v - ek)
+	ic = ik
+
+
+}
+
+DERIVATIVE states {
+	rate(v)
+	n' =(n_inf - n)/tau_n
+}
+
+FUNCTION alp_n(v(mV))(/ms) {
+	alp_n = Aalpha_n*exp((v-V0alpha_n)/Kalpha_n)
+}
+
+FUNCTION bet_n(v(mV))(/ms) {
+	bet_n = Abeta_n*exp((v-V0beta_n)/Kbeta_n)
+}
+UNITSOFF
+LOCAL delta
+LOCAL q10
+
+PROCEDURE rate(v (mV)) {LOCAL a_n, b_n, s_n
+	TABLE n_inf, tau_n
+	DEPEND Aalpha_n, Kalpha_n, V0alpha_n,
+	       Abeta_n, Kbeta_n, V0beta_n, V0_ninf, B_ninf, fix_celsius FROM -100 TO 30 WITH 13000
+	a_n = alp_n(v)
+	b_n = bet_n(v)
+	tcorr = Q10_diff^((fix_celsius - 22)/10)
+	s_n = tcorr*(a_n + b_n)
+	tau_n = 1/s_n
+
+
+	n_inf = 1/(1+exp(-(v-V0_ninf)/B_ninf))
+}

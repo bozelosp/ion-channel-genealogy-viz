@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXPassNONSPECIFIC_CURRENTiRANGEg,erev}PARAMETER{g=.001(mho/cm2)erev=-70(mV)}ASSIGNED{i(mA/cm2)v(mV)}BREAKPOINT{i=g*(v-erev)VERBATIMin_passiv_breakpoint();ENDVERBATIM}VERBATIMvoidin_passiv_breakpoint(){}ENDVERBATIM

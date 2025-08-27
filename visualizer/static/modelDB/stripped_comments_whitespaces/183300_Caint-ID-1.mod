@@ -1,0 +1,1 @@
+NEURON{SUFFIXCaconUSEIONcaREADica,caiWRITEcaiGLOBALtauca,A,camin}UNITS{(mA)=(milliamp)(mV)=(millivolt)(molar)=(1/liter)(mM)=(millimolar)(uM)=(micromolar)}PARAMETER{dt(ms)tauca=800(ms)A=0.2camin=1e-8(mM)}STATE{cai(mM)}INITIAL{cai=camin}ASSIGNED{ica(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{cai'=-A*ica-(cai-camin)/tauca}

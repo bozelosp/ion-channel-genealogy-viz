@@ -1,0 +1,1 @@
+NEURON{SUFFIXkOUSEIONOREADeOWRITEiOVALENCE1RANGEgkbar,iO,eO}UNITS{(mA)=(milliamp)(mV)=(millivolt)}INDEPENDENT{tFROM0TO1WITH1(ms)}PARAMETER{v(mV)dt(ms)gkbar=0(mho/cm2)eO=-90(mV)}ASSIGNED{iO(mA/cm2)}BREAKPOINT{iO=gkbar*(v-eO)}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXbrainPOINTERbPointer}ASSIGNED{bPointer}STATE{a}BREAKPOINT{SOLVEstatesMETHODderivimplicit}INITIAL{a=1.0}DERIVATIVEstates{a'=da_dt()}FUNCTIONda_dt(){LOCALrhsrhs=a*(1-a)-bPointerif(a>0||rhs>=0){da_dt=rhs}else{da_dt=0}}

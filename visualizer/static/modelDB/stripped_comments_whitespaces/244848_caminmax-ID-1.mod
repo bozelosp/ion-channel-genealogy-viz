@@ -1,0 +1,1 @@
+NEURON{SUFFIXcaminmaxUSEIONcaREADcaiRANGEcamax,camin,tmax,tmin}UNITS{(mM)=(milli/liter)}ASSIGNED{cai(mM)camax(mM)camin(mM)tmax(ms)tmin(ms)}INITIAL{camax=caicamin=caitmax=ttmin=t}BREAKPOINT{VERBATIMif(cai>camax){camax=cai;tmax=t;}if(cai<camin){camin=cai;tmin=t;}ENDVERBATIM}

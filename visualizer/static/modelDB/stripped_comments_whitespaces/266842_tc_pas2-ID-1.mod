@@ -1,0 +1,1 @@
+NEURON{SUFFIXtcpas2USEIONnaREADenaWRITEinaUSEIONkREADekWRITEikNONSPECIFIC_CURRENTiRANGEg_kl,g_nl}UNITS{(mV)=(millivolt)(mA)=(milliamp)(nA)=(nanoamp)(pA)=(picoamp)(S)=(siemens)}PARAMETER{g_kl=5e-5(mho/cm2)g_nl=2e-5(mho/cm2)ena=45(mV)ek=-95(mV)v(mV)}ASSIGNED{i(mA/cm2)ik(mA/cm2)ina(mA/cm2)}BREAKPOINT{ik=g_kl*(v-ek)ina=g_nl*(v-ena)i=ik+ina}

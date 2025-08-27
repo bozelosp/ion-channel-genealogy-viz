@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSExp2SynAMPApreRANGEe,iNONSPECIFIC_CURRENTiPOINTERpreRANGEgmax}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(uS)=(microsiemens)}PARAMETER{e=0(mV)gmax=1(uS)}ASSIGNED{pre(mV)v(mV)i(nA)}STATE{W}INITIAL{W=0}BREAKPOINT{SOLVEstateMETHODcnexpi=gmax*W*(v-e)}DERIVATIVEstate{W'=H(pre)/1(ms)-W/2(ms)}FUNCTIONH(x(mV)){if(x>-40){H=1}else{H=0}}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXpeakRANGEtm,vm}ASSIGNED{tm(ms)vm(millivolt)v(millivolt)}INITIAL{tm=tvm=v}AFTERSOLVE{if(v>vm){vm=vtm=t}}

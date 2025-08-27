@@ -1,0 +1,1 @@
+NEURON{SUFFIXarhRT03}NEURON{USEIONotherWRITEiotherVALENCE1}ASSIGNED{iother}PARAMETER{erev=-35.(mV)gmax=0.4(S/cm2)vrest=0(mV)mvhalf=75.mkconst=5.5exptemp=37.mq10=1mexp=1hvhalf=0hkconst=0hq10=1hexp=0}INCLUDE"boltz_cvode.inc"FUNCTIONsettau(j,v){if(j==0){settau=1./(exp(-14.6-0.086*v)+exp(-1.87+0.07*v))}else{settau=1}}PROCEDUREiassign(){i=g*(v-erev)iother=i}

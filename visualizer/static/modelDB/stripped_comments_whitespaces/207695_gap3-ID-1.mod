@@ -1,0 +1,1 @@
+NEURON{THREADSAFEPOINT_PROCESSgap3NONSPECIFIC_CURRENTiRANGEi,gRANGEvgap}PARAMETER{v(millivolt)g=0(nanosiemens)}ASSIGNED{i(nanoamp)vgap(millivolt)}BREAKPOINT{i=(v-vgap)*g*(0.001)}

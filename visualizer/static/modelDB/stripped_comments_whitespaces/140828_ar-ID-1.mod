@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}INDEPENDENT{vFROM-100TO50WITH50(mV)}NEURON{SUFFIXarNONSPECIFIC_CURRENTiRANGEg,e,c}PARAMETER{g0=.0001(S/cm2)<0,1e9>e=-75(mV)c=1000000(cm4ohm2/mV)}ASSIGNED{i(mA/cm2)g(S/cm2)}BREAKPOINT{if(c==0){g=g0i=g0*(v-e)}else{g=1/sqrt(1/g0^2+4*c*(v-e))i=(-1/g0+1/g)/(2*c)}}

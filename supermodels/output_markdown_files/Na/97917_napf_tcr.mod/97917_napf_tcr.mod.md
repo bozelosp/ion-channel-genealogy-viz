@@ -1,0 +1,68 @@
+# 97917_napf_tcr.mod
+
+## SUFFIX
+
+napf_tcr
+
+## GMAX_NAME
+
+gbar_napf_tcr
+
+## G_VALS
+
+- **gbar_napf_tcr**: 1.0
+
+## I_VALS
+
+- **37**: 1.0
+- **6.3**: 1.0
+
+## STATES
+
+- m
+
+## GATES
+
+- **m**: 1
+
+## ERROR_FLAGS
+
+
+## RATES
+
+- True
+
+## Q10_TAU
+
+1.0
+
+## Q10_G
+
+1.0
+
+## RATE_VALS
+
+![m Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Na/97917_napf_tcr.mod/images/m.png)
+
+## SM1_FIT
+
+- True
+
+## RATE_VALS_V
+
+## SM2_FIT
+
+- True
+
+## SM3_FIT
+
+- True
+
+## SM4_FIT
+
+- True
+
+## SM5_FIT
+
+- True
+

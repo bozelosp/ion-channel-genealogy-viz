@@ -1,0 +1,1 @@
+UNITS{(molar)=(1/liter)(pA)=(picoamp)(mV)=(millivolt)(S)=(siemens)(mA)=(milliamp)(mM)=(millimolar)}INDEPENDENT{vFROM-100TO50WITH50(mV)}NEURON{SUFFIXkcaUSEIONcaREADcaiUSEIONkREADekWRITEikRANGEgkbar,km,oinf,n}PARAMETER{dt(ms)cai(mM)celsius=35(degC)gkbar=800e-6(S/cm2)km=0.00019(mM)n=4.0(1)}ASSIGNED{ik(mA/cm2)oinfek(mV)}BREAKPOINT{oinf=1/(1+pow(km/cai,n))ik=oinf*gkbar*(v-ek)}

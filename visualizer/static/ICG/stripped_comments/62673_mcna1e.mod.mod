@@ -1,0 +1,91 @@
+NEURON {
+     SUFFIX MCna1
+     USEION na READ ena WRITE ina
+     RANGE gna1bar, gna1, ina   
+     GLOBAL cnt1, cnt2, Na_intern, Na_extern 
+}
+
+UNITS {
+     (mA) = (milliamp)
+     (mV) = (millivolt)
+}
+
+PARAMETER {
+
+     gna1bar=.120 (mho/cm2) <0,1e9> 
+
+
+
+
+
+
+     Na_intern = 15 (mM)
+     Na_extern = 135 (mM)
+
+}
+STATE {
+     C1 C2 O I1 I2 IO
+}
+ASSIGNED {
+     v (mV)
+     celsius (degC) 
+     ena (mV)
+     cnt1 cnt2
+     ina (mA/cm2)
+     gna1 (mho/cm2)
+}
+
+ASSIGNED {  a1 (/ms)   b1 (/ms)  a2 (/ms)  b2 (/ms) a3 (/ms)  b3 (/ms)}
+
+INITIAL {
+	cnt1 = 0
+	cnt2 = 0
+     C1=1
+     rate(v*1(/mV))
+     SOLVE states STEADYSTATE sparse
+}
+
+BREAKPOINT {
+     SOLVE states METHOD sparse
+     gna1 = gna1bar*O
+
+     ina = gna1*v*(Na_intern/Na_extern - exp(-v/25.4))/(1-exp(-v/25.4)) 
+
+
+
+	cnt1 = cnt1 + 1
+}
+
+KINETIC states {
+	cnt2 = cnt2 + 1
+     rate(v*1(/mV))
+
+     ~ I1 <-> I2 (a1, b1) 
+     ~ C1 <-> C2 (a1, b1)         
+   
+     ~ I2 <-> IO (a2, b2)
+     ~ C2 <-> O (a2, b2)
+
+     ~ C1 <-> I1 (a3, b3)
+     ~ C2 <-> I2 (a3, b3)      
+     ~ O <-> IO (a3, b3)   
+}
+
+UNITSOFF
+
+PROCEDURE rate(v) {LOCAL q10, q11 
+     TABLE a1, a2, a3, b1, b2, b3 DEPEND celsius FROM -100 TO 100 WITH 200
+     q10 = (2.8)^((celsius - 13)/10)  
+     q11 = (2.4)^((celsius - 13)/10) 
+ 
+     a1 = q10*10*exp((v+6)/45) 
+
+
+     a2 = q10*11/(0.4+exp(-(v+6)/12))
+     b1 = q10*0.35*exp(-(v+6)/8)
+     b2 = q10*0.035/(0.0015 + exp((v+6)/12))
+
+     a3 = q11*2/(2+exp(-(v+6)/12))      
+     b3 = q11*0.00005*exp(-(v+6)/13)
+}
+UNITSON

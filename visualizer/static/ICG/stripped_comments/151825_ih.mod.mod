@@ -1,0 +1,80 @@
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+	SUFFIX iH
+	
+ 	NONSPECIFIC_CURRENT i
+        RANGE gbar, h_inf, tau 
+	GLOBAL t0,t1,t2,t3,v05, z
+	GLOBAL q10, temp, tadj, vmin,vmax
+	GLOBAL eh
+}
+
+UNITS {
+	(mA) 	= (milliamp)
+	(mV) 	= (millivolt)
+	(molar)	= (1/liter)
+	(mM) 	= (millimolar)
+	(pS) = (picosiemens)
+	(um) = (micron)
+
+}
+
+PARAMETER {
+	v		(mV)
+	
+	celsius		(degC)
+	eh	   (mV)     
+	gbar	= 1.0	(pS/um2)
+
+	v05 = -91       (mV)   		
+	z=6		(mV)	 	
+	
+	t0 = 0.0003933	(1/ms) 	 	
+	t1 = -0.0249	(1/mV)     
+	t2 = 0.0877	(1/ms)     
+	t3 = 0.062	(1/mV)
+			
+	temp = 21	(degC)		
+	q10  = 2.3			
+	vmin = -120 (mV)
+	vmax = 100 (mV)     
+	
+}
+
+
+ASSIGNED {
+	i		(mA/cm2)
+        h_inf
+        tau        (ms)
+	tadj
+	
+}
+
+STATE { h }
+
+
+INITIAL {
+	rates(v)
+      	h = h_inf
+}
+
+BREAKPOINT { 
+	SOLVE states METHOD cnexp
+      	i = (1e-4) * gbar * h * (v-eh)
+}
+
+
+DERIVATIVE states  { 
+
+	rates(v) 
+	h' = (h_inf-h)/tau  
+}
+
+
+PROCEDURE rates( v (mV)) {
+
+	tadj= q10^((celsius-22)/10)
+	h_inf = 1/(1+exp((v-v05)/z))	
+        tau = 1/(tadj*(t0*exp(t1*v)+t2*exp(t3*v)))			
+}

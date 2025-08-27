@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSgapJNONSPECIFIC_CURRENTiRANGEg,iPOINTERvgap}PARAMETER{g(umho)}ASSIGNED{i(milliamp)v(millivolt)vgap(millivolt)}BREAKPOINT{i=g*(v-vgap)}

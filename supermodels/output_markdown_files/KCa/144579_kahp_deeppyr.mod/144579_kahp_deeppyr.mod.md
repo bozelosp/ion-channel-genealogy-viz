@@ -1,0 +1,68 @@
+# 144579_kahp_deeppyr.mod
+
+## SUFFIX
+
+kahp_deeppyr
+
+## GMAX_NAME
+
+gbar_kahp_deeppyr
+
+## G_VALS
+
+- **gbar_kahp_deeppyr**: 1.0
+
+## I_VALS
+
+- **37**: 0.9999000504865693
+- **6.3**: 0.9999000504865693
+
+## STATES
+
+- m
+
+## GATES
+
+- **m**: 1
+
+## ERROR_FLAGS
+
+
+## RATES
+
+- True
+
+## Q10_TAU
+
+1.0
+
+## Q10_G
+
+1.0
+
+## RATE_VALS
+
+![m Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/KCa/144579_kahp_deeppyr.mod/images/m.png)
+
+## RATE_VALS_V
+
+## SM1_FIT
+
+- False
+
+## SM2_FIT
+
+- False
+
+## SM3_FIT
+
+- False
+
+## SM4_FIT
+
+- False
+
+## SM5_FIT
+
+- False
+

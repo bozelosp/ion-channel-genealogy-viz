@@ -1,0 +1,1 @@
+NEURON{SUFFIXnaleakUSEIONnaREADenaRANGEg,i,enaNONSPECIFIC_CURRENTi}PARAMETER{g=0(S/cm2)}UNITS{(mA)=(milliamp)(mV)=(millivolt)(pS)=(picosiemens)(um)=(micron)}ASSIGNED{i(mA/cm2)ena(mV)}BREAKPOINT{i=g*(v-ena)}

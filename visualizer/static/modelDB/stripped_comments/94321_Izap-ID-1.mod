@@ -1,0 +1,34 @@
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+    POINT_PROCESS Izap
+    RANGE Astart, Astop, ttstart, ttstop, Fstart, Fstop, Ioff
+    NONSPECIFIC_CURRENT i
+}
+
+UNITS {
+    (nA) = (nanoamp) 
+    (mV) = (millivolt)
+}
+
+PARAMETER {
+  Ioff      = 0. (nA) 
+  Astart    = 0. (nA) 
+  Astop     = 0. (nA) 
+  ttstart   = 0. (ms) 
+  ttstop    = 0. (ms) 
+  Fstart    = 0. (Hz) 
+  Fstop     = 0. (Hz) 
+}
+
+ASSIGNED {
+    i     (nA)        
+}
+
+
+BREAKPOINT {
+    if ((t < ttstart) || (t > ttstop)) {  i = - Ioff }
+    else { 
+    i    = - (Ioff + (  ((Astart*(ttstop-t)/(ttstop-ttstart)) + ((t-ttstart)/(ttstop-ttstart)) * Astop)) * sin(  (0.0062831853071795866 * Fstart + ((t-ttstart)/(ttstop-ttstart)) * 0.5 * 0.0062831853071795866 * (Fstop - Fstart) ) * (t-ttstart)))        
+    }
+}

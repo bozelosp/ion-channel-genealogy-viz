@@ -1,0 +1,1 @@
+NEURON{SUFFIXkmUSEIONkREADekWRITEikRANGEgbarRANGEninf,ntauGLOBALvhalf_n,vsteep_n,exp_nGLOBALtskew_n,tscale_n,toffset_n}INCLUDE"noinact_k_currs.inc"INCLUDE"noinact_gate_states.inc"INCLUDE"var_funcs.inc"

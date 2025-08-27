@@ -1,0 +1,1 @@
+NEURON{SUFFIXIK1USEIONkREADekWRITEikRANGEgK1,ikGLOBALdummy}UNITS{(mA)=(milliamp)(mV)=(millivolt)(mM)=(milli/liter)}PARAMETER{gK1=0.1567e-3(S/cm2)<0,1e9>}ASSIGNED{v(mV)ik(mA/cm2)ek(mV)dummy}LOCALkBREAKPOINT{ik=gK1/(1+exp(0.07*(v+80)))*(v-ek)}

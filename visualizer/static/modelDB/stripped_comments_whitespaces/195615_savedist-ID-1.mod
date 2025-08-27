@@ -1,0 +1,1 @@
+NEURON{SUFFIXsavedistRANGEx}PARAMETER{x=0(micron)}

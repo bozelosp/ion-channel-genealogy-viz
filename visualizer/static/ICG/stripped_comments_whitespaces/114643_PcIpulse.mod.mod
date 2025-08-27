@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESScIpulseRANGEactiveRANGEdel,dur,ampUSEIONzREADezWRITEizVALENCE1}UNITS{(nA)=(nanoamp)(mV)=(millivolt)}PARAMETER{active=0del=0(ms)dur=1e+09(ms)amp=0(nA)}ASSIGNED{iz(nA)ez(mV)}INITIAL{iz=0}BREAKPOINT{if(active){if((t>=del)&&(t<dur)){iz=-amp}else{iz=0}}else{iz=0}}PROCEDUREUpdate(){}

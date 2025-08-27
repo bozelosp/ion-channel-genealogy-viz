@@ -1,0 +1,1 @@
+NEURON{SUFFIXcapUSEIONcaREADecaWRITEicaRANGEgca,ica}UNITS{(S)=(siemens)(mV)=(millivolt)(mA)=(milliamp)}PARAMETER{gca=6e-4(S/cm2)}ASSIGNED{v(mV)eca(mV)ica(mA/cm2)}BREAKPOINT{ica=gca*sinf(v)*(v-eca)}FUNCTIONsinf(Vm(mV)){UNITSOFFsinf=1/(1+exp(-(Vm+22)/4.53))UNITSON}

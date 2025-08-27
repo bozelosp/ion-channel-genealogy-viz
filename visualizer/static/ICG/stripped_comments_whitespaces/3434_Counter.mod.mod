@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSCounterRANGEcount}PARAMETER{count=0}NET_RECEIVE(change){count=count+change}

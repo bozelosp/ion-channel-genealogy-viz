@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGABAa}PARAMETER{Cdur=1.08(ms)Alpha=1.(/msmM)Beta=0.5(/ms)Erev=-75(mV)DELAY=0Deadtime=0(ms)GMAX=1.0(uS)}INCLUDE"sns.inc"

@@ -1,0 +1,1 @@
+NEURON{SUFFIXknaUSEIONnaREADnaiUSEIONkREADekWRITEikRANGEgbar,ik}UNITS{(molar)=(1/liter)(mM)=(millimolar)(mA)=(milliamp)(mV)=(millivolt)(S)=(siemens)}PARAMETER{EC50=38.7(mM)pmax=0.37nH=3.5}ASSIGNED{v(mV)ek(mV)ik(mA/cm2)nai(mM)gbar(S/cm2)}STATE{w}INITIAL{w=pmax/(1+(EC50/nai)^nH)ik=gbar*w*(v-ek)}BREAKPOINT{w=pmax/(1+(EC50/nai)^nH)ik=gbar*w*(v-ek)}

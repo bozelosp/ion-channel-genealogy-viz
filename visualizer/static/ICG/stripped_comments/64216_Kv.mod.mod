@@ -1,0 +1,128 @@
+NEURON 
+{
+	SUFFIX Kv
+	
+	
+	USEION k READ ek WRITE ik
+	
+        RANGE gKv, gKvbar
+	
+	
+	
+	
+
+}
+
+UNITS
+{
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(mS) = (millimho)
+	
+}
+
+PARAMETER
+{
+        
+        gKvbar = 2.0 (mS/cm2) <0,1e9>
+        
+       
+        
+
+}
+
+STATE
+{
+	mKv
+	hKv
+	
+}
+
+ASSIGNED
+{
+	v (mV)
+	ek (mV)
+	ik (mA/cm2)
+              
+          
+	infmKv
+	taumKv  (ms)
+	infhKv
+	tauhKv  (ms)
+           
+     
+	gKv (mho/cm2)
+	
+}
+
+INITIAL
+{
+	rate(v)
+	mKv = infmKv
+	hKv  = infhKv
+}
+
+
+
+
+BREAKPOINT
+{
+	SOLVE states METHOD cnexp
+	gKv = (0.001)*gKvbar*mKv*mKv*mKv *hKv
+	ik = gKv*(v - ek)
+}
+
+DERIVATIVE states
+{
+	rate(v)
+	mKv' = (infmKv - mKv)/taumKv
+	hKv' =  (infhKv - hKv )/tauhKv
+
+}
+
+
+UNITSOFF
+
+FUNCTION alphamKv(v(mV)) (/ms)
+{ 
+	alphamKv = (0.001)*5*(100-v)/( exp( (100-v)/42) -1 )
+	
+}
+
+FUNCTION  betamKv (v(mV)) (/ms)
+{
+	
+	betamKv = (0.001)*9*exp (- (v-20) /40 )
+}
+
+
+FUNCTION alphahKv (v(mV)) (/ms)
+{
+	alphahKv = (0.001)*0.15 *exp (-v/22)
+}
+
+FUNCTION betahKv (v(mV)) (/ms)
+{ 
+	betahKv = (0.001)*0.4125/( exp ( ( 10-v)/7 ) +1 )
+
+}
+
+UNITSON
+
+PROCEDURE rate(v (mV))
+{
+        LOCAL a, b
+
+	
+	a = alphamKv(v)
+	b = betamKv(v)
+	taumKv = 1/(a + b)
+	infmKv = a/(a + b)
+	
+	a = alphahKv(v)
+	b = betahKv(v)
+	tauhKv = 1/(a + b)
+	infhKv = a/(a + b)
+	
+
+}

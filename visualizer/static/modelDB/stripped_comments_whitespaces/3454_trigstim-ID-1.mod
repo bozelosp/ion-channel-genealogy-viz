@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSTriggeredIClampRANGEdur,amp,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{dur(ms)<0,1e9>amp(nA)}ASSIGNED{i(nA)ilocal(nA)}INITIAL{i=0ilocal=0}BREAKPOINT{i=ilocal}NET_RECEIVE(w){if(flag==0){ilocal=ilocal+ampnet_send(dur,1)}else{ilocal=ilocal-amp}}

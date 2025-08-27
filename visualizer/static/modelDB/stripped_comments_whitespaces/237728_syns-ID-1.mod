@@ -1,0 +1,1 @@
+NEURON{SUFFIXsynsRANGEnpyAt,npyUnif,sstAt,sstUnif,vlsAt,vgatAtRANGEvgatAt,vlnAt,pvAtRANGEexc}ASSIGNED{npyAtnpyUnifsstAtsstUnifvlsAtvgatAtvlnAtpvAtexc}

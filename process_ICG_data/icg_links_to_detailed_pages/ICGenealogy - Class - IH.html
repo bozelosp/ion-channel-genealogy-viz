@@ -1,0 +1,1283 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="author" content="Centre for Neural Circuits and Behavior, University of Oxford"/>
+    <meta name="keywords" content="ion channels, hodgkin, huxley, repository, visualization, browsing, NEURON, brain, modeling, model, models, channeldb, modeldb, brain, neuroscience, open source, calcium, potassium, sodium, moose, channelpedia, database, computational, compneuro"/>
+    <link rel="icon" type="image/png" href="/static/icg/img/favicon.png"/>
+    <title>ICGenealogy - Class: IH</title>
+    
+	<style type="text/css">
+		.channels li {
+			margin-bottom: 0px !important;
+			font-size: 1.2em;
+			line-height: 1.1em;
+		}
+		.channels li>small {
+			color:#aaa;
+		}
+		.channels li>a {
+			font-weight: bold;
+		}
+		.navbar-form {
+			border: 0px !important;
+		}
+	</style>
+	
+	<meta name="description" content="Overview of all ion channel models of the &quot;IH&quot; class."/>
+
+
+    
+<link rel="stylesheet" href="/static/icg/js/jquery-ui.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/icg/css/autocomplete.css" rel="stylesheet"/>
+<script type="text/javascript" src="/static/icg/js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/static/icg/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/icg/js/jquery.autocomplete.min.js"></script>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+    	
+		$('#autocomplete').devbridgeAutocomplete({
+			serviceUrl: '/api/app/search',
+			paramName: 'q',
+			params: {"all": 1},
+			width: '300px',
+			minChars: 3,
+			deferRequestBy:300,
+			preserveInput: true,
+			autoSelectFirst: true,
+
+			onSearchStart : function(){ $(this).addClass('autocomplete-working') },
+			onSearchComplete : function(){ $(this).removeClass('autocomplete-working') },
+			onSearchError: function(){ $(this).removeClass('autocomplete-working'); },
+
+		    onSelect: function (suggestion) {
+
+		    	var tmp = JSON.parse(suggestion.data);
+		    	if (tmp[1] <= 0)
+		    		tmp[1] = "other";
+		    	var loc = '/channels/'+tmp[1]+'/'+tmp[0];
+		    	window.location = loc;
+		    }
+		});
+
+		// Removed due to user feedback
+		// $('#autocomplete').focusin(function(){
+		// 	$(this).val('');
+		// });
+	}
+    
+	
+</script>
+
+	
+
+	<script type="application/ld+json">
+	{
+	  "@context": "http://schema.org",
+	  "@type": "BreadcrumbList",
+	  "itemListElement": [{
+	    "@type": "ListItem",
+	    "position": 1,
+	    "item": {
+	      "@id": "https://icg.neurotheory.ox.ac.uk/channels",
+	      "name": "Channels"
+	    }
+	  },{
+	    "@type": "ListItem",
+	    "position": 2,
+	    "item": {
+	      "@id": "https://icg.neurotheory.ox.ac.uk/channels/4",
+	      "name": "IH"
+	    }
+	  }]
+	}
+	</script>
+
+
+
+
+  
+    
+    <link href="/static/icg/css/icg.min.css" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/static/icg/css/navbar-fixed-top.css" rel="stylesheet">
+    <link href="/static/icg/css/sticky-footer-navbar.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-393083-14', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom:0px;">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">ICGenealogy</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+
+
+            <li><a href="/viewer"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span>&nbsp;Browse ICG</a></li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Database<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/api">API</a></li>
+                <li><a href="/channels">Channel list</a></li>
+                <li><a href="/compare">Channel comparison</a></li>
+                <li><a href="/submit">Submit your channel</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">About<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/about">About ICG</a></li>
+                <li><a href="/development">Development</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/manual">Manual</a></li>
+              </ul>
+            </li>
+
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+  
+            
+              <li><a href="/accounts/login/">Sign In</a></li>
+              <li><a href="/accounts/signup/">Sign Up</a></li>
+            
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    
+    
+    <div id="icg-main-content" class="container icg_20top">
+
+    
+    
+
+	
+	
+	<ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+		<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+      		<a itemprop="item" href="/channels/">
+      			<span itemprop="name">Channels</span>
+      		</a>
+      		<meta itemprop="position" content="1" />
+      	</li>
+      	<li class="active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+      		<a itemprop="item" href="/channels/4">
+      			<span itemprop="name">IH</span>
+      		</a>
+      		<meta itemprop="position" content="2" />
+      	</li>
+	</ol>
+
+	<h1>IH <small>(254 channels)</small> </h1>
+
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	
+	      <div class="btn-group navbar-left navbar-form" role="group" aria-label="...">
+	      	 <button onclick="javascript: window.open('/viewer?family=4','_blank');" type="button" class="btn btn-default">Open class in channel browser</button>
+			</div>
+
+	      <form class="navbar-form navbar-right" role="search">
+	        <div class="form-group">
+	          <input style="width:200px"type="text" class="form-control" placeholder="Search all channels &nbsp;" id="autocomplete">
+	        </div>
+	      </form>
+	  </div><!-- /.container-fluid -->
+	</nav>
+	
+	<div class="row">
+    	<div class="col-md-12">
+    		<ul class='channels'>
+				
+					<li>
+						<a href="/channels/4/1754">2937-iq</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1784">3332-hcno</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1870">3665-hpg</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1880">3677-iqq</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1884">3684-htc</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2352">7659-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2401">8284-hyperde2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2402">8284-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2403">8284-hyperso</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3469">8284-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3468">8284-hyperde2_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3470">8284-hyperso_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3467">8284-hyperde1_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2400">8284-hyperde1</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2546">9769-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1546">19176-hcn2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1565">19591-h_chan</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1568">19696-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1579">19746-L98NCh</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1596">20007-KhdM01</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1649">20212-iq</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1640">20212-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1641">20212-h_v2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1674">20756-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1744">28316-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1777">32992-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1920">37856-pyr</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1921">37857-hcno</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1922">37857-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2004">44050-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2887">45539-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2028">48332-ihpkj</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2074">51781-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3471">51781-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2115">53869-ih_VCN2003</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2130">53876-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2153">55035-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2925">64170-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2181">64195-ih_stochastic</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2182">64195-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2195">64216-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2206">64228-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2218">64229-arhRT03</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2235">64229-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3474">64229-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2219">64229-arhRT03_v2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2293">64296-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2309">71312-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2344">74298-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2363">80769-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2376">82364-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2429">84589-hdend</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2430">84589-hsoma</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2469">87284-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2477">87454-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2488">87535-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2512">93321-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2536">95870-hyper</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2562">97860-hcn_siegelbaum</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2586">97874-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2603">97917-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3472">97917-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2612">97917-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2645">98005-hcn12_ch</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2646">98005-hcn2_ch</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/8">101629-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/21">102288-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/39">105385-hcn12_gp</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/40">105385-hcn2_gp</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/60">106551-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/83">108459-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/94">112359-IhDA</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/112">112546-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/132">112685-Golgi_hcn2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/131">112685-Golgi_hcn1</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/177">113732-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/185">113732-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/204">114355-G_h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/210">114355-M_h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/232">114394-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/241">114685-HCN</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/263">115356-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/348">116862-ntIh</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/358">116983-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/372">118098-hca3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/381">118986-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/398">119266-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/408">119283-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/454">121259-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/455">121259-h2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/465">122329-hcn2_gp</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/464">122329-hcn12_gp</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/478">123453-HCN</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/514">123815-hNa</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/494">123815-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/513">123815-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/547">123927-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/559">124043-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/560">124043-h2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/562">124043-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/578">124063-Cone_ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/586">124063-Rod_ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/575">124063-Bip_ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/608">124513-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3463">124513-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/625">125152-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/719">126776-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/731">126814-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/748">127021-Golgi_hcn1</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/749">127021-Golgi_hcn2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2731">127305-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/848">135898-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/869">135902-iholmkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/852">135902-CA1ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/870">135902-iholmw</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/871">135902-ihpyrkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/907">135903-ihpyrkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/906">135903-iholmw</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/905">135903-iholmkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/888">135903-CA1ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/934">136095-H</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/947">136095-ntIh</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/973">136803-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/988">137259-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1000">138205-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1065">139421-iholmw</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1066">139421-ihpyrkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1064">139421-iholmkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1051">139421-CA1ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1087">139653-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1124">139656-Golgi_hcn1</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1125">139656-Golgi_hcn2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1135">139657-sjg_ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1160">140249-iar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1175">140828-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1179">140828-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2747">141063-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1199">141273-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1218">143100-HCN</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1242">143671-ghchan</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1256">143719-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1289">144089-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1326">144392-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1356">144450-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1374">144482-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1417">144490-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1418">144490-h_v2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1443">144520-if</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1464">144523-TNC</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1466">144523-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1477">144526-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/1481">144541-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2769">144579-ar</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3199">144589-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2805">144976-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2834">146026-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2851">146376-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3138">146509-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2865">146565-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3015">147538-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3260">147539-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3058">147578-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3003">147757-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3155">147867-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3024">148094-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3224">148644-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3242">149100-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3274">149174-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3473">149174-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3195">149737-ih_stochastic</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2976">149739-hpg</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3179">150024-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3186">150024-TNC</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3190">150239-hcn</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/2948">150288-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3387">150538-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3111">151126-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3108">151126-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3143">151282-HCN1</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3145">151282-iholmw</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3139">151282-CA3ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3072">151460-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3170">151825-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3398">153280-ch_HCNp</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3430">154732-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3374">155057-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3466">155568-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3346">155568-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3335">155601-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3464">155601-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3441">155602-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3465">155602-hyperde3_icgIH2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3589">155735-ihpkj_cn</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3590">155735-ihpkj</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3355">155796-ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3329">156120-h_chann</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3591">156780-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4813">157157-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3592">157339-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4814">168310-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4815">168310-hcb</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4816">168310-hin</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3593">168858-hcurrent</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3594">169457-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3595">170030-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3596">180370-ghchan</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3597">180373-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3598">180789-cha</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3599">180789-hpkj</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4817">181967-hyperde3</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3600">181967-h</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3601">181967-h2</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3602">181967-hNa</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3603">181967-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3604">182134-ca1ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3605">182134-iholmkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3606">182134-iholmw</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3607">182134-ihpyrkop</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3608">182797-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4818">183300-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3609">183949-ghchan</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3610">184139-KhdM01</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3611">184145-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3612">184148-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3613">184152-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3614">184168-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3615">184178-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3616">184180-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3617">184182-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3618">184184-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3619">184196-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3620">184297-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3621">184303-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3622">184310-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3623">184316-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3624">184319-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3625">184323-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3626">184325-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3627">184327-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3628">184331-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3629">184337-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3630">184339-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3631">184346-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3632">184348-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3633">184350-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3634">184352-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4819">185355-HCN</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3636">185858-ihlts</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3635">185858-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/3637">186977-h_chann</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4820">187604-ch_HCNolm</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4821">187615-Ih</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4822">229585-HCN1_Angeloetal2007</a> 
+					</li>
+				
+					<li>
+						<a href="/channels/4/4823">230811-h</a> 
+					</li>
+				
+    		</ul>
+    	</div>
+    </div>
+    
+
+
+      
+
+    </div> <!-- /container -->
+
+     <!-- /body -->
+
+    
+    
+
+    
+    
+    <div class="footer icg_footer">
+      <div class="container small">
+        <p class="muted">ICGenealogy <a href="/development#versions">0.3.5</a> <strong>© 2015-2016, CNCB, University of Oxford</strong>. All material on this page is in copyright. No reproduction of any part of it may take place without the written permission of the CNCB.</p>
+      </div>
+    </div>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/icg/js/jquery.bootstrap-growl.min.js"></script>
+  
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/icg/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
+

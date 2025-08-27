@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{SUFFIXpas_gpNONSPECIFIC_CURRENTiRANGEg,e,gbar}PARAMETER{gbar=1(S/cm2)e=-70(mV)}ASSIGNED{v(mV)i(mA/cm2)g(S/cm2)}BREAKPOINT{g=gbari=g*(v-e)}

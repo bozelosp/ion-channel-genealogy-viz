@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="keywords" content="Ion Channel Genealogy, ICG, ModelDB, ion channel models, ion channel properties, electrophysiology, computational neuroscience, neuroscience" />
+
+<head>
+
+	<title>Interactive Ion Channel Model Graph</title>
+
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/node_group_sum_boxes.css">
+	<link rel="stylesheet" href="css/ion-channel-class-filters.css">
+	<link rel="stylesheet" href="css/supermodel-filters.css">
+	<link rel="stylesheet" href="css/icg-toggle.css">
+	<link rel="stylesheet" href="css/button_styling.css">
+	<link rel="stylesheet" href="css/nodes.css">
+	<link rel="stylesheet" href="css/links.css">
+	<link rel="stylesheet" href="css/node_labels.css">
+	<link rel="stylesheet" href="css/diff.css">
+
+	<svg id="my_graph" width="1800" height="1000">
+		<g id="my_root">
+			<g id="rnd"></g>
+		</g>
+	</svg>
+
+	<svg id="gradient_rect_left" width="100" height="1000"></svg>
+	<svg id="gradient_rect_right" width="100" height="1000"></svg>
+	
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.js"></script>
+		
+</head>
+
+<body>
+
+<div class="boxed mouseover-details-box" id="mouseover-details-box">
+	<span style="color: #ffc42c; font-size: 1.18em;">Details</span>
+	<br>
+</div>
+
+<div class="boxed siblings-family-box" id="siblings-family-box">
+	<div class="scrollbar" id="siblings-style">
+		<div class="force-overflow"></div>
+	</div>	
+</div>
+
+<div id="ion-channel-class-box" class="boxed">Ion Channel Class</div>
+
+<form id='ion-channel-class-filters' method='POST' action='#'>
+
+	<input type='button' id='all-button' class="ion-channel-button" value='All'/>
+	<input type='button' id='k-button' class="ion-channel-button" value='K'/>
+	<input type='button' id='na-button' class="ion-channel-button" value='Na'/>
+	<input type='button' id='ca-button' class="ion-channel-button" value='Ca'/>
+	<input type='button' id='ih-button' class="ion-channel-button" value='Ih'/>
+	<input type='button' id='kca-button' class="ion-channel-button" value='KCa'/>
+	<input type='button' id='other-button' class="ion-channel-button" value='Other'/>
+	
+</form>
+
+<div id="supermodel-icg-toggle-container">
+
+	<div class="boxed supermodel-box">Supermodels</div>
+	
+	<div class="boxed supermodel-text" id="supermodel-1">1</div>
+	<div class="boxed supermodel-checkbox" id="supermodel-checkbox-1"></div>
+	<div class="supermodel-checkbox-checked" id="supermodel-checkbox-checked-1"></div>
+	
+	<div class="boxed supermodel-text" id="supermodel-2">2</div>
+	<div class="boxed supermodel-checkbox" id="supermodel-checkbox-2"></div>
+	<div class="supermodel-checkbox-checked" id="supermodel-checkbox-checked-2"></div>
+
+	<div class="boxed icg-box">ICG entry</div>
+	<div class="switch">
+		<input id="icg-checkbox" class="icg-toggle icg-toggle-round" type="checkbox">
+		<label for="icg-checkbox"></label>
+	</div>
+
+</div>
+
+
+
+<div class="boxed copies-num-box"># copies</div>
+
+<form class='copies-minus-plus'>
+
+	<input type='button' id="copies-number-decrease" value='–' class="plus-minus-button minus-button" field='quantity1'/>
+	<input type='text' id="copies-number" value='1' class="number-value"/>
+	<input type='button' id="copies-number-increase" value='+' class="plus-minus-button plus-button" field='quantity1'/>
+
+</form>
+
+<div class="boxed similarity-score-box">similarity score</div>
+<form class='similarity-score-minus-plus' method='POST' action='#'>
+
+	<input type='button' id="similarity-score-decrease" value='–' class="plus-minus-button minus-button" field='quantity2'/>
+	<input type='text' id='similarity-score-number' value='95' class="number-value"/>
+	<input type='button' id="similarity-score-increase" value='+' class="plus-minus-button plus-button" field='quantity2'/>
+	
+</form>
+
+<div id="node-groups-box">
+    <div class="scrollbar" id="group-summary-container">
+        <div class="force-overflow"></div>
+    </div>
+</div>
+
+<div id="gradient_rect_bottom_right"></div>
+
+<div id="difflib-container"></div>
+
+<div id="diff-source-label"></div>
+<div id="diff-target-label"></div>
+<div id="diff-id-label"></div>
+
+<div class="vl"></div>
+
+<div id='search-bar'>
+	<input type="text" id="my-input" placeholder="Search for modelDB IDs ...">
+</div>
+
+<script type="text/javascript" src="js/set_vis_dimensions.js"></script>
+<script type="text/javascript" src="js/load_data.js"></script>
+<script type="text/javascript" src="js/filters.js"></script>
+<script type="text/javascript" src="js/data_preparation.js"></script>
+<script type="text/javascript" src="js/setup_forces.js"></script>
+<script type="text/javascript" src="js/svg_elements.js"></script>
+<script type="text/javascript" src="js/split_groups.js"></script>
+<script type="text/javascript" src="js/group_sum_boxes.js"></script>
+<script type="text/javascript" src="js/simulation.js"></script>
+<script type="text/javascript" src="js/user_interactions.js"></script>
+<!-- <script type="text/javascript" src="js/key_actions.js"></script> -->
+<script type="text/javascript" src="js/util_functions.js"></script>
+<script type="text/javascript" src="js/mouseover_handler.js"></script>
+<script type="text/javascript" src="js/fetch_source_code_files.js"></script>
+<script type="text/javascript" src="js/diff_utils.js"></script>
+
+<script>
+	window.onload = async function() {
+
+		// Initialize an empty object to store the fetched files
+		const fetched_files = {};
+
+		let is_first_draw = true;
+		let local_group;
+		let link, node, label;
+		let filter_state, fixed_location_circles, network_data; // Make these global
+		let existingSimulation = null; 
+
+		let [ source_node_ids, target_node_ids ] = [ [], [] ];
+
+		async function initialize() {
+			[filter_state, fixed_location_circles, network_data] = await loadData();
+
+			// Initialize dashboard and filters
+			const filter_items = initialize_dashboard_filters(filter_state);
+			// { checkbox_names, filter_state, numeric_button_id_to_name_map, checkbox_id_to_name_map, filter_ids, numeric_filter_button_ids };
+
+			const filter_ids = filter_items.filter_ids;
+
+			filter_ids.forEach((id) => {
+				document.getElementById(id).addEventListener('click', async (event) => {
+					// handle filter click
+					await handle_filter_click(event, filter_items);
+
+					console.log("local_group: ", local_group);
+
+					// Use updated filter_state, fixed_location_circles, and network_data
+					await draw_network(filter_state, fixed_location_circles, network_data, local_group);
+				});
+			});
+
+
+			const svg = d3.select("svg");
+			local_group = svg.append("g");
+
+			// Use updated filter_state, fixed_location_circles, and network_data
+			await draw_network(filter_state, fixed_location_circles, network_data);
+			
+		}
+
+		async function draw_network(filter_state, fixed_location_circles, network_data) {
+
+			let [nodes_data, links_data] = prepare_data(network_data, filter_state);
+
+			let [link_force, charge_force, center_force] = setup_forces(links_data, nodes_data, graph_width, graph_height);
+
+			let [nodes_grouped_by_filter, node_id_to_location] = group_nodes_by_selected_filters(nodes_data, filter_state, fixed_location_circles);
+
+			create_summary_boxes(nodes_grouped_by_filter);
+
+			let split_var = Object.keys(nodes_grouped_by_filter).length > 1;
+			
+			[ node, link, label ] = draw_or_update_elements(nodes_data, links_data, local_group);
+
+			existingSimulation = await setup_simulation(split_var, nodes_data, links_data, node_id_to_location, link, node, label, charge_force, link_force, graph_width, graph_height, existingSimulation);
+
+			handle_node_mouseover(node, nodes_data);
+
+			setup_click_events_for_nodes(links_data, node, network_data, fetched_files);
+
+			is_first_draw = false; // Update the flag after the first draw
+
+		}
+
+		initialize();
+
+	};
+</script>
+
+</body>

@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)}NEURON{SUFFIXdsRANGEvmax,tmax,vamp}ASSIGNED{vmaxtmaxvminvamp}INITIAL{vmax=-90vmin=-30vamp=0}BREAKPOINT{if(t>100){if(v<vmin){vmin=v}if(v>vmax){vmax=vtmax=t}vamp=vmax-vmin}else{vmax=-70tmax=0}}

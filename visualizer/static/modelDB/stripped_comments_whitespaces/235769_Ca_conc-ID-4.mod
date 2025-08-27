@@ -1,0 +1,1 @@
+NEURON{SUFFIXCa_concUSEIONcaREADicaWRITEcaiRANGEcai,cca}UNITS{(mV)=(millivolt)(mA)=(milliamp)FARADAY=(faraday)(coulombs)(molar)=(1/liter)(mM)=(millimolar)}PARAMETER{f=0.004kCa=8(/ms)alpha=1(mol/C/cm2)}ASSIGNED{cai(mM)ica(mA/cm2)}STATE{cca(mM)}BREAKPOINT{SOLVEstateMETHODcnexp}INITIAL{cca=0.0001}DERIVATIVEstate{cca'=f*(-alpha*ica-kCa*cca)cai=cca}

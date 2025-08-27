@@ -1,0 +1,1 @@
+UNITS{(molar)=(1/liter)(S)=(siemens)(mA)=(milliamp)(mV)=(millivolt)(mM)=(millimolar)F=(faraday)(coulomb)R=(molek)(mV-coulomb/degC)}NEURON{SUFFIXtypemRANGEmarker}PARAMETER{marker=0(1)}UNITSOFFUNITSON

@@ -1,0 +1,1 @@
+NEURON{SUFFIXd3RANGEx,y,z}ASSIGNED{x(micron)y(micron)z(micron)}

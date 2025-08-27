@@ -1,0 +1,1 @@
+NEURON{SUFFIXvmaxRANGEvm}ASSIGNED{v(millivolt)vm(millivolt)}INITIAL{vm=v}BREAKPOINT{if(v>vm){vm=v}}

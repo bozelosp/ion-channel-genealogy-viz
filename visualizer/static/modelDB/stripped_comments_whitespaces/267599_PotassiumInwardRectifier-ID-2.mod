@@ -1,0 +1,1 @@
+NEURON{SUFFIXkirUSEIONkWRITEikRANGEgbar,Offset,Slope,ik,ek,g}PARAMETER{gbar(siemens/cm2)ek=-95(mV)Offset=15(mV)Slope=-10(mV)}ASSIGNED{v(mV)ik(mA/cm2)}STATE{g}BREAKPOINT{LOCALArgArg=-(v-ek+Offset)/Slopeif(Arg<-50){g=gbar}elseif(Arg>50){g=0}else{g=gbar/(1.0+exp(Arg))}ik=(v-ek)*g}

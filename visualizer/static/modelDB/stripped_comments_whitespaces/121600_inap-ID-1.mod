@@ -1,0 +1,1 @@
+NEURON{SUFFIXiNaPUSEIONnaREADenaWRITEinaRANGEg,ina}UNITS{(S)=(siemens)(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{g=7e-5(S/cm2)}ASSIGNED{v(mV)ena(mV)ina(mA/cm2)minf}BREAKPOINT{rates()ina=g*minf*(v-ena)}INITIAL{rates()}PROCEDURErates(){UNITSOFFminf=1/(1+exp(-(v+40)/5))}UNITSON

@@ -1,0 +1,62 @@
+# 126637_CaEcvode.mod
+
+## SUFFIX
+
+CaEcvode
+
+## GMAX_NAME
+
+gcabar_CaEcvode
+
+## G_VALS
+
+- **gcabar_CaEcvode**: 0.0005
+
+## I_VALS
+
+- **37**: 0.000499901182025934
+- **6.3**: 0.0004999000456528298
+
+## STATES
+
+- m
+- h
+
+## GATES
+
+- **m**: 1
+- **h**: 1
+
+## ERROR_FLAGS
+
+- 19
+
+## RATES
+
+- True
+
+## RATE_VALS
+
+![m Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/126637_CaEcvode.mod/images/m.png)
+![h Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/126637_CaEcvode.mod/images/h.png)
+
+## SM1_FIT
+
+- False
+
+## SM2_FIT
+
+- False
+
+## SM3_FIT
+
+- False
+
+## SM4_FIT
+
+- False
+
+## SM5_FIT
+
+- False
+

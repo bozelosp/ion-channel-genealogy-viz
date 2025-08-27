@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSRefrac_absRANGEgr,e,tr,gNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)}PARAMETER{tr=2(ms)gr=1(umho)e=-65(mV)}ASSIGNED{g(umho)v(mV)i(nA)}INITIAL{g=0}BREAKPOINT{i=g*(v-e)}NET_RECEIVE(w){if(flag==0){g=grnet_send(tr,1)}else{g=0}}

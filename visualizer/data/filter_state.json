@@ -1,0 +1,78 @@
+{
+	"All": {
+		"filter_id": "all-button",
+		"filter_name": "All",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"K": {
+		"filter_id": "k-button",
+		"filter_name": "K",
+		"filter_type": "checkbox",
+		"filter_value": true
+	},
+	"Na": {
+		"filter_id": "na-button",
+		"filter_name": "Na",
+		"filter_type": "checkbox",
+		"filter_value": true
+	},
+	"Ca": {
+		"filter_id": "ca-button",
+		"filter_name": "Ca",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"Ih": {
+		"filter_id": "ih-button",
+		"filter_name": "Ih",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"KCa": {
+		"filter_id": "kca-button",
+		"filter_name": "KCa",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"Other": {
+		"filter_id": "other-button",
+		"filter_name": "Other",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"ICG entry": {
+		"filter_id": "icg-checkbox",
+		"filter_name": "ICG entry",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"Supermodel 1": {
+		"filter_id": "supermodel-checkbox-checked-1",
+		"filter_name": "Supermodel 1",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"Supermodel 2": {
+		"filter_id": "supermodel-checkbox-checked-2",
+		"filter_name": "Supermodel 2",
+		"filter_type": "checkbox",
+		"filter_value": false
+	},
+	"# copies": {
+		"filter_id": "copies-number",
+		"filter_name": "# copies",
+		"filter_type": "number",
+		"filter_value": 2,
+		"min": 1,
+		"max": 10000
+	},
+	"similarity score": {
+		"filter_id": "similarity-score-number",
+		"filter_name": "similarity score",
+		"filter_type": "number",
+		"filter_value": 85,
+		"min": 50,
+		"max": 100
+	}
+}

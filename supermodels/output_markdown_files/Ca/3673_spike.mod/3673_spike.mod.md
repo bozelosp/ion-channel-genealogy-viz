@@ -1,0 +1,86 @@
+# 3673_spike.mod
+
+## SUFFIX
+
+spike
+
+## GMAX_NAME
+
+gcabar_spike
+
+## G_VALS
+
+- **gabar_spike**: 0.0
+- **gcabar_spike**: 0.002
+- **gkbar_spike**: 0.0
+- **gkcbar_spike**: 0.0
+- **gnabar_spike**: 0.0
+
+## I_VALS
+
+- **37**: 93623290686.98218
+- **6.3**: 93623305355.62767
+
+## STATES
+
+- m
+- h
+- n
+- p
+- q
+- c
+
+## GATES
+
+- **m**: 3
+- **h**: 1
+- **n**: 4
+- **p**: 3
+- **q**: 1
+- **c**: 3
+
+## ERROR_FLAGS
+
+- 8
+
+## RATES
+
+- True
+
+## Q10_TAU
+
+1.0
+
+## Q10_G
+
+0.9999999489650504
+
+## RATE_VALS
+
+![m Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/m.png)
+![h Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/h.png)
+![n Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/n.png)
+![p Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/p.png)
+![q Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/q.png)
+![c Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/3673_spike.mod/images/c.png)
+
+## SM1_FIT
+
+- False
+
+## SM2_FIT
+
+- False
+
+## SM3_FIT
+
+- False
+
+## SM4_FIT
+
+- False
+
+## SM5_FIT
+
+- False
+

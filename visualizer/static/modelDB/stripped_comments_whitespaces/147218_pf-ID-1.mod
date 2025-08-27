@@ -1,0 +1,1 @@
+NEURON{SUFFIXpfNONSPECIFIC_CURRENTiRANGEi,e,g}PARAMETER{g=0(siemens/cm2)<0,1e9>e=0(millivolts)}ASSIGNED{i(milliamp/cm2)v(millivolt)}BREAKPOINT{i=g*(v-e)}

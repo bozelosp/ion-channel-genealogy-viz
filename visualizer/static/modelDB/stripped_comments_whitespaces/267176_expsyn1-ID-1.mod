@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSExpSyn1RANGEtau,e,i,gmaxNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(uS)=(microsiemens)}PARAMETER{tau=0.1(ms)<1e-9,1e9>e=0(mV)}ASSIGNED{v(mV)i(nA)gmax(uS)}STATE{g(uS)}INITIAL{g=0}BREAKPOINT{SOLVEstateMETHODcnexpi=g*(v-e)}DERIVATIVEstate{g'=-g/tau}NET_RECEIVE(weight(uS)){g=gmax*(g+weight)}

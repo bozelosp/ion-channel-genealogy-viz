@@ -1,0 +1,58 @@
+UNITS { 
+	(mV) = (millivolt) 
+	(mA) = (milliamp) 
+	(mM) = (milli/liter)
+} 
+
+NEURON { 
+	SUFFIX kahp_deeppyr
+	USEION k READ ek WRITE ik
+	USEION ca READ cai
+	RANGE gbar, ik, m
+}
+
+PARAMETER { 
+	gbar = 1.0 	(mho/cm2)
+	v		(mV) 
+	ek 		(mV)  
+	cai		(mM)
+}
+ 
+ASSIGNED { 
+	ik 		(mA/cm2) 
+	alpha (/ms) beta	(/ms)
+}
+ 
+STATE {
+	m
+}
+
+BREAKPOINT { 
+	SOLVE states METHOD cnexp
+	ik = gbar * m * ( v - ek ) 
+}
+ 
+INITIAL { 
+	rates( cai )
+	m = alpha / ( alpha + beta )
+	m = 0
+}
+ 
+DERIVATIVE states { 
+	rates( cai )
+	m' = alpha * ( 1 - m ) - beta * m 
+}
+
+UNITSOFF 
+
+PROCEDURE rates(chi (mM)) { 
+
+	if( cai < 100 ) {
+		alpha = cai * 1e-4
+	}else{
+		alpha = 0.01
+	}
+	beta = 0.001  
+}
+
+UNITSON

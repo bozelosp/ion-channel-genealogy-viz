@@ -1,0 +1,75 @@
+
+#ion-channel-class-box {
+	background-color: #226588e6;
+	text-align: center;
+	font-family: arial;
+	font-size: 17px;
+	color: white;
+	font-weight: bold;
+	padding: 9px;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 326px;
+	height: 58px;
+	border-radius: 6px;
+	border: none;
+}
+
+#ion-channel-class-filters {
+	text-align: center;
+	padding: 9px;
+	display: inline-block;
+	position: absolute; 
+	top: 46px;
+	right: 25px;
+}
+
+/* Common styles for all buttons */
+.ion-channel-button {
+    font-size: 18px;
+    font-weight: bold;
+    vertical-align: middle;
+    background-color: #CDCDCD;
+    color: white;
+    height: 30px;
+    border-radius: 6px;
+    border: none;
+}
+
+#all-button {
+    width: 35px;
+}
+
+#k-button {
+    width: 31px;
+}
+
+#na-button {
+    width: 39px;
+}
+
+#ca-button {
+    width: 39px;
+}
+
+#ih-button {
+    width: 31px;
+}
+
+#kca-button {
+    width: 53px;
+}
+
+#other-button {
+    width: 63px;
+}
+
+.ion-channel-button:hover, .ion-channel-button:after {
+	background: #A9A9A9;
+}
+
+.ion-channel-button.active {
+	background: white;
+	color: #226588e6;
+}

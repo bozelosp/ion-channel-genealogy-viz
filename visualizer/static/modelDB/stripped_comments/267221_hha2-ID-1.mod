@@ -1,0 +1,109 @@
+NEURON {
+	SUFFIX hha2
+	USEION na READ ena WRITE ina
+	USEION k READ ek WRITE ik
+	NONSPECIFIC_CURRENT il
+	RANGE gnabar, gkbar, gl, el, ik, il, ina
+	RANGE ar2
+}
+
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(S) = (siemens)
+	FARADAY = (faraday) (kilocoulombs)
+	R = (k-mole) (joule/degC)
+}
+
+PARAMETER {
+	
+	a0r = 0.0003 (/ms)
+	b0r = 0.0003 (/ms)
+	zetar = 12
+	zetas = 12
+	gmr = 0.2
+	
+	ar2 = 1.0			
+	taumin = 3 (ms)		
+	vvs = 2 (mV)		
+	vhalfr = -50 (mV)	
+
+	gnabar = 0 (S/cm2)
+	gkbar = 0 (S/cm2)
+	gl = 0 (S/cm2)
+}
+
+ASSIGNED { 
+	v (mV)
+	ena (mV)
+	ek (mV)
+	el (mV)
+	celsius (degC)
+
+	ina (mA/cm2)
+	ik (mA/cm2)
+	il (mA/cm2)
+
+	minf
+	taum (ms)
+	hinf
+	tauh (ms)
+	sinf
+	taus (ms)
+	ninf
+	taun (ms)
+}
+
+STATE { 
+	m
+	h
+	s
+	n
+}
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	ina = gnabar*pow(m, 2)*h*s*(v - ena)	
+	ik = gkbar*pow(n, 2)*(v - ek)			
+	il = gl*(v - el)				
+}
+
+DERIVATIVE states {
+	rates(v)
+	m' = (minf - m)/taum 
+	h' = (hinf - h)/tauh 
+	s' = (sinf - s)/taus 
+	n' = (ninf - n)/taun 
+}
+
+INITIAL {
+	rates(v)
+	m = minf
+	h = hinf
+	s = 1
+	n = ninf
+}
+
+FUNCTION alpr(v (mV)) (1) {
+	
+	alpr = exp(1.e-3*zetar*(v-vhalfr)*FARADAY/(R*(273.16+celsius)))
+}
+
+FUNCTION betr(v (mV)) (1) {
+	
+	betr = exp(1.e-3*zetar*gmr*(v-vhalfr)*FARADAY/(R*(273.16+celsius)))
+}
+
+PROCEDURE rates(v (mV)) {
+	minf = 1 / (1 + exp((v - 3.0(mV) + 42.5(mV))/(-3(mV))))		
+	hinf = 1 / (1 + exp((v - 3.0(mV) + 49(mV))/(3.5(mV))))		
+	sinf = (1+ar2*exp((v-vhalfr)/vvs))/(1+exp((v-vhalfr)/vvs))	
+	ninf = 1 / (1 + exp((v - 3.0(mV) + 46.3(mV))/(-3(mV))))		
+
+	taum = 0.05	
+	tauh = 1.0	
+	taun = 1.0 
+
+	taus = betr(v)/(a0r+b0r*alpr(v)) 
+	if (taus<taumin) {taus = taumin}
+}

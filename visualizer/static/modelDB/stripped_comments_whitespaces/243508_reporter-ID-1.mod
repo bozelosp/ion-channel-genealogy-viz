@@ -1,0 +1,1 @@
+NEURON{THREADSAFESUFFIXreporter}PARAMETER{period=100(ms)}BREAKPOINT{VERBATIMstaticdoublelastReportTime;if(fmod(t,period)==0&&t>lastReportTime){printf("time:%gms\n",t);}lastReportTime=t;ENDVERBATIM}

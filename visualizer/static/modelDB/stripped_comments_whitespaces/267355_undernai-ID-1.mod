@@ -1,0 +1,1 @@
+NEURON{SUFFIXundernaiUSEIONnaREADnaiRANGEnau,b,naund,tr}PARAMETER{tSta=0.1}ASSIGNED{nai(milli/liter)nau(milli/liter)naund(milli/liter)btrplp}INITIAL{b=1plp=0.1nau=10naund=0}BREAKPOINT{VERBATIMplp=b*tSta;naund=naund+nai;tr=t;if((tr<plp+0.005)&&(tr>plp-0.005)){nau=naund/10;naund=0;b=b+1;}ENDVERBATIM}

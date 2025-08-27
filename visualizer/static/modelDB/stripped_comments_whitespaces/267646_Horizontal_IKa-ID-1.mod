@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXHor_IKaUSEIONkREADekWRITEikRANGEgbar}UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{gbar=4.2453e-05(mho/cm2)}ASSIGNED{v(mV)ek(mV)ik(mA/cm2)m(mV)}BREAKPOINT{UNITSOFFm=1/(1+exp((v+60)/12))UNITSONik=gbar*m*m*m*m*m*(v-ek)}

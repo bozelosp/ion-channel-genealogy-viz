@@ -1,0 +1,66 @@
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+	SUFFIX cad
+	USEION ca READ ica, cai WRITE cai
+	RANGE depth,kt,kt2,kd,cainf,taur,k,taur2,cainf2
+        RANGE drive_channel,drive_pump,drive_pump2
+}
+
+UNITS {
+	(molar) = (1/liter)			
+	(mM)	= (millimolar)
+	(um)	= (micron)
+	(mA)	= (milliamp)
+	(msM)	= (ms mM)
+}
+
+CONSTANT {
+	FARADAY = 96489		(coul)		
+
+}
+
+PARAMETER {
+	depth	= .1	(um)		
+	taur	= 700	(ms)		
+	taur2	= 70	(ms)		
+	cainf	= 1e-8	(mM)
+	cainf2	= 5e-5	(mM)
+	cainit  = 5e-5
+	kt	= 1	(mM/ms)		
+	kt2	= 1	(mM/ms)		
+	kd	= 5e-4	(mM)		
+	kd2	= 1e-7	(mM)		
+        k       = 1
+}
+
+STATE {
+	cai		(mM) <1e-8> 
+}
+
+INITIAL {
+	cai = cainit
+}
+
+ASSIGNED {
+	ica		(mA/cm2)
+	drive_channel	(mM/ms)
+	drive_pump	(mM/ms)
+	drive_pump2	(mM/ms)
+}
+	
+BREAKPOINT {
+	SOLVE state METHOD cnexp
+}
+
+DERIVATIVE state { 
+
+	drive_channel =  - (k*10000) * ica / (2 * FARADAY * depth)
+
+	if (drive_channel<=0.) { drive_channel = 0. }
+
+
+	drive_pump = -kt * cai / (cai + kd )		
+	drive_pump2 = -kt2 * cai / (cai + kd2 )		
+	cai' = drive_channel+drive_pump+drive_pump2+(cainf-cai)/taur+(cainf2-cai)/taur2
+}

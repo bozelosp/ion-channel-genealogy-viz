@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSNIClampRANGEdel,dur,amp,del1,n,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del=100(ms)<0,1e9>dur=.1(ms)<0,1e9>amp=2(nA)del1=1000(ms)<1e-9,1e9>n=100<0,1e9>}ASSIGNED{i(nA)cnta(nA)}INITIAL{i=0cnt=0net_send(del,1)}BREAKPOINT{i=a}NET_RECEIVE(w){if(flag==1){a=ampcnt=cnt+1net_send(dur,2)}elseif(flag==2){a=0if(cnt<n){net_send(del1,1)}}}

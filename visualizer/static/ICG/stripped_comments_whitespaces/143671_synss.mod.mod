@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXsynssRANGEonset,offset,gss,e,i,gGLOBALmultNONSPECIFIC_CURRENTi}UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{onset=0(ms)offset=0(ms)gss=0(mho/cm2)e=0(mV)v(mV)mult=0}ASSIGNED{i(mA/cm2)g(mho/cm2)}BREAKPOINT{g=gss*alpha(t)*multi=g*(v-e)}FUNCTIONalpha(x){if(x<onset||x>=offset){alpha=0}else{alpha=1}}

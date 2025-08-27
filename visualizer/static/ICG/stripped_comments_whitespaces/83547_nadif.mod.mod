@@ -1,0 +1,1 @@
+NEURON{SUFFIXnadiflUSEIONnaREADinaWRITEnaiRANGED,nainit,f}UNITS{(mM)=(milli/liter)(um)=(micron)FARADAY=(faraday)(coulomb)PI=(pi)(1)}PARAMETER{D=.6(um2/ms)nainit=3.54(mM)f=1.00}ASSIGNED{ina(milliamp/cm2)diam(um)}STATE{nai(mM)<1e-4>}BREAKPOINT{SOLVEstateMETHODsparse}INITIAL{nai=nainit}KINETICstate{COMPARTMENTPI*diam*diam/4{nai}~nai<<(-f*ina*PI*diam*(1e4)/(FARADAY))}

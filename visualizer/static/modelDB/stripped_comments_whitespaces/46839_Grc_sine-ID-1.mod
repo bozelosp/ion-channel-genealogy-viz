@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGrC_SineRANGEdel,dur,amp,i,freq,phaseELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{PI=3.141592del(ms)dur(ms)amp=0.006(nA)freq=4(1/ms)phase=0}ASSIGNED{i(nA)}INITIAL{i=0}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del+dur&&t>del){i=amp*sin(2*PI*freq*t/1000)}else{i=0}}

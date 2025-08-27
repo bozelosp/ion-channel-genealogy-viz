@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGapPOINTERvgapRANGEg,iNONSPECIFIC_CURRENTi}PARAMETER{g=1.0(microsiemens)}ASSIGNED{v(millivolt)vgap(millivolt)i(nanoamp)}BREAKPOINT{i=(v-vgap)*g}

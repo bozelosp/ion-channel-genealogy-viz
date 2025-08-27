@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGrCtonicGABARANGEe,iNONSPECIFIC_CURRENTiRANGEg}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(uS)=(microsiemens)}PARAMETER{e=-75(mV)g=260e-6(uS)}ASSIGNED{v(mV)i(nA)}INITIAL{i=g*(v-e)}BREAKPOINT{i=g*(v-e)}

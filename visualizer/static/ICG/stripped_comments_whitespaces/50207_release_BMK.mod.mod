@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXrelRANGET,del,dur,amp}UNITS{(mM)=(milli/liter)}PARAMETER{del(ms)dur(ms)<0,1e9>amp(mM)}ASSIGNED{T(mM)}INITIAL{T=0}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del+dur&&t>del){T=amp}else{T=0}}

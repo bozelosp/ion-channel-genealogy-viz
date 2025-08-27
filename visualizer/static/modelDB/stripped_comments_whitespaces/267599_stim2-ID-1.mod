@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSMyIClampRANGEdel,dur,amp,amp2,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del(ms)dur(ms)<0,1e9>amp(nA)amp2(nA)}ASSIGNED{i(nA)}INITIAL{i=amp}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del+dur&&t>del){i=amp+amp2}else{i=amp}}

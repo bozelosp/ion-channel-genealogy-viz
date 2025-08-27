@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSgaba_synNONSPECIFIC_CURRENTiRANGEi,ggabaRANGErisetime,decaytime,e}PARAMETER{e=-75.0(mV)risetime=0.5(ms)decaytime=20(ms)v(mV)}ASSIGNED{i(nA)ggaba}STATE{RD}INITIAL{R=0D=0ggaba=0}BREAKPOINT{SOLVEstateMETHODcnexpggaba=D-Ri=(1e-3)*ggaba*(v-e)}NET_RECEIVE(weight){R=R+weightD=D+weight}DERIVATIVEstate{R'=-R/risetimeD'=-D/decaytime}

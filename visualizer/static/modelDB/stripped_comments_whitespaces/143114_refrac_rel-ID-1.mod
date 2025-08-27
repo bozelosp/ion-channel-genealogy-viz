@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSRefrac_relRANGEgr,e,g,tauNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)}PARAMETER{tau=1(ms)gr=1(umho)e=-65(mV)}ASSIGNED{v(mV)i(nA)}STATE{g(umho)}INITIAL{g=0}BREAKPOINT{SOLVEstateMETHODcnexpi=g*(v-e)}DERIVATIVEstate{g'=-g/tau}NET_RECEIVE(w){if(flag==0){g=g+gr}}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSlinearIclampRANGEdel,dur,pkamp,freq,phase,biasELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del=215(ms)dur=1000(ms)slamp=0.3(nA)}ASSIGNED{i(nA)}BREAKPOINT{if(t<del){i=0}else{if(t<del+dur){i=slamp*(t-del)}else{i=0}}}

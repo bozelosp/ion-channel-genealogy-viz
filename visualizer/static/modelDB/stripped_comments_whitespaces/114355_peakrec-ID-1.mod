@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}DEFINESIZE100NEURON{POINT_PROCESSPeakRecRANGEtime,peak}UNITS{(mV)=(millivolt)}ASSIGNED{peaktimev_initv}INITIAL{v_init=vpeak=0time=t}BREAKPOINT{SOLVEcheck}PROCEDUREcheck(){VERBATIMif(v>peak+v_init){peak=v-v_init;time=t;}return0;ENDVERBATIM}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGABAb}PARAMETER{Cdur=85(ms)Alpha=0.016(/msmM)Beta=0.0047(/ms)Erev=-90(mV)DELAY=0Deadtime=1.(ms)GMAX=1.0(uS)Thresh=-70}INCLUDE"sns.inc"BREAKPOINT{if(v>Thresh){g=g*((v/Thresh)*(v/Thresh)*(v/Thresh))i=g*(v-Erev)}}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXidRANGEid1,id2,id3,id4,id5}ASSIGNED{id1id2id3id4id5}

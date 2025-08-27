@@ -1,0 +1,1 @@
+NEURON{SUFFIXnaf}NEURON{USEIONnaWRITEina}ASSIGNED{ina}PARAMETER{erev=60(mV)gmax=0.030(umho)vrest=0mvalence=4.mgamma=0.5mbaserate=4.5mvhalf=-33.5mbasetau=0.02mtemp=37mq10=3.mexp=3hvalence=-6hgamma=0.3hbaserate=0.095hvhalf=-39hbasetau=0.25htemp=37hq10=3.hexp=1cao(mM)cai(mM)celsius(degC)dt(ms)v(mV)vmax=100(mV)vmin=-100(mV)}INCLUDE"bg.inc"PROCEDUREiassign(){i=g*(v-erev)ina=i}

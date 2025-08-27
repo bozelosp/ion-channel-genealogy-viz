@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSRampIClampRANGEdur,amp,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}ASSIGNED{i(nA)tc2(ms)tc3(ms)dur[3](ms)amp[3](mV)}INITIAL{tc2=dur[0]+dur[1]tc3=tc2+dur[2]}BREAKPOINT{if(t<dur[0]){i=amp[0]}elseif(t<tc2){i=((amp[1]-amp[0])/dur[1])*(t-dur[0])+amp[0]}elseif(t<tc3){i=((amp[2]-amp[1])/dur[2])*(t-tc2)+amp[1]}else{i=amp[2]}}

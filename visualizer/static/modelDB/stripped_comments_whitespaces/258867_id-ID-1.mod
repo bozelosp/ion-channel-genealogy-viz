@@ -1,0 +1,1 @@
+NEURON{SUFFIXidRANGEisTerm,isTuft,isObl,isBas,isPrimRANGEbrOrd}ASSIGNED{isTermisTuftisOblisBasisPrimbrOrd}

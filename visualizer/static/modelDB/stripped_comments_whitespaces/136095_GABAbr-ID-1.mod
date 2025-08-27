@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGABAbr}PARAMETER{Cdur=85(ms)Alpha=0.016(/msmM)Beta=0.0047(/ms)Erev=-90(mV)}INCLUDE"netrand.inc"

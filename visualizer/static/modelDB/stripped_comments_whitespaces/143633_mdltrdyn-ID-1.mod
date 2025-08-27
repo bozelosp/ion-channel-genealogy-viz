@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSmdltrdynRANGEtau1,tau2NONSPECIFIC_CURRENTi}PARAMETER{tau1=10(ms)tau2=20(ms)}ASSIGNED{v(millivolt)i(nanoamp)}STATE{g(nanoamp)a(nanoamp)b(nanoamp)}INITIAL{g=0a=0b=0}BREAKPOINT{SOLVEstateMETHODcnexpi=g}DERIVATIVEstate{a'=-a/tau1b'=-b/tau2g=b-a}NET_RECEIVE(weight(nanoamp)){a=a+weightb=b+weight}

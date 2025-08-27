@@ -1,0 +1,1 @@
+NEURON{SUFFIXnmdacNONSPECIFIC_CURRENTinmdacRANGEgNMDAcbar}UNITS{(uS)=(microsiemens)(nA)=(nanoamp)(mV)=(millivolt)}PARAMETER{gNMDAcbar=0.0(mho/cm2)<0,1e9>enmda=0.0(mV)}ASSIGNED{v(mV)inmdac}BREAKPOINT{LOCALss=1.50265/(1+0.33*exp(-0.0625*v))inmdac=gNMDAcbar*s*(v-enmda)}

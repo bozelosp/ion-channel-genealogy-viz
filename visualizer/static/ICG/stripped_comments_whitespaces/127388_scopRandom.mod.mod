@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSscopRandomRANGEr}PARAMETER{s}ASSIGNED{r}PROCEDUREseed(x){s=xset_seed(s)}PROCEDUREnext(){r=scop_random()}INITIAL{r=0}

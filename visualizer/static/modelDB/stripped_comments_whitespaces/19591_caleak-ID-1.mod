@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}INDEPENDENT{vFROM-100TO50WITH50(mV)}NEURON{SUFFIXcaleakUSEIONcaWRITEicaRANGEgbar,iGLOBALe}PARAMETER{gbar=1.616e-6(mho/cm2)e=80(mV)}ASSIGNED{i(mA/cm2)ica(mA/cm2)}BREAKPOINT{i=gbar*(v-e)ica=i}

@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}NEURON{SUFFIXLeakmNONSPECIFIC_CURRENTilRANGEgl,el}INDEPENDENT{tFROM0TO1WITH1(ms)}PARAMETER{gl=.000075(mho/cm2)el=-75(mV)}ASSIGNED{v(mV)il(mA/cm2)}BREAKPOINT{il=gl*(v-el)}

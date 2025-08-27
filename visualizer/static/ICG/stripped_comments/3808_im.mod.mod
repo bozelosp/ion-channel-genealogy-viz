@@ -1,0 +1,62 @@
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+	SUFFIX iM
+	USEION k READ ek WRITE ik 
+        RANGE gkbar, m_inf, tau_m, ik
+}
+
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+}
+
+PARAMETER {
+	v		(mV)
+	celsius		(degC)
+        dt              (ms)
+	ek		(mV)
+	gkbar= 0.00031	(mho/cm2)
+}
+
+STATE {
+	m
+}
+
+ASSIGNED {
+	ik		(mA/cm2)
+	m_inf
+	tau_m		(ms)
+	tau_h		(ms)
+	tadj
+}
+
+BREAKPOINT { 
+	SOLVE states 
+	ik = gkbar * m * (v+105)
+}
+
+
+
+
+
+
+  
+PROCEDURE states() {
+        evaluate_fct(v)
+
+        m= m + (1-exp(-dt/tau_m))*(m_inf-m)
+}
+
+UNITSOFF
+INITIAL {
+	tadj = 3^((celsius-23.5)/10)
+	evaluate_fct(v)
+	m = m_inf
+}
+
+PROCEDURE evaluate_fct(v(mV)) {  LOCAL a,b
+	tau_m = 1000.0/(3.3*(exp((v+35)/20)+exp(-(v+35)/20))) / tadj
+	m_inf = 1.0 / (1+exp(-(v+35)/10))
+}
+UNITSON

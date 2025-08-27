@@ -1,0 +1,22 @@
+/* .nodes {
+
+} */
+
+.graph-node {
+	fill: #00BFFF;
+	stroke: #aaa;
+    /* make it go at the very front */
+    z-index: 99999;
+}
+
+.source-node {
+    fill: #ffd700 !important;
+    stroke: #215885;
+    stroke-width: 2;
+}
+
+.selected-node {
+    fill: #00BFFF;
+    stroke: #215885;
+    stroke-width: 2;
+}

@@ -1,0 +1,66 @@
+NEURON {
+
+	SUFFIX nafpr
+	USEION na READ ena WRITE ina
+	RANGE gna, ina
+}
+	
+UNITS {
+
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(mS) = (millisiemens)
+}
+
+PARAMETER {
+
+    gna  = 30 (mS/cm2)
+    
+}
+    
+ASSIGNED {
+    ena  (mV)
+    v    (mV)
+    ina  (mA/cm2)
+    minf (1)
+    hinf (1)
+    tauh (ms)
+}
+
+STATE { h }
+
+INITIAL {
+    
+    rates(v)
+    h  = hinf
+}
+
+BREAKPOINT {
+
+	SOLVE states METHOD cnexp
+	
+	ina = (1e-3) * gna * minf^2 * h * (v-ena)
+}
+
+
+DERIVATIVE states { 
+
+    rates(v)
+    h' = (hinf-h)/tauh
+}
+
+
+
+PROCEDURE rates(v(mV)) { LOCAL a, b
+
+    a    = fun3(v,  -46.9, -0.32,    -4) 
+    b    = fun3(v,  -19.9,  0.28,     5) 
+    minf = a/(a+b)
+    
+    a    = fun1(v,  -43,    0.128,  -18) 
+    b    = fun2(v,  -20,    4,       -5)
+    hinf = a/(a+b)
+    tauh = 1.0/(a+b)
+}
+
+INCLUDE "custom_code/inc_files/135903_aux_fun.inc"

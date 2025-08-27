@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXnothing}PROCEDUREvseed(seed){VERBATIMsrand48((unsigned)_lseed);set_seed(_lseed);ENDVERBATIM}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESScalciumgapNONSPECIFIC_CURRENTigUSEIONcaREADcaiWRITEicaRANGEr,cap,ig,icaPOINTERvgap,cagap}UNITS{(mV)=(millivolt)(mA)=(milliamp)}PARAMETER{v(mV)vgap(mV)cai(micromolar)cagap(micromolar)r=1e10(megaohm)cap=0.3}ASSIGNED{ig(nanoamp)ica(nanoamp)}BREAKPOINT{ica=cap*((v-vgap)-(25.69*log(cagap/cai)))/rig=((v-vgap)/r)-ica}

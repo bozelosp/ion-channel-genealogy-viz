@@ -1,0 +1,72 @@
+NEURON {
+	SUFFIX nap
+	
+	USEION na READ ena WRITE ina
+        RANGE gbar
+	GLOBAL taum_min
+}
+
+UNITS {
+	(S)	=	(siemens)
+	(mV)	=	(millivolt)
+	(mA)	=	(milliamp)
+}
+
+PARAMETER {
+	gbar = 33e-6	(S/cm2) < 0, 1e9 >
+	
+	taum_min = 1.0 (ms)
+}
+
+ASSIGNED {
+        ena (mV)
+	ina (mA/cm2)
+	v (mV)
+	g (S/cm2)
+	minf
+	tau_m (ms)
+}
+
+STATE {	m }
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	g = gbar * m
+	ina = g * (v - ena)
+}
+
+INITIAL {
+	
+	m = alpham(v)/(alpham(v) + betam(v))
+}
+
+DERIVATIVE states {
+	rates(v)
+	m' = (minf - m)/tau_m
+}
+
+FUNCTION alpham(Vm (mV)) (/ms) {
+	UNITSOFF
+	alpham = 0.12 * exp( 0.12 * (Vm + 56))
+	UNITSON
+}
+
+FUNCTION betam(Vm (mV)) (/ms) {
+	UNITSOFF
+	betam =  0.12 * exp( -0.03 * (Vm + 56))
+	UNITSON
+}
+
+FUNCTION taum(Vm (mV)) (/ms) {
+	UNITSOFF
+	taum = 1.0 / (alpham(Vm) + betam(Vm))
+	if (taum < taum_min) {
+		taum = taum_min
+	}
+	UNITSON
+}
+
+PROCEDURE rates(Vm(mV)) {
+	tau_m = taum(Vm)
+	minf = alpham(Vm)/(alpham(Vm) + betam(Vm))
+}

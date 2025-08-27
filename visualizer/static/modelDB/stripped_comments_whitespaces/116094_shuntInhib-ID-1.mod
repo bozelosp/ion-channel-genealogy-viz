@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSshuntIRANGEdel,dur,amp,tau,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del(ms)dur(ms)<0,1e9>amp(nA)Erev=-65.4(mV)}ASSIGNED{i(nA)}INITIAL{i=0}BREAKPOINT{LOCALgif(t<del+dur&&t>=del){g=ampi=-g*(v-Erev)}else{i=0}}

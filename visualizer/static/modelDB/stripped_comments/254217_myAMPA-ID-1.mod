@@ -1,0 +1,10 @@
+NEURON {
+	POINT_PROCESS myAMPA
+}
+
+INCLUDE "ISyn.inc"
+INCLUDE "IUtils.inc"
+
+NET_RECEIVE(w) {
+	EPSP(1)
+}

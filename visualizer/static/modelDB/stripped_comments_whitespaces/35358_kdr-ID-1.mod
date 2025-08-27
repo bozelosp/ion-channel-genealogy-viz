@@ -1,0 +1,1 @@
+NEURON{SUFFIXkdr}NEURON{USEIONkWRITEik}ASSIGNED{ik}PARAMETER{erev=-75.(mV)gmax=0.015(mho/cm2)vrest=-60exptemp=37maflag=3malphaA=-0.016malphaB=-5.0malphaV0=35.1mbflag=1mbetaA=0.25mbetaB=-40.mbetaV0=20.mq10=3mexp=1haflag=0halphaA=0halphaB=0halphaV0=0hbflag=0hbetaA=0hbetaB=0hbetaV0=0hq10=3hexp=0vmax=100(mV)vmin=-100(mV)}INCLUDE"geneval_cvode.inc"PROCEDUREiassign(){i=g*(v-erev)ik=i}

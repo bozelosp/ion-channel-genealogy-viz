@@ -1,0 +1,1 @@
+NEURON{SUFFIXcarUSEIONcaREADecaWRITEicaRANGEgbarRANGEminf,mtau,hinf,htauGLOBALvhalf_m,vsteep_m,exp_mGLOBALtskew_m,tscale_m,toffset_mGLOBALvhalf_h,vsteep_h,exp_hGLOBALtskew_h,tscale_h,toffset_h}INCLUDE"inact_ca_currs.inc"INCLUDE"inact_gate_states.inc"INCLUDE"var_funcs.inc"

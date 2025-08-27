@@ -1,0 +1,1 @@
+?ThisisaNEURONmodfilegeneratedfromaChannelMLfile?UnitsystemoforiginalChannelMLfile?CreatingsynapticmechanismforanelectricalsynapseUNITS{(nA)=(nanoamp)(mV)=(millivolt)(uS)=(microsiemens)}NEURON{POINT_PROCESSgapCondNONSPECIFIC_CURRENTiRANGEg,iRANGEweightPOINTERvgap}PARAMETER{v(millivolt)vgap(millivolt)g=1e-6(microsiemens)weight=1}ASSIGNED{i(nanoamp)}BREAKPOINT{i=weight*g*(v-vgap)}

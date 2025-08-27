@@ -1,0 +1,1 @@
+NEURON{SUFFIXcouple5NONSPECIFIC_CURRENTiRANGEr,iPOINTERvc}PARAMETER{r=100(ohm-cm2)}ASSIGNED{i(milliamp/cm2)v(millivolt)vc(millivolt)}BREAKPOINT{i=(v-vc)/r}

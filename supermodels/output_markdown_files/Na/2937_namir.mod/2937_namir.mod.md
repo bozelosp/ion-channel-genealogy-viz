@@ -1,0 +1,77 @@
+# 2937_namir.mod
+
+## SUFFIX
+
+namr
+
+## GMAX_NAME
+
+gnabar_namr
+
+## G_VALS
+
+- **gnabar_namr**: 0.01
+
+## I_VALS
+
+- **37**: 0.010000133625891338
+- **6.3**: 0.010000038944086157
+
+## STATES
+
+- n
+- l
+- r
+- fr
+
+## GATES
+
+- **n**: 1
+- **l**: 1
+- **r**: 1
+- **fr**: 1
+
+## ERROR_FLAGS
+
+
+## RATES
+
+- True
+
+## Q10_TAU
+
+1.4645710800275775
+
+## Q10_G
+
+1.0000030840760334
+
+## RATE_VALS
+
+![n Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Na/2937_namir.mod/images/n.png)
+![l Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Na/2937_namir.mod/images/l.png)
+![r Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Na/2937_namir.mod/images/r.png)
+![fr Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Na/2937_namir.mod/images/fr.png)
+
+## SM1_FIT
+
+- False
+
+## RATE_VALS_V
+
+## SM2_FIT
+
+- False
+
+## SM3_FIT
+
+- False
+
+## SM4_FIT
+
+- False
+
+## SM5_FIT
+
+- False
+

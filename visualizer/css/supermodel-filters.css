@@ -1,0 +1,89 @@
+.supermodel-box {
+	text-align: center;
+	font-family: arial;
+	font-size: 17px;
+	color: white;
+	font-weight: bold;
+	padding: 9px;
+	background-color: #46c06dcf;
+	position: absolute;
+	top: 102px;
+	right: 195px;
+	width: 151px;
+	height: 60px;
+	border-radius: 6px;
+	border: none;
+}
+
+.supermodel-text {
+	vertical-align: middle;
+	text-align: center;
+	font-family: arial;
+	font-size: 18px;
+	color: white;
+	font-weight: bold;
+	background-color: none;
+	position: absolute;
+	top: 145px;
+	text-align: center;
+	vertical-align: middle;
+	border: none;
+}
+
+.supermodel-checkbox {
+	vertical-align: middle;
+	text-align: center;
+	font-family: arial;
+	font-size: 18px;
+	color: #46c06dcf;
+	font-weight: bold;
+	background-color: white;
+	position: absolute;
+	top: 143px;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+}
+
+.supermodel-checkbox-checked {
+	vertical-align: middle;
+	text-align: center;
+	font-family: arial;
+	font-size: 18px;
+	color: #46c06dcf;
+	font-weight: bold;
+	background-color: #CDCDCD;
+	position: absolute;
+	top: 147px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+}
+
+#supermodel-1 {
+	right: 318px;
+}
+
+#supermodel-2 {
+	right: 260px;
+}
+
+#supermodel-checkbox-1 {
+	right: 287px;
+}
+
+#supermodel-checkbox-2 {
+	right: 229px;
+}
+
+#supermodel-checkbox-checked-1 {
+	right: 291px;
+}
+
+#supermodel-checkbox-checked-2 {
+	right: 233px;
+}
+
+.supermodel-checkbox-checked.active {
+	background-color: rgba(70, 192, 109, 0.70);
+}

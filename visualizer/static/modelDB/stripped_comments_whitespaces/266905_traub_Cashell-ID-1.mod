@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)(S)=(siemens)(mS)=(millisiemens)(molar)=(1/liter)(uM)=(micromolar)}NEURON{THREADSAFESUFFIXCaShellUSEIONcaREADicaWRITEcaiRANGEphiGLOBALbeta_x,cai0}PARAMETER{phi=578.135(uM-cm2/mA-ms)beta_x=0.075(/ms)cai0=0(mM)}STATE{cai(uM)}ASSIGNED{ica(mA/cm2)}BREAKPOINT{SOLVEstatesMETHODcnexp}INITIAL{cai=cai0}DERIVATIVEstates{cai'=-phi*ica-beta_x*cai}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSShuntNONSPECIFIC_CURRENTIRANGEI,e,G}PARAMETER{G=0(micromho)e=0(millivolt)}ASSIGNED{I(nanoamp)v(millivolt)}BREAKPOINT{I=G*(v-e)}

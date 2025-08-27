@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXkleakUSEIONkREADekWRITEikRANGEgmax}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)}PARAMETER{gmax=0.004(umho)}ASSIGNED{ek(mV)v(mV)ik(nA)}INITIAL{}BREAKPOINT{ik=gmax*(v-ek)}

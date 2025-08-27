@@ -1,0 +1,1 @@
+NEURON{SUFFIXdipoleRANGEri,ia,Q,ztanPOINTERpvPOINTERQsum}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(Mohm)=(megaohm)(um)=(micrometer)(Am)=(ampmeter)(fAm)=(femtoampmeter)}ASSIGNED{ia(nA)ri(Mohm)pv(mV)v(mV)ztan(um)Q(fAm)Qsum(fAm)}AFTERSOLVE{ia=(pv-v)/riQ=ia*ztanQsum=Qsum+Q}AFTERINITIAL{ia=(pv-v)/riQ=ia*ztanQsum=Qsum+Q}

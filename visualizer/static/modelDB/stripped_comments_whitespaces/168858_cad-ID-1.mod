@@ -1,0 +1,1 @@
+NEURON{SUFFIXcadUSEIONcaREADicaWRITEcaiRANGEphi,betaGLOBALceiling}UNITS{(mA)=(milliamp)}PARAMETER{phi(1)beta(/ms)ceiling(1)}STATE{cai(1)}INITIAL{cai=0.0}ASSIGNED{ica(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexpif(cai<0){cai=0}if(cai>ceiling){cai=ceiling}}DERIVATIVEstate{cai'=-phi*ica-beta*cai}

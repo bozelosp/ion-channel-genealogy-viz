@@ -1,0 +1,1 @@
+UNITS{(mv)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXNaLUSEIONnaREADena,naiWRITEinaRANGEgna,inaLGLOBALgmax_naL}PARAMETER{v(mV)gna=2.8e-5(mho/cm2)inaL=0.0(mA/cm2)enanaicelsius}ASSIGNED{ina(mA/cm2)gmax_naL}BREAKPOINT{ina=gna*gmax_naL*(v-ena)inaL=ina}INITIAL{gmax_naL=1}

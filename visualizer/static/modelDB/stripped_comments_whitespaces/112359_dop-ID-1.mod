@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSdopnetRANGEvmax,kmNONSPECIFIC_CURRENTi}UNITS{}PARAMETER{vmax=5e-3km=0.2}ASSIGNED{i}STATE{dop}INITIAL{dop=0}BREAKPOINT{SOLVEreleaseMETHODcnexpi=0}DERIVATIVErelease{dop'=-vmax/((km/dop)+1)}NET_RECEIVE(weight){state_discontinuity(dop,dop+weight)}

@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXnothing}VERBATIM#include"misc.h"ENDVERBATIMFUNCTIONistmpobj(){VERBATIM_listmpobj=hoc_is_tempobj_arg(1);ENDVERBATIM}

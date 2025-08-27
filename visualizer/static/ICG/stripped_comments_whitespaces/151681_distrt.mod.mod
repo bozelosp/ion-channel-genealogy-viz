@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)thr=-10}NEURON{SUFFIXthGLOBALthrRANGEflag}ASSIGNED{flagvpre}INITIAL{vpre=vflag=0}BREAKPOINT{if(v>thr&&vpre<thr){flag=1}else{flag=0}vpre=v}

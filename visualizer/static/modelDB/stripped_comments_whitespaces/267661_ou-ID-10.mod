@@ -1,0 +1,1 @@
+NEURON{SUFFIXOURANGEi,D,tau,biasNONSPECIFIC_CURRENTi}UNITS{(mA)=(milliamp)}PARAMETER{bias=0(mA/cm2)D=0.0005(/ms)tau=1(ms)}ASSIGNED{i(mA/cm2)noise(mA/cm2)dt(ms)}STATE{n(mA/cm2)}BREAKPOINT{SOLVEkinMETHODcnexpi=bias+n}DERIVATIVEkin{noise=1(mA/cm2)*normrand(0,D/sqrt(dt))n'=(-n+noise)/tau}

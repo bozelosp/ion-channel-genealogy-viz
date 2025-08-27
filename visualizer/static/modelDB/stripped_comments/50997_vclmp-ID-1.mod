@@ -1,0 +1,116 @@
+DEFINE NSTEP 6
+
+NEURON {
+	POINT_PROCESS VClamp2
+	ELECTRODE_CURRENT i
+	RANGE e0,vo0,vi0,dur,amp,gain,rstim,tau1,tau2,fac,i
+}
+
+UNITS {
+	(nA) = (nanoamp)
+	(mV) = (millivolt)
+	(uS) = (micromho)
+}
+
+
+PARAMETER {
+	dur[NSTEP] (ms)		<0, 1e9>
+	amp[NSTEP] (mV)
+	gain = 1e5		<0,1e9>
+	rstim = 1 (megohm)	<1e-9,1e9>
+	tau1 = .001 (ms)	<0,1e9>
+	tau2 = 0   (ms)		<0,1e9>
+	e0 (mV) vo0 (mV) vi0(mV)
+	fac=0			<1,10>
+}
+
+ASSIGNED {
+	v (mV)	
+	dt (ms)
+	i (nA)
+	stim (mV)
+	tc (ms)
+}
+
+
+STATE {
+	e (mV)
+	vo (mV)
+	vi (mV)
+}
+
+INITIAL {
+	e0 = 0
+	vo = v
+	vo0 = v
+	vi = v
+	vi0 = v
+	e = 0
+	FROM j=0 TO NSTEP-1 { if (dur[j] > 0 && amp[j] != 0) {
+		
+		
+		
+		VERBATIM
+		{extern int cvode_active_;
+		if (cvode_active_) {
+			hoc_execerror("VClamp", " does not work with CVODE");
+		}}
+		ENDVERBATIM
+	}}
+}
+
+BREAKPOINT {
+	SOLVE update METHOD after_cvode 
+	vstim()
+	i = icur()
+}
+
+PROCEDURE vstim() { 
+			
+			
+	tc = 0 (ms)
+	FROM j=0 TO NSTEP-1 {
+		stim = amp[j]
+		tc = tc + dur[j]
+		if (t < tc) {
+			tc = tc + 100	
+			VERBATIM
+			break;
+			ENDVERBATIM
+		}
+	}
+}
+
+FUNCTION icur()(nA) {  
+			
+			
+	LOCAL vout
+	if (t > tc) {
+		e0 = 0
+		vo0 = 0
+		icur = 0
+	}else{
+		SOLVE clamp
+		icur = (vo - v)/rstim
+	}
+}
+
+LINEAR clamp {
+	LOCAL t1, t2
+	t1 = tau1/dt
+	t2 = tau2/dt
+	~ vi = v + fac*vo - fac*v
+	~ t2*vo - t2*vo0 + vo = -gain * e
+	~ -stim - e  +  vi - e  +  t1*vi - t1*e - t1*(vi0 - e0)
+	  = 0
+}
+
+PROCEDURE update() {
+	i = icur()
+	e0 = e
+	vo0 = vo
+	vi0 = vi
+	VERBATIM
+	return 0;
+	ENDVERBATIM
+}

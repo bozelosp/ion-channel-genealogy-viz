@@ -1,0 +1,73 @@
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(molar) = (1/liter)
+	(mM) = (millimolar)
+	FARADAY = (faraday) (coulomb)
+	R = (k-mole) (joule/degC)
+}
+
+PARAMETER {
+	v (mV)
+	celsius		(degC)
+	gbar=.008 (mho/cm2)
+        vhalfn=-51.73   (mV)
+        vhalfl=-85.4   (mV)
+        kn=6.53   (1)
+        kl=-5.4   (1)
+	q10=2.3
+	cai 	= 0.00665315 (mM)
+	cao 	= 2	(mM)	
+	eca
+}
+
+
+NEURON {
+	SUFFIX cat1g
+	USEION ca READ cai, cao, eca WRITE ica
+        RANGE gbar, carev, ica
+        GLOBAL ninf,linf,taul,taun, q10
+}
+
+STATE {
+	n
+        l
+}
+
+ASSIGNED {
+	ica	(mA/cm2)		
+	carev	(mV)			
+        ninf
+        linf      
+        taul
+        taun
+}
+
+INITIAL {
+	rates(v)
+	n=ninf
+	l=linf
+}
+
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	carev = (1e3) * (R*(celsius+273.15))/(2*FARADAY) * log (cao/cai)
+	ica = gbar*n*l*(v-carev)
+}
+
+
+DERIVATIVE states {     
+        rates(v)
+        n' = (ninf - n)/taun
+        l' =  (linf - l)/taul
+}
+
+PROCEDURE rates(v (mV)) { 
+        LOCAL a,qt
+        qt=q10^((celsius-22)/10)
+        ninf = 1/(1 + exp(-(v-vhalfn)/kn))
+        linf = 1/(1 + exp(-(v-vhalfl)/kl))
+        taun = (0.5+0.124*exp(-v/15.8))/qt
+        taul = (10.4+0.0118*exp(-v/7.85))/qt
+}

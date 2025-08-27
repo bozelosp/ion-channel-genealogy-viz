@@ -1,0 +1,1 @@
+NEURON{SUFFIXkdrRT03}NEURON{USEIONkREADekWRITEik}ASSIGNED{ik}PARAMETER{erev=-95(mV)gmax=0.4(S/cm2)vrest=0(mV)mvhalf=29.5mkconst=-10exptemp=37mq10=1mexp=4hvhalf=0hkconst=0hq10=1hexp=0ek}INCLUDE"boltz_cvode.inc"FUNCTIONsettau(j,v){if(j==0){if(v<-10.0){settau=.25+4.35*exp((v+10.)/10.)}else{settau=.25+4.35*exp((-v-10.)/10.)}}else{settau=1}}PROCEDUREiassign(){i=g*(v-ek)ik=i}

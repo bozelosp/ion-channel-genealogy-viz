@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGABAA}PARAMETER{Cdur=0.3(ms)Alpha=12(/msmM)Beta=0.1(/ms)Erev=-75(mV)}INCLUDE"netcon.inc"

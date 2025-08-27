@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{SUFFIXleakNONSPECIFIC_CURRENTiRANGEg,e}PARAMETER{g=.0001(S/cm2)<0,1e9>e=-70(mV)}ASSIGNED{v(mV)i(mA/cm2)celsius(degC)rho}BREAKPOINT{rho=1.3^((celsius-25(degC))/10(degC))i=rho*g*(v-e)}

@@ -1,0 +1,120 @@
+UNITS {
+	  (mA) = (milliamp)
+	  (mV) = (millivolt)
+    (molar) = (1/liter)
+    (mM) = (millimolar)
+    FARADAY = (faraday) (coulomb)
+    R = (k-mole) (joule/degC)
+}
+
+
+PARAMETER {           
+	  v             (mV)
+    tBase = 23.5  (degC)
+	  celsius = 22  (degC)
+	  gcatbar = 0   (mho/cm2)  
+	  ki = 0.001    (mM)
+	  cai = 5.e-5   (mM)       
+	  cao = 2       (mM)       
+    tfa = 1                  
+    tfi = 0.68               
+    eca = 140                
+}
+
+NEURON {
+	  SUFFIX cat
+	  USEION ca READ cai,cao 
+    USEION Ca WRITE iCa VALENCE 2
+    
+    
+    
+    RANGE gcatbar, hinf, minf, taum, tauh, iCa, gmax
+}
+
+STATE {	m h }  
+
+ASSIGNED {     
+	  iCa  (mA/cm2)
+    gcat (mho/cm2) 
+    gmax (mho/cm2) 
+    minf
+    hinf
+    taum (ms)
+    tauh (ms)
+}
+
+INITIAL {
+    
+    rates(v)
+    m = minf
+    h = hinf
+	  gcat = gcatbar*m*m*h*h2(cai)
+    gmax = gcat
+}
+
+BREAKPOINT {
+	  SOLVE states METHOD cnexp
+	  gcat = gcatbar*m*m*h*h2(cai) 
+	  iCa = gcat*ghk(v,cai,cao)    
+    if (gcat > gmax) {
+        gmax = gcat
+    }
+}
+
+FUNCTION h2(cai(mM)) {
+	  h2 = ki/(ki+cai)
+}
+
+FUNCTION ghk(v(mV), ci(mM), co(mM)) (mV) { LOCAL nu,f
+    f = KTF(celsius)/2
+    nu = v/f
+    ghk=-f*(1. - (ci/co)*exp(nu))*efun(nu)
+}
+
+FUNCTION KTF(celsius (degC)) (mV) {   
+    KTF = ((25(mV)/293.15(degC))*(celsius + 273.15(degC)))
+}
+
+FUNCTION efun(z) {
+	  if (fabs(z) < 1e-4) {
+		    efun = 1 - z/2
+	  }else{
+		    efun = z/(exp(z) - 1)
+	  }
+}
+
+FUNCTION alph(v(mV)) (/ms) {
+	  alph = 1.6e-4(/ms)*exp(-(v+57(mV))/19(mV))
+}
+
+FUNCTION beth(v(mV)) (/ms) {
+	  beth = 1(/ms)/(exp((-v+15(mV))/10(mV))+1.0)
+}
+
+FUNCTION alpm(v(mV)) (/ms) {
+	  alpm = 0.1967(/ms)*(-1.0(/mV)*v+19.88)/(exp((-1.0*v+19.88(mV))/10.0(mV))-1.0)
+}
+
+FUNCTION betm(v(mV)) (/ms) {
+	  betm = 0.046(/ms)*exp(-v/22.73(mV))
+}
+
+
+
+
+DERIVATIVE states {     
+    rates(v)
+    m' = (minf - m)/taum
+    h' = (hinf - h)/tauh
+}
+
+PROCEDURE rates(v (mV)) { 
+    LOCAL a
+    TABLE taum, minf, tauh, hinf FROM -150 TO 150 WITH 300
+    a = alpm(v)
+    taum = 1/(tfa*(a + betm(v))) 
+    minf =  a/(a+betm(v))        
+    a = alph(v)
+    tauh = 1/(tfi*(a + beth(v))) 
+    hinf = a/(a+beth(v))         
+}

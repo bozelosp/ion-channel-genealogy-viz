@@ -1,0 +1,1 @@
+NEURON{SUFFIXmaxRANGEval}ASSIGNED{v(millivolt)val(millivolt)}INITIAL{val=v}AFTERSOLVE{if(v>val){val=v}}

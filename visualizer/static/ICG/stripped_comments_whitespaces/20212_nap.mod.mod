@@ -1,0 +1,1 @@
+NEURON{SUFFIXnapUSEIONnaREADenaWRITEinaRANGEgnabar,vhalf,K}UNITS{(mA)=(milliamp)(mV)=(millivolt)}INDEPENDENT{tFROM0TO1WITH100(ms)}PARAMETER{dt(ms)v(mV)ena=50(mV)K=4.5(1)gnabar=1.0vhalf=-50.4(mV)}STATE{n}ASSIGNED{ina(mA/cm2)}INITIAL{}BREAKPOINT{SOLVEstatesina=gnabar*n*n*n*(v-ena)}PROCEDUREstates(){n=1/(1+(exp(vhalf-v)/K))VERBATIMreturn0;ENDVERBATIM}

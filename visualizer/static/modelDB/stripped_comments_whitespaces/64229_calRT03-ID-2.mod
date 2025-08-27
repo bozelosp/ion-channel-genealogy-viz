@@ -1,0 +1,1 @@
+NEURON{SUFFIXcalRT03}NEURON{USEIONcaWRITEica}ASSIGNED{ica}PARAMETER{erev=125(mV)gmax=0(mho/cm^2)vrest=0maflag=2malphaA=1.6malphaB=-13.889malphaV0=5.mbflag=3mbetaA=0.02mbetaB=5.mbetaV0=-8.9exptemp=37mq10=1mexp=2haflag=0halphaA=0halphaB=0halphaV0=0hbflag=0hbetaA=0hbetaB=0hbetaV0=0hq10=3hexp=0}INCLUDE"geneval_cvode.inc"PROCEDUREiassign(){i=g*(v-erev)ica=i}

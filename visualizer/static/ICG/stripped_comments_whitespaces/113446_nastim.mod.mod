@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSnastimUSEIONnaWRITEinaRANGEdel,dur,amp,ina}UNITS{(nA)=(nanoamp)}PARAMETER{del(ms)dur(ms)amp(nA)}ASSIGNED{ina(nA)}INITIAL{ina=0}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del+dur&&t>del){ina=-amp}else{ina=0}}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSHalfGapELECTRODE_CURRENTiRANGEr,i,vgap}PARAMETER{r=1e10(megohm)}ASSIGNED{v(millivolt)vgap(millivolt)i(nanoamp)}BREAKPOINT{i=(vgap-v)/r}

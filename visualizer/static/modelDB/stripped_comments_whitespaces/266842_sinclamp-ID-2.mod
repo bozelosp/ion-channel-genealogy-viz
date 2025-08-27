@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSSinClampRANGEdel,dur,pkamp,freq,phase,biasELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del=5(ms)dur=200(ms)pkamp=1(nA)freq=1(Hz)phase=0(rad)bias=0(nA)PI=3.14159265358979323846}ASSIGNED{i(nA)}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del){i=0}else{if(t<del+dur){i=pkamp*sin(2*PI*freq*(t-del)/1000+phase)+bias}else{i=0}}}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXcamaxUSEIONcaREADcaiRANGEcamx,tmx}UNITS{(molar)=(1/liter)(mM)=(millimolar)}ASSIGNED{camx(mM)tmx(ms)cai(mM)}INITIAL{camx=cai}BREAKPOINT{if(cai>camx){camx=caitmx=t}}

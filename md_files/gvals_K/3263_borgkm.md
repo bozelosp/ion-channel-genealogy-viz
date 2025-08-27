@@ -1,0 +1,13 @@
+# 3263_borgkm.mod
+
+- **G_VALS**:
+  - gkmbar_borgkm: 0.003
+- **GATES**:
+  - m: 1
+- **SUFFIX**: borgkm
+- **GMAX_NAME**: gkmbar_borgkm
+- **STATES**: ['m']
+- **I_VALS**:
+  - 6.3: 0.0030000168340940307
+  - 37: 0.003000150754787745
+- **ERROR_FLAGS**: []

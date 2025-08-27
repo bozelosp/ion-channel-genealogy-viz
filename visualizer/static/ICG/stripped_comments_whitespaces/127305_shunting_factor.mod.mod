@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{kk=0(/mV)}NEURON{SUFFIXShuntingFactorRANGEkk}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSAHPUSEIONkREADekRANGEgr,e,g,tauNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)(uS)=(microsiemens)}PARAMETER{tau=5(ms)gr=300e-6(uS)e=-90(mV)}ASSIGNED{v(mV)i(nA)ek(mV)}STATE{g(uS)}INITIAL{g=0}BREAKPOINT{SOLVEstateMETHODcnexpi=g*(v-ek)}DERIVATIVEstate{g'=-g/tau}NET_RECEIVE(weight(uS)){if(flag==0){g=g+weight}}

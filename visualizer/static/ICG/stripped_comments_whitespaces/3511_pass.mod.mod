@@ -1,0 +1,1 @@
+NEURON{SUFFIXpassNONSPECIFIC_CURRENTiLRANGEgL,eL}UNITS{(mA)=(milliamp)(nA)=(nanoamp)(mV)=(millivolt)(um)=(micron)}INDEPENDENT{tFROM0TO1WITH1(ms)}PARAMETER{v(mV)dt=0.1(ms)gL=0.00000729(mho/cm2)eL=-60(mV)}STATE{}ASSIGNED{iL(mA/cm2)}BREAKPOINT{iL=gL*(v-eL)}

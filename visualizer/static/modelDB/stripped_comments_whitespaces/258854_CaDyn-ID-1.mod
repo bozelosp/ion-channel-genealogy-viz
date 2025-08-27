@@ -1,0 +1,1 @@
+NEURON{SUFFIXcadUSEIONcaREADicaWRITEcaiRANGEphi,tauGLOBALceiling}UNITS{(mA)=(milliamp)(mM)=(milli/liter)}PARAMETER{phi=1e-3(100/coulombmeter)tau=50(ms)ceiling=1e6(mM)}STATE{cai(mM)}INITIAL{cai=0}ASSIGNED{ica(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexpif(cai<0){cai=0}if(cai>ceiling){cai=ceiling}}DERIVATIVEstate{cai'=-phi*ica-(cai)/tau}

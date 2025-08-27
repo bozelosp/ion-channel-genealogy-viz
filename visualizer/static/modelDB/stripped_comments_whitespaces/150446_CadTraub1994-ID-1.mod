@@ -1,0 +1,1 @@
+NEURON{SUFFIXCadUSEIONcaREADicaWRITEcaiRANGEphi,beta}UNITS{(mA)=(milliamp)(molar)=(1/liter)(mM)=(millimolar)}PARAMETER{phibeta(/ms)}STATE{cai(mM)}INITIAL{cai=0}ASSIGNED{ica(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexpif(cai<0){cai=0}}DERIVATIVEstate{cai'=-phi*ica-beta*(cai)}

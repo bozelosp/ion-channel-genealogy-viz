@@ -1,0 +1,33 @@
+NEURON {
+	SUFFIX lfp
+	POINTER transmembrane_current
+	RANGE lfp_line,lfp_point,lfp_rc,initial_part_point, initial_part_line, initial_part_rc
+	
+}
+
+
+ASSIGNED {
+
+	initial_part_line 
+	initial_part_rc
+	transmembrane_current 
+	lfp_line
+	lfp_point
+	lfp_rc
+	initial_part_point
+
+
+}
+
+BREAKPOINT { 
+
+	
+	lfp_point =   transmembrane_current * initial_part_point * 1e-1   
+
+	
+	lfp_line =   transmembrane_current * initial_part_line  * 1e-1  
+
+	
+	lfp_rc =   transmembrane_current * initial_part_rc * 1e-3 
+
+}

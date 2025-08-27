@@ -1,0 +1,1 @@
+NEURON{SUFFIXspinesRANGEscale,count}PARAMETER{scale=1count=0}

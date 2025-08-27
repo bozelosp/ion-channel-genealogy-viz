@@ -1,0 +1,1 @@
+NEURON{SUFFIXkkUSEIONkREADekWRITEikRANGEgbarRANGEminf,mtauRANGEhinf,htauGLOBALvhalf_m,vsteep_m,exp_mGLOBALtskew_m,tscale_m,toffset_mGLOBALvhalf_h,vsteep_h,exp_hGLOBALtskew_h,tscale_h,toffset_h}INCLUDE"custom_code/inc_files/84589_inact_k_currs.inc"INCLUDE"custom_code/inc_files/84589_kk_inact_gate_states.inc"INCLUDE"custom_code/inc_files/84589_var_funcs.inc"

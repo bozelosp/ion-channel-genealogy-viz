@@ -1,0 +1,1 @@
+NEURON{SUFFIXGRANULE_LKG1NONSPECIFIC_CURRENTilRANGEQ10_diff,g,fix_celsiusRANGEel,ic,gbar_Q10,gbar}UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)gbar=5.68e-5(mho/cm2)Q10_diff=1.5el=0(mV)fix_celsius=37(degC)}ASSIGNED{il(mA/cm2)ic(mA/cm2)g(mho/cm2)gbar_Q10(mho/cm2)}INITIAL{gbar_Q10=gbar*(Q10_diff^((fix_celsius-30)/10))g=gbar_Q10}BREAKPOINT{il=g*(v-el)ic=il}

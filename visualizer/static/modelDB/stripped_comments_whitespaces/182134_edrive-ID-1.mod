@@ -1,0 +1,1 @@
+NEURON{SUFFIXEdriveNONSPECIFIC_CURRENTedrive,edrivenoiseRANGEdrive,drivenoise}PARAMETER{drive=0(milliamp/cm2)drivenoise=0(milliamp/cm2)}ASSIGNED{edrive(milliamp/cm2)edrivenoise(milliamp/cm2)}BREAKPOINT{edrive=-driveedrivenoise=-drivenoise}

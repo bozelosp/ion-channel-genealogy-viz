@@ -1,0 +1,1 @@
+NEURON{SUFFIXA}NEURON{USEIONkWRITEik}ASSIGNED{ik(mA/cm2)}PARAMETER{erev=-70(mV)gmax=1.45e-07(mho/cm2)VhlfMaxm=-24VhlfMaxh=8slopem=-3.2slopeh=4.9taum=82(ms)tauh=5(ms)}INCLUDE"ofc.inc"PROCEDUREiassign(){i=g*(v-erev)ik=i}

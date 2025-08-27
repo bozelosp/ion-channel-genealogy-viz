@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXCaLUSEIONcaREADecaWRITEicaRANGEgmax}PARAMETER{gmax=0.0025(mho/cm2)}ASSIGNED{v(mV)eca(mV)ica(mA/cm2)}BREAKPOINT{LOCALden,mden=1+exp((v+20)/-9)m=1/denica=gmax*m*m*(v-eca)}

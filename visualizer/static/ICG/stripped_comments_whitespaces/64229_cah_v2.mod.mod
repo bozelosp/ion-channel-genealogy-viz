@@ -1,0 +1,1 @@
+NEURON{SUFFIXcah}NEURON{USEIONcaREADcao,caiWRITEica}ASSIGNED{ica}PARAMETER{erevgmax=0.001(umho)vrest=0(mV)mvalence=6mgamma=0.7mbaserate=1mvhalf=-15.mbasetau=0.1mtemp=37mq10=3mexp=1hvalence=0hgamma=0hbaserate=0hvhalf=0hbasetau=0htemp=0hq10=3hexp=0cao(mM)cai(mM)celsius(degC)dt(ms)v(mV)}INCLUDE"custom_code/inc_files/64229_bg_cvode.inc"PROCEDUREiassign(){i=g*ghkca(v)ica=i}

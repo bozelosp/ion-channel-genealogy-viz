@@ -1,0 +1,1 @@
+NEURON{SUFFIXextrRANGEvmax,vmin,tmax,tmin,r2,vmax2,tmin2}ASSIGNED{v(millivolt)vmin(millivolt)tmin(ms)vmax(millivolt)tmax(ms)vmax2(millivolt)tmax2(ms)r2(1)}INITIAL{vmin=vtmin=tvmax=vtmax=tvmax2=vtmax2=tr2=0}AFTERSOLVE{if(v<vmin){vmin=vtmin=t}if(v>vmax){vmax=vtmax=t}if(r2==0&&vmax>-70&&v<-70){r2=1}if(r2&&v>vmax2){vmax2=vtmax2=t}}

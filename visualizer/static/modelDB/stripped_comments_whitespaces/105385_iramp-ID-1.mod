@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSIRampRANGEdel,dur,amp0,amp1,iELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del(ms)dur(ms)amp0(nA)amp1(nA)t_eff(ms)}ASSIGNED{i(nA)}INITIAL{i=0}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del+dur&&t>=del){t_eff=t-deli=amp0+((amp1-amp0)/dur)*t_eff}else{i=0}}

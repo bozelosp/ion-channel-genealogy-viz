@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}INDEPENDENT{vFROM-100TO50WITH50(mV)}NEURON{SUFFIXPasSNONSPECIFIC_CURRENTi,isRANGEg,erev,gs,es}PARAMETER{g=0.0(mho/cm2)erev=-65(mV)gs=0.0000677254(mho/cm2)es=0.0(mV)}ASSIGNED{i(mA/cm2)is(mA/cm2)}BREAKPOINT{i=g*(v-erev)is=gs*(v-es)}

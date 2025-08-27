@@ -1,0 +1,1 @@
+NEURON{SUFFIXnaextUSEIONnaREADinaWRITEnaoGLOBALnabathRANGEfhspace,txfer}UNITS{(mV)=(millivolt)(mA)=(milliamp)FARADAY=96500(coulombs)(molar)=(1/liter)(mM)=(millimolar)}PARAMETER{nabath=154(mM)fhspace=1e-4(cm)txfer=50(ms)}ASSIGNED{ina(mA/cm2)}STATE{nao(mM)}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{nao'=ina/(fhspace*FARADAY)+(nabath-nao)/txfer}

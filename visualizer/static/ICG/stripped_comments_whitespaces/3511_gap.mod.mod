@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSgapNONSPECIFIC_CURRENTiRANGEgg,iPOINTERvgap}PARAMETER{v(millivolt)vgap(millivolt)gg=5e-4(micromho)}ASSIGNED{i(nanoamp)}BREAKPOINT{i=(v-vgap)*gg}

@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(nA)=(nanoamp)(uS)=(microsiemens)}NEURON{POINT_PROCESSGapPOINTERvgapRANGEg,iNONSPECIFIC_CURRENTi}PARAMETER{g=0.0(uS)}ASSIGNED{v(mV)vgap(mV)i(nA)}BREAKPOINT{i=g*(v-vgap)}

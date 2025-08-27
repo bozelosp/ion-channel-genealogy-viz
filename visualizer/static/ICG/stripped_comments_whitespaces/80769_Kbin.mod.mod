@@ -1,0 +1,1 @@
+NEURON{SUFFIXKbinUSEIONkREADekWRITEikRANGEgbar,gk,ikGLOBALvth}UNITS{(mV)=(millivolt)(mA)=(milliamp)(nA)=(nanoamp)(pA)=(picoamp)(S)=(siemens)(nS)=(nanosiemens)(pS)=(picosiemens)(um)=(micron)}PARAMETER{v(mV)gbar=16e-4(mho/cm2)ek=-88(mV)vth=-10(mV)}ASSIGNED{ik(mA/cm2)gk(mho/cm2)}BREAKPOINT{gk=gbar*gatefkt(v)ik=gk*(v-ek)}FUNCTIONgatefkt(v(mV)){if(v<vth){gatefkt=0}else{gatefkt=1}}

@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}INDEPENDENT{vFROM-100TO50WITH50(mV)}NEURON{SUFFIXnaleakUSEIONnaREADenaWRITEinaRANGEgbar}PARAMETER{gbar=1.167e-5(mho/cm2)}ASSIGNED{ina(mA/cm2)ena(mV)}BREAKPOINT{ina=gbar*(v-ena)}

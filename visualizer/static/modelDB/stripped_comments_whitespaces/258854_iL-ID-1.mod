@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)(S)=(siemens)}?interfaceNEURON{SUFFIXiLNONSPECIFIC_CURRENTilRANGEgl,elTHREADSAFE}PARAMETER{gl=.0025(S/cm2)<0,1e9>el=-54.3(mV)}ASSIGNED{v(mV)celsius(degC)il(mA/cm2)}?currentsBREAKPOINT{il=gl*(v-el)}

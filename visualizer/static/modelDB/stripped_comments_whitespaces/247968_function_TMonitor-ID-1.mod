@@ -1,0 +1,1 @@
+NEURON{SUFFIXTMonitorRANGEtmon,percentage,totaltime}UNITS{}PARAMETER{}ASSIGNED{tmon(ms)percentagelastpercentagetotaltime(ms)}INITIAL{lastpercentage=-1percentage=0}BREAKPOINT{tmon=tpercentage=ceil(t*100.0/totaltime)-1if(percentage!=lastpercentage){printf("%fpercentisdone!\n",percentage)lastpercentage=percentage}}

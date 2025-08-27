@@ -1,0 +1,1 @@
+NEURON{SUFFIXpredatorPOINTERaPointer}PARAMETER{}ASSIGNED{aPointer}STATE{b}BREAKPOINT{SOLVEstatesMETHODderivimplicit}INITIAL{b=10}DERIVATIVEstates{b'=0.1*aPointer*b-0.4*b}

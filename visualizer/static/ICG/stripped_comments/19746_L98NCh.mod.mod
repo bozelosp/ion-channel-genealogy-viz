@@ -1,0 +1,87 @@
+UNITS {
+    (mA) = (milliamp)
+    (mV) = (millivolt)
+
+}
+
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+    SUFFIX L98NCh
+    NONSPECIFIC_CURRENT i
+        RANGE ghbar
+        GLOBAL ninf,linf,taul,taun,alphan,betan,alphal,betal,t0l, eh
+}
+
+PARAMETER {
+        dt (ms)
+    v (mV)
+        
+    celsius = 32    (degC)
+    ghbar=7.8e-5 (mho/cm2)
+        vhalfn=0   (mV)
+        vhalfl=-98   (mV)
+        zn=0    (1)
+        zl=-2    (1)
+        gmn=0   (1)
+        gml=0   (1)
+    Kn=0    (1)
+    Kl=0    (1)
+    t0n=0   (ms)
+    t0l=180 (ms)
+}
+
+STATE {
+        l
+}
+
+ASSIGNED {
+    eh (mV)
+    i (mA/cm2)
+        gh (mho/cm2)
+        ninf
+        linf
+    facn
+    facl      
+        taul
+        taun
+    alphan
+    betan
+    alphal
+    betal
+}
+
+INITIAL {
+    rates(v)
+    l = linf
+}
+
+BREAKPOINT {
+    SOLVE states
+    gh = ghbar*l
+    i = gh*(v-eh)
+}
+
+
+FUNCTION alphap(v(mV),K,z,gamma,vhalf) {
+  alphap = K*exp(z*gamma*(v-vhalf)*96.487/(8.314*(273.16+32))) 
+}
+
+FUNCTION betap(v(mV),K,z,gamma,vhalf) {
+  betap = K*exp(-z*(1-gamma)*(v-vhalf)*96.487/(8.314*(273.16+32))) 
+}
+
+PROCEDURE states() {     
+        rates(v)
+        l = l + facl*(linf - l)
+}
+
+PROCEDURE rates(v (mV)) { 
+    LOCAL q10
+        TABLE linf, facl, taul DEPEND dt, t0l, celsius FROM -100 TO 100 WITH 200
+
+
+        linf = 1/(1+betap(v,1.0,zl,0.0,vhalfl))
+    taul = t0l
+        facl = (1 - exp(-dt/taul))
+}

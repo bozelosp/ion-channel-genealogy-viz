@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH10(ms)}NEURON{SUFFIXkcc2USEIONkREADko,kiWRITEikUSEIONclREADclo,cliWRITEiclVALENCE-1RANGEik,icl}UNITS{(mV)=(millivolt)(molar)=(1/liter)(mM)=(millimolar)(um)=(micron)(mA)=(milliamp)(mol)=(1)}PARAMETER{U=0.0020939418(mA/cm2)}ASSIGNED{ik(mA/cm2)icl(mA/cm2)ko(mM)ki(mM)clo(mM)cli(mM)}BREAKPOINT{LOCALraterate=U*log((ki*cli)/(ko*clo))ik=rateicl=-rate}

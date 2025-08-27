@@ -1,0 +1,1 @@
+NEURON{SUFFIXmarUSEIONcaREADcaiRANGEval,cval}ASSIGNED{v(millivolt)val(millivolt)cai(millimolar)cval(millimolar)}INITIAL{val=vcval=cai}BREAKPOINT{if(v>val){val=v}if(cai>cval){cval=cai}}

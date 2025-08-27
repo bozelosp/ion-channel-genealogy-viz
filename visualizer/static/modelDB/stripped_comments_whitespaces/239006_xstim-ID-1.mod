@@ -1,0 +1,1 @@
+NEURON{SUFFIXxstimPOINTERexGLOBALisRANGErxRANGEx,y,z}PARAMETER{rx=1(megohm)x=0(1)y=0(1)z=0(1)}ASSIGNED{v(millivolts)ex(millivolts)is(milliamp)}INITIAL{ex=is*rx*(1e6)}BEFOREBREAKPOINT{ex=is*rx*(1e6)}

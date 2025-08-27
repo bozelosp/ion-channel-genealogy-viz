@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSsynphRANGEnsyn,e1del,e1flag,e2del,e2flagRANGEratio,noampablock,nonmdablock,sloc}PARAMETER{nsyn=1e1del=2(ms)e1flag=1e2del=22(ms)e2flag=0ratio=1noampablock=1nonmdablock=1sloc=-1}

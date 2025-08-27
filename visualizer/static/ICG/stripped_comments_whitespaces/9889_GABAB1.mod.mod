@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGABAB1}PARAMETER{Cmax=1(mM)Cdur=150(ms)Alpha=0.01(/msmM)Beta=0.005(/ms)Erev=-95(mV)Prethresh=0Deadtime=1(ms)gmax(umho)}INCLUDE"synq.inc"

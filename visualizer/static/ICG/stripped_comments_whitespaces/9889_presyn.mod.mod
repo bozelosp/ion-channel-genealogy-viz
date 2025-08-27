@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSPRESYNRANGEspk_internal,spkGLOBALthresh}PARAMETER{thresh=0}ASSIGNED{spkspk_internalv}INCLUDE"presyn.inc"INITIAL{spk=0spk_internal=0}BREAKPOINT{SOLVEpp}PROCEDUREpp(){if(v>thresh){if(spk_internal==0){newspike()spk_internal=1spk=1}}else{spk_internal=0spk=0}}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXkdrp}NEURON{USEIONkWRITEik}ASSIGNED{ik}PARAMETER{erev=-90(mV)gmax=0.08(umho)vrest=0mvalence=3.mgamma=0.7mbaserate=10mvhalf=-30.mbasetau=50mtemp=24.mq10=3mexp=2hvalence=0hgamma=0hbaserate=0hvhalf=0hbasetau=0htemp=0hq10=3hexp=0vmax=50(mV)vmin=-100(mV)}INCLUDE"bg_cvode.inc"PROCEDUREiassign(){i=g*(v-erev)ik=i}

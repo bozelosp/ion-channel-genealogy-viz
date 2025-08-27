@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{SUFFIXtransducer_pasNONSPECIFIC_CURRENTiRANGEg,e}PARAMETER{g=.0025(S/cm2)<0,1e9>e=-60(mV)}ASSIGNED{v(mV)i(mA/cm2)}BREAKPOINT{i=g*(v-e)}

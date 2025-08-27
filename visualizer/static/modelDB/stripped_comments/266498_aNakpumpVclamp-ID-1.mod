@@ -1,0 +1,47 @@
+NEURON {
+	SUFFIX aNaKpump
+	USEION k READ ko WRITE ik	
+	USEION na READ nai WRITE ina
+	RANGE INaKmax, ina, ink, Kmko, Kmnai, ik
+	GLOBAL dummy 
+}
+
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+	(molar) = (1/liter)
+  	(mM) = (millimolar)
+	
+}
+
+PARAMETER {
+	INaKmax = 0.009726135 (mA/cm2) <0,1e6>
+	Kmnai = 5.46 (mM)    <0,1e6>
+	Kmko = 0.621 (mM)    <0,1e6>
+	Q10NaK = 1.16
+}
+
+ASSIGNED {
+	celsius (degC)
+	v (mV)
+	ko (mM)
+	nai (mM)
+	ik (mA/cm2)
+	ina (mA/cm2)
+	ink (mA/cm2)
+	dummy
+}
+
+BREAKPOINT { LOCAL fnk
+	
+	fnk = (v + 150)/(v + 200)
+				
+	ink = INaKmax*fnk*((nai/(nai+Kmnai))^3)*((ko/(ko+Kmko))^2) 
+	
+	if (celsius >= 37) {
+		ink=Q10NaK*ink
+	}
+	
+	ina = 3*ink
+	ik = -2*ink
+}

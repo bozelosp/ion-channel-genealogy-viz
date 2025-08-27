@@ -1,0 +1,1 @@
+NEURON{SUFFIXGrC_Lkg1NONSPECIFIC_CURRENTilRANGEel,gl,i}UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)gl=5.68e-5(mho/cm2)celsius=30(degC)el=-58(mV)}ASSIGNED{il(mA/cm2)i(mA/cm2)}BREAKPOINT{il=gl*(v-el)i=il}

@@ -1,0 +1,26 @@
+UNITS {
+        (mA) = (milliamp)
+        (mV) = (millivolt)
+		(S) = (siemens)
+}
+ 
+NEURON {
+        SUFFIX lk
+        NONSPECIFIC_CURRENT il
+        RANGE gl, el
+}
+ 
+PARAMETER { 
+        gl = 0.007 (S/cm2)	  <0,1e9>
+        el = -70 (mV)
+}
+ 
+ASSIGNED {
+        v (mV)
+
+        il (mA/cm2)
+}
+ 
+BREAKPOINT {
+        il = gl*(v - el)
+}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXhsomaNONSPECIFIC_CURRENTiRANGEgbarRANGEninf,ntauGLOBALehGLOBALvhalf_n,vsteep_n,exp_nGLOBALtskew_n,tscale_n,toffset_n}INCLUDE"custom_code/inc_files/84589_noinact_nak_currs.inc"INCLUDE"custom_code/inc_files/84589_hsoma_noinact_gate_states.inc"INCLUDE"custom_code/inc_files/84589_var_funcs.inc"

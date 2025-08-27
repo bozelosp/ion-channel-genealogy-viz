@@ -1,0 +1,1 @@
+NEURON{SUFFIXCalciumUSEIONcaREADicaWRITEcaiRANGEa2v}UNITS{(mM)=(milli/liter)(mA)=(milliamp)(um)=(microm)F=(faraday)(coulomb)}PARAMETER{dt(ms)z=2.0kca=0.4(1/ms)cai0=0.00001(mM)a2v=3000.0(1/cm)}ASSIGNED{ica(mA/cm2)alpha}STATE{cai(mM)}BREAKPOINT{SOLVEintegrateMETHODcnexp}UNITSOFFINITIAL{alpha=a2v/(z*F)cai=cai0}DERIVATIVEintegrate{cai'=-alpha*ica-kca*(cai-cai0)}UNITSON

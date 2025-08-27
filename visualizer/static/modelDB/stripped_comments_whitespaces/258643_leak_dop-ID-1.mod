@@ -1,0 +1,1 @@
+NEURON{SUFFIXleakNONSPECIFIC_CURRENTiEXTERNALapc_metap,fpc_metapRANGEi,e,g,gbar}UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}PARAMETER{gbar=1(S/cm2)e=0(mV)}ASSIGNED{g(S/cm2)i(mA/cm2)v(mV)}INITIAL{g=gbari=g*(v-e)}BREAKPOINT{g=gbari=g*(v-e)}

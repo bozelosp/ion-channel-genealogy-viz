@@ -1,0 +1,36 @@
+NEURON {
+	SUFFIX nap
+	USEION na READ ena WRITE ina
+        RANGE  gnabar,vhalf, K, ina
+
+}
+
+UNITS {
+	(mA) = (milliamp)
+	(mV) = (millivolt)
+
+}
+
+PARAMETER {            
+	K = 4.5            (mV)      
+
+	gnabar = 0        (mho/cm2)
+	vhalf  = -50.4    (mV)      
+}	
+
+
+ASSIGNED {
+	v             (mV)
+        ena           (mV)    
+	ina           (mA/cm2)
+}
+
+STATE { n }
+
+BREAKPOINT {
+	ina = gnabar*n*n*n*(v-ena)
+}
+
+INITIAL {
+        n = 1 / (1 + (exp((vhalf - v)/K))) 
+}

@@ -1,0 +1,79 @@
+NEURON {
+    SUFFIX hh3na
+    USEION na READ ena WRITE ina
+    RANGE gbar, g
+    GLOBAL vmin, vmax
+    GLOBAL taum, tauh, taus, tausvh, tausvs, tausb
+    GLOBAL powm, powh, pows
+}
+
+UNITS {
+    (mA) = (milliamp)
+    (mV) = (millivolt)
+}
+
+PARAMETER {
+    v (mV)
+    gbar = .20 (mho/cm2)
+    vmin = -120 (mV)
+    vmax = 100 (mV)
+    ena (mV)
+    tausvh = 30 (mV)
+    tausvs = 1 (mV)
+    taus = 50 (ms)
+    tausb = .5 (ms)
+    taum = .05 (ms)
+    tauh = .5 (ms)
+    pows = 0
+    powm = 2
+    powh = 1
+}
+
+STATE {    
+    h  <1e-1> 
+    m  <1e-1> 
+    s  <1e-1> 
+}
+
+ASSIGNED {
+    ina (mA/cm2)
+    g (mho/cm2)
+}
+
+INITIAL {
+    m = ssm(v)
+    h = ssh(v)
+    s = sss(v)
+}
+
+BREAKPOINT {
+    SOLVE states METHOD cnexp
+    g = gbar*(m^powm)*(h^powh)*(s^pows)
+    ina = g*(v - ena)
+}
+
+DERIVATIVE states {
+    m' = (ssm(v) - m)/taum
+    h' = (ssh(v) - h)/tauh
+    s' = (sss(v) - s)/tauss(v)
+}
+
+FUNCTION ssm(v (mV)) {  
+    TABLE FROM vmin TO vmax WITH 200
+    ssm = 1/(1 + exp((v + 40 (mV))/-3 (mV)))
+}
+
+FUNCTION ssh(v (mV)) {  
+    TABLE FROM vmin TO vmax WITH 200
+    ssh = 1/(1 + exp((v + 45 (mV))/3 (mV)))
+}
+
+FUNCTION sss(v (mV)) {  
+    TABLE FROM vmin TO vmax WITH 200
+    sss = 1/(1 + exp((v + 44 (mV))/3 (mV)))
+}
+
+FUNCTION tauss(v (mV)) (ms) {  
+    TABLE FROM vmin TO vmax WITH 200
+    tauss = tausb + taus/(1 + exp((v + tausvh)/tausvs))
+}

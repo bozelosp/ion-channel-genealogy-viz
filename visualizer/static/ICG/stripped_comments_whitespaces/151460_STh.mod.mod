@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXSThRANGEgpas,epasNONSPECIFIC_CURRENTipas}PARAMETER{v(mV)dt(ms)gpas=7.84112e-05(mho/cm2)<0,1e9>epas=-58.4477(mV)celsius}ASSIGNED{ipas(mA/cm2)}BREAKPOINT{ipas=gpas*(v-epas)}

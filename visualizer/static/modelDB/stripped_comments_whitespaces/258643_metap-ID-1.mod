@@ -1,0 +1,1 @@
+NEURON{SUFFIXmetapGLOBALapc,fpc}PARAMETER{apc=0fpc=0}

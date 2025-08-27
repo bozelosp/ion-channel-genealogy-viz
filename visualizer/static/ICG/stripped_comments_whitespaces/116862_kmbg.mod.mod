@@ -1,0 +1,1 @@
+NEURON{SUFFIXkmbg}NEURON{USEIONkREADekWRITEik}ASSIGNED{ikek(mV)}PARAMETER{gmax=0.1(S/cm2)vrest=0.mvalence=3.5mgamma=0.8mbaserate=0.2mvhalf=-46.mbasetau=3.mtemp=37mq10=3mexp=3hvalence=0hgamma=0hbaserate=0hvhalf=0hbasetau=0htemp=0hq10=3hexp=0celsius(degC)dt(ms)v(mV)vmax=100(mV)vmin=-100(mV)}INCLUDE"custom_code/inc_files/116862_bg_cvode.inc"PROCEDUREiassign(){i=g*(v-ek)ik=i}

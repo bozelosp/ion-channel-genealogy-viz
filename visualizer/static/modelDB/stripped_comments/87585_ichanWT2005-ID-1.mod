@@ -1,0 +1,167 @@
+UNITS {
+    (mA) = (milliamp)
+    (mV) = (millivolt)
+    (uF) = (microfarad)
+    (molar) = (1/liter)
+    (nA) = (nanoamp)
+    (mM) = (millimolar)
+    (um) = (micron)
+    (S) = (siemens)
+    FARADAY = 96520 (coul)
+    R = 8.3134  (joule/degC)
+
+}
+
+ 
+NEURON { 
+    SUFFIX ichanWT2005 
+    USEION nat READ enat WRITE inat VALENCE 1
+    USEION kf READ ekf WRITE ikf  VALENCE 1
+    NONSPECIFIC_CURRENT il 
+    RANGE gnat, gkf
+    RANGE gnatbar, gkfbar
+    RANGE gl, el
+    RANGE minf, mtau, hinf, htau, sinf, stau, nfinf, nftau, inat, m, h, s
+}
+
+ 
+INDEPENDENT {t FROM 0 TO 100 WITH 100 (ms)}
+
+ 
+PARAMETER {
+    
+    celsius = 6.3 (degC)
+    dt (ms) 
+    enat  (mV)
+    gnatbar (mho/cm2)   
+    ekf  (mV)
+    gkfbar (mho/cm2)
+    gl (mho/cm2)    
+    el (mV)
+}
+
+
+ASSIGNED {
+      
+    v (mV) 
+    gnat (mho/cm2) 
+    gkf (mho/cm2)
+    inat (mA/cm2)
+    ikf (mA/cm2)
+    il (mA/cm2)
+    minf hinf sinf nfinf
+    mtau (ms) htau (ms) stau (ms) nftau (ms)
+    mexp hexp sexp nfexp
+} 
+
+
+STATE {
+    m h s nf
+}
+ 
+
+BREAKPOINT {
+    SOLVE states
+    gnat = gnatbar*m*m*m*h*s  
+    inat = gnat*(v - enat)
+    gkf = gkfbar*nf*nf*nf*nf
+    ikf = gkf*(v-ekf)
+    il = gl*(v-el)
+}
+
+ 
+UNITSOFF
+
+ 
+INITIAL {
+
+    trates(v)
+    
+    m = minf
+    h = hinf
+    s = sinf
+
+    nf = nfinf
+    
+    VERBATIM
+    return;
+    ENDVERBATIM
+}
+
+
+PROCEDURE states() {        
+                            
+    trates(v)           
+
+    m = m + mexp*(minf-m)
+    h = h + hexp*(hinf-h)
+    s = s + sexp*(sinf-s)
+    nf = nf + nfexp*(nfinf-nf)
+    
+    VERBATIM
+    return 0;
+    ENDVERBATIM
+}
+ 
+
+LOCAL q10
+
+
+PROCEDURE rates(v (mV)) {   
+                            
+
+    LOCAL  alpha, beta, sum
+    q10 = 3^((celsius - 6.3)/10)
+    
+    
+    
+    minf = 1/(1+exp(-(v+27.4)*4.7*0.03937))		
+    mtau = 0.15
+
+    
+    hinf = 1/(1+exp((v+41.9)/6.7))				
+    htau = 23.12*exp(-0.5*((v+77.58)/43.92)^2) 	
+       
+    
+    sinf = 1/(1+exp((v+46.0)/6.6))						
+    stau = 1000*(140.4*exp(-0.5*((v+71.3)/30.9)^2))   	
+
+    
+    alpha = -0.07*vtrap((v+65-47),-6)
+    beta = 0.264/exp((v+65-22)/40)
+    sum = alpha+beta        
+    nftau = 1/sum      
+    nfinf = alpha/sum
+}
+ 
+
+PROCEDURE trates(v (mV)) {  
+                            
+    LOCAL tinc
+ 
+    TABLE minf, mexp, hinf, hexp, sinf, sexp, nfinf, nfexp, mtau, htau, stau, nftau
+        DEPEND dt, celsius FROM -100 TO 100 WITH 200
+                           
+    rates(v)    
+                
+                
+
+    tinc = -dt * q10
+    mexp = 1 - exp(tinc/mtau)
+    hexp = 1 - exp(tinc/htau)
+    sexp = 1 - exp(tinc/stau)
+    nfexp = 1 - exp(tinc/nftau)
+}
+
+ 
+FUNCTION vtrap(x,y) {  
+
+    if (fabs(x/y) < 1e-6) {
+        vtrap = y*(1 - x/y/2)
+    }else{  
+        vtrap = x/(exp(x/y) - 1)
+    }
+}
+ 
+
+UNITSON

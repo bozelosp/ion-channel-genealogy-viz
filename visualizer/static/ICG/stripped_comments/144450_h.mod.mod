@@ -1,0 +1,81 @@
+NEURON {
+	SUFFIX h
+        RANGE  gbar,vhalf, K, taun, ninf, g, ihi
+
+
+	NONSPECIFIC_CURRENT i
+	GLOBAL eh
+}
+
+UNITS {
+	(um) = (micrometer)
+	(mA) = (milliamp)
+	(uA) = (microamp)
+	(mV) = (millivolt)
+	(pmho) = (picomho)
+	(mmho) = (millimho)
+}
+
+
+
+PARAMETER {              
+
+
+
+
+
+
+	K      = 8.5   (mV)
+	gbar   = 1.0     (mho/cm2)  
+	vhalf  = -90   (mV)       
+}	
+
+
+STATE {                
+	n
+}
+
+ASSIGNED {             
+        v 
+
+	i (mA/cm2)
+	ninf
+	taun (ms)
+	g
+        eh (mV)
+}
+
+        
+
+
+INITIAL {               
+	rates()	
+	n = ninf
+	g = gbar*n
+
+	i = g*(v-eh)
+}
+
+
+BREAKPOINT {
+	SOLVE states METHOD cnexp
+	g = gbar*n
+
+	i = g*(v-eh)  
+}
+
+DERIVATIVE states {
+	rates()
+        n' = (ninf - n)/taun
+}
+
+PROCEDURE rates() {  
+ 
+ 	if (v > -30) {
+	   taun = 1
+	} else {
+           taun = 2*(1/(exp((v+145)/-17.5)+exp((v+16.8)/16.5)) + 5) 
+
+	}  
+         ninf = 1 - (1 / (1 + exp((vhalf - v)/K)))                  
+}

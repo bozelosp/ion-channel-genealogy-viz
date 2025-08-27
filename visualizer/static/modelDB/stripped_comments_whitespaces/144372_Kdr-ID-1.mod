@@ -1,0 +1,1 @@
+NEURON{SUFFIXKdrUSEIONkREADekWRITEikRANGEg,ik}UNITS{(S)=(siemens)(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{g(S/cm2)}ASSIGNED{v(mV)ek(mV)ik(mA/cm2)ntau(ms)ninf}STATE{n}BREAKPOINT{SOLVEstatesMETHODcnexpik=g*n^4*(v-ek)}DERIVATIVEstates{rates()n'=(ninf-n)/ntau}INITIAL{rates()n=ninf}PROCEDURErates(){UNITSOFFninf=1/(1+exp(-(v+30)/10))ntau=0.37+1.85/(1+exp((v+27)/15))}UNITSON

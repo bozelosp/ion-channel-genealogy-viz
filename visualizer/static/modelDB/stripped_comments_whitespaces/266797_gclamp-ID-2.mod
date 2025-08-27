@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGClampRANGEgamp,e,i,gNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(uS)=(microsiemens)}PARAMETER{gamp=0(uS)<0,1e9>e=0(mV)}ASSIGNED{v(mV)i(nA)g(uS)}BREAKPOINT{g=gampi=g*(v-e)}

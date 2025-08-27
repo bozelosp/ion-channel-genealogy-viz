@@ -1,0 +1,1 @@
+NEURON{SUFFIXGolgi_lkgNONSPECIFIC_CURRENTiRANGEQ10_diff,gbar_Q10,fix_celsiusRANGEel,gbar,g,ic}UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)Q10_diff=1.5gbar=21e-6(mho/cm2)fix_celsius=37(degC)el=-55(mV)}ASSIGNED{i(mA/cm2)gbar_Q10(mho/cm2)icg}INITIAL{gbar_Q10=gbar*(Q10_diff^((fix_celsius-23)/10))g=gbar_Q10}BREAKPOINT{i=gbar_Q10*(v-el)ic=i}

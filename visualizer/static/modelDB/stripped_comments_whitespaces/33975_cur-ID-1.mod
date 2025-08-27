@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)}NEURON{SUFFIXcurNONSPECIFIC_CURRENTiRANGEamp}PARAMETER{amp(milliamp/cm2)}ASSIGNED{i(mA/cm2)}BREAKPOINT{i=-amp}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGapPOINTERvgapRANGEr,iNONSPECIFIC_CURRENTi}PARAMETER{r=1e10(megohm)}ASSIGNED{v(millivolt)vgap(millivolt)i(nanoamp)}BREAKPOINT{i=(v-vgap)/r}

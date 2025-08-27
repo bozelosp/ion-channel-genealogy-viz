@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSGolgi_extraGABANONSPECIFIC_CURRENTiRANGEg,i,e}PARAMETER{g=216e-06(microsiemens)e=-80(millivolt)}ASSIGNED{i(nanoamp)v(millivolt)}BREAKPOINT{i=g*(v-e)}

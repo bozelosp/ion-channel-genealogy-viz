@@ -1,0 +1,1 @@
+NEURON{SUFFIXmyionsUSEIONkWRITEko,kiUSEIONnaWRITEnao,nai}UNITS{(molar)=(1/liter)(mM)=(millimolar)}ASSIGNED{nai(mM)nao(mM)ki(mM)ko(mM)}BREAKPOINT{nai=nainao=naoki=kiko=ko}

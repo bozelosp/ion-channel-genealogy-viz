@@ -1,0 +1,1 @@
+NEURON{SUFFIXleakNONSPECIFIC_CURRENTiRANGEi,e,gbar}UNITS{(mV)=(millivolt)(mA)=(milliamp)(nA)=(nanoamp)(pA)=(picoamp)(S)=(siemens)}PARAMETER{gbar=5e-5(S/cm2)<0,1e9>e=-60(mV)}ASSIGNED{i(mA/cm2)v(mV)}BREAKPOINT{i=gbar*(v-e)}

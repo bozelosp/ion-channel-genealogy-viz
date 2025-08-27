@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXWMPasDend2NONSPECIFIC_CURRENTiRANGEg,eleak}PARAMETER{v(mV)g=2.5e-5(mho/cm2)<0,1e9>eleak=-65(mV)}ASSIGNED{i(mA/cm2)}BREAKPOINT{i=g*(v-eleak)}

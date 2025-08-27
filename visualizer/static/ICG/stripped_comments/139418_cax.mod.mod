@@ -1,0 +1,37 @@
+NEURON {
+	SUFFIX cax
+	USEION ca READ ica WRITE cai
+	RANGE K1, K2
+}
+
+UNITS {
+	(mM) = (milli/liter)
+	(mA) = (milliamp)
+	F = (faraday) (coulombs)
+}
+
+PARAMETER {
+	K1 = 0.02 (mM-cm2/ms-mA)
+	K2 = 0.04 (/ms)
+	cai0 = 0.0000604 (mM)
+}
+
+ASSIGNED {
+	 ica (mA/cm2)
+}
+
+STATE {
+	cai (mM)
+}
+
+INITIAL {
+	cai = cai0
+}
+
+BREAKPOINT {
+	SOLVE integrate METHOD derivimplicit
+}
+
+DERIVATIVE integrate {
+	cai' = -(K1*ica + K2*cai)
+}

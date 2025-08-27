@@ -1,0 +1,1 @@
+INCLUDE"Unit.inc"INCLUDE"Volume.inc"NEURON{SUFFIXik1USEIONkREADek,koWRITEikRANGEg,ik}PARAMETER{g=920(uS)Km1=210(mM)}ASSIGNED{v(mV)celsius(degC)ik(mA/cm2)minfmtau(ms)ek(mV)ko(mM)ki(mM)}LOCALRTINITIAL{RT=(1000)*R*(273.15+celsius)}BREAKPOINT{ik=(1e-06)*g/S*(ko/(ko+Km1))*((v-ek)/(1+exp((v-ek+10)*2*F/RT)))}

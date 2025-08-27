@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSFzap_DCRANGEdel,dur,ampPOINTERx}PARAMETER{del(ms)dur(ms)amp(1)}ASSIGNED{x(1)on(1)}INITIAL{x=0on=0if(del<0){del=0}if(dur<0){dur=0}if(dur>0){net_send(del,1)net_send(del+dur,1)}}BEFOREBREAKPOINT{if(on==0){x=0}else{x=amp}}NET_RECEIVE(w){if(flag==1){VERBATIMon=(double)(on==0.0);ENDVERBATIM}}

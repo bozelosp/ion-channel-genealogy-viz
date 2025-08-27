@@ -1,0 +1,1 @@
+UNITS{(S)=(siemens)(mV)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXleakNONSPECIFIC_CURRENTiRANGEgmaxTHREADSAFE}PARAMETER{gmax=0.000125(S/cm2)Eleak=-65(mV)}ASSIGNED{v(mV)i(mA/cm2)}BREAKPOINT{i=gmax*(v-Eleak)}

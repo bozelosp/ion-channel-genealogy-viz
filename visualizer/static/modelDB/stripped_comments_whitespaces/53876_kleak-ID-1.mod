@@ -1,0 +1,1 @@
+NEURON{SUFFIXkleakNONSPECIFIC_CURRENTiRANGEi,Erev,g}PARAMETER{g=132.8e-6(siemens/cm2)<0,1e9>Erev=-82(millivolt)}ASSIGNED{i(milliamp/cm2)v(millivolt)}BREAKPOINT{i=g*(v-Erev)}

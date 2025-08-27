@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)}NEURON{SUFFIXINaPUSEIONnaREADenaWRITEinaRANGEgbar,ina}PARAMETER{gbar=1.0(mho/cm2)ena=45(mV)shm=1(mV)}ASSIGNED{v(mV)ina(mA/cm2)}BREAKPOINT{ina=gbar*minf(v)*(v-ena)}UNITSOFFFUNCTIONminf(v){minf=1/(1+exp(-(v+51-shm)/5))}UNITSON

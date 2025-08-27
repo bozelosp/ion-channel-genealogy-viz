@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSThreshDetectRANGEvthresh}UNITS{(mV)=(millivolt)}PARAMETER{vthresh=-40(mV)}ASSIGNED{v(mV)}INITIAL{net_send(0,1)}NET_RECEIVE(w){if(flag==1){WATCH(v>vthresh)2}elseif(flag==2){net_event(t)}}

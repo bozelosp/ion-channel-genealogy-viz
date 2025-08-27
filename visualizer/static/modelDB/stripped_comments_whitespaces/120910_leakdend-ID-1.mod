@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}NEURON{SUFFIXleakdendNONSPECIFIC_CURRENTilRANGEgl,el}PARAMETER{v(mV)celsius(degC)dt(ms)gl=0.000125(mho/cm2)el=-30(mV)}STATE{c}ASSIGNED{il(mA/cm2)}BREAKPOINT{il=gl*(v-el)}UNITSON

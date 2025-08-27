@@ -1,0 +1,14 @@
+# 22203_kaprox.mod
+
+- **G_VALS**:
+  - gkabar_kap: 0.008
+- **GATES**:
+  - l: 1
+  - n: 1
+- **SUFFIX**: kap
+- **GMAX_NAME**: gkabar_kap
+- **STATES**: ['n', 'l']
+- **I_VALS**:
+  - 6.3: 0.007998622816414041
+  - 37: 0.007999387054635942
+- **ERROR_FLAGS**: []

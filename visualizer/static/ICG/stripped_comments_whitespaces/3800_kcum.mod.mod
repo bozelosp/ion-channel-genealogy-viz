@@ -1,0 +1,1 @@
+NEURON{SUFFIXK_accUSEIONkREADki,ikWRITEkiRANGEVi,Kneutral}UNITS{(mV)=(millivolt)(mM)=(milli/liter)(mA)=(milliamp)F=(faraday)(coulombs)}PARAMETER{Vi=13668e-12(cm3)ik(mA/cm2)Kneutral=3e-5(mA/cm2)<0,1e6>}STATE{kiSTART141.13(mM)}LOCALViFINITIAL{VERBATIMki=_ion_ki;ENDVERBATIMViF=Vi*F*2e4}BREAKPOINT{SOLVEstateMETHODderivimplicit}DERIVATIVEstate{ki'=-(ik-Kneutral)/(ViF)}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXinfoRANGEDendDist,SpaceConstant,ElectroL,ElectroDist,TerminalRANGEx,y,z}PARAMETER{DendDist=0SpaceConstant=0ElectroL=0ElectroDist=0Terminal=0x=0(1)y=0(1)z=0(1)}

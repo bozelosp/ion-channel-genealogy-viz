@@ -1,0 +1,1 @@
+NEURON{SUFFIXcapumpUSEIONcaREADcaiWRITEicaRANGEica}UNITS{(uM)=(micro/liter)(mM)=(milli/liter)(mA)=(milliamp)}INDEPENDENT{tFROM0TO1WITH1(ms)}PARAMETER{final_conc=0.0001(mM)tau=150(ms)celsius(degC)}INITIAL{cai=0.0001}ASSIGNED{ica(mA/cm2)cai(mM)}LOCALQ,s_celsiusBREAKPOINT{if(s_celsius*1(degC)!=celsius){s_celsius=celsiusQ=3^((celsius-6.3)/10(degC))}ica=(cai-final_conc)/tau}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXnap}NEURON{USEIONnaWRITEina}ASSIGNED{ina}PARAMETER{erev=45(mV)gmax=0.1(umho)vrest=0mvalence=4.3mgamma=0.7mbaserate=4.2mvhalf=-40mbasetau=0.1mtemp=37mq10=3mexp=3hvalence=-6hgamma=0.5hbaserate=0.2hvhalf=-50hbasetau=4htemp=37hq10=3hexp=1cao(mM)cai(mM)celsius=37(degC)dt(ms)v(mV)vmax=50(mV)vmin=-100(mV)}INCLUDE"bg_cvode.inc"PROCEDUREiassign(){i=g*(v-erev)ina=i}

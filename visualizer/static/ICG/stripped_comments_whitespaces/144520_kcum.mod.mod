@@ -1,0 +1,1 @@
+INCLUDE"Unit.inc"INCLUDE"Volume.inc"NEURON{SUFFIXK_accUSEIONkREADki,ik,koWRITEki,koRANGEik,pf,kb}PARAMETER{ik(mA/cm2)kb=4(mM)pf=0.7(/s)}STATE{kiSTART140(mM)koSTART4(mM)}LOCALViF,VeFINITIAL{VERBATIMki=_ion_ki;ko=_ion_ko;ENDVERBATIMVeF=(1e-3)*Ve*F/SViF=(1e-3)*Vi*F/S}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{ki'=-ik/ViFko'=ik/VeF-(0.001)*pf*(ko-kb)}

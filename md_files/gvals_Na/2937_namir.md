@@ -1,0 +1,16 @@
+# 2937_namir.mod
+
+- **G_VALS**:
+  - gnabar_namr: 0.01
+- **GATES**:
+  - fr: 1
+  - r: 1
+  - l: 1
+  - n: 1
+- **SUFFIX**: namr
+- **GMAX_NAME**: gnabar_namr
+- **STATES**: ['n', 'l', 'r', 'fr']
+- **I_VALS**:
+  - 6.3: 0.010000038944086154
+  - 37: 0.010000133625891337
+- **ERROR_FLAGS**: []

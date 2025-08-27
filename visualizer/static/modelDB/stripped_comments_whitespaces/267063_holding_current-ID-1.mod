@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSi_holdRANGEi_holdingNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{i_holding=0}ASSIGNED{i(nA)g_a(umho)}BREAKPOINT{i=i_holding/1000*-1}

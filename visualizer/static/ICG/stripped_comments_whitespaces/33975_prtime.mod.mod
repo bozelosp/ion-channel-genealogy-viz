@@ -1,0 +1,1 @@
+NEURON{SUFFIXnothing}VERBATIM#include<unistd.h>#include<limits.h>#include<time.h>#include<stdio.h>ENDVERBATIMFUNCTIONprtime(){VERBATIMdoubleprt;staticdoublePRTIME;prt=(clock()-PRTIME)/CLOCKS_PER_SEC;if(prt<0)prt+=UINT_MAX/CLOCKS_PER_SEC;PRTIME=clock();_lprtime=prt;ENDVERBATIM}

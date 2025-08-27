@@ -1,0 +1,1 @@
+NEURON{SUFFIXCadynamUSEIONcaREADica,caiWRITEcaiUSEIONcsREADicsVALENCE2RANGEics}UNITS{(mM)=(milli/liter)(mA)=(milliamp)}ASSIGNED{ica(mA/cm2)ics(mA/cm2)}PARAMETER{}STATE{caiSTART0.001(mM)<1e-6>}INITIAL{VERBATIMcai=_ion_cai;ENDVERBATIM}BREAKPOINT{SOLVEstateMETHODderivimplicit}DERIVATIVEstate{cai'=-1e-7*ics+0.07*(1e-7-cai)}

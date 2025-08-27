@@ -1,0 +1,68 @@
+# 84612_cachan.mod
+
+## SUFFIX
+
+cachan
+
+## GMAX_NAME
+
+- None
+
+## G_VALS
+
+- **gcalbar_cachan**: 0.000216
+- **gcanbar_cachan**: 0.000171
+- **gcatbar_cachan**: 0.001044
+
+## I_VALS
+
+
+## STATES
+
+- d_t
+- dl
+- dn
+- ft
+
+## GATES
+
+- **d_t**: 1
+- **dl**: 1
+- **dn**: 1
+- **ft**: 1
+
+## ERROR_FLAGS
+
+- 7
+
+## RATES
+
+- True
+
+## RATE_VALS
+
+![d_t Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/84612_cachan.mod/images/d_t.png)
+![dl Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/84612_cachan.mod/images/dl.png)
+![dn Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/84612_cachan.mod/images/dn.png)
+![ft Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/Ca/84612_cachan.mod/images/ft.png)
+
+## SM1_FIT
+
+- False
+
+## SM2_FIT
+
+- False
+
+## SM3_FIT
+
+- False
+
+## SM4_FIT
+
+- False
+
+## SM5_FIT
+
+- False
+

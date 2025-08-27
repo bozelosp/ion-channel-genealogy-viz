@@ -1,0 +1,1 @@
+NEURON{SUFFIXkOUSEIONkREADekWRITEikRANGEgkbar}UNITS{(mA)=(milliamp)(mV)=(millivolt)}INDEPENDENT{tFROM0TO1WITH1(ms)}PARAMETER{v(mV)dt(ms)gkbar=1.0(mho/cm2)}ASSIGNED{ik(mA/cm2)ek(mV)}BREAKPOINT{ik=gkbar*(v-ek)}

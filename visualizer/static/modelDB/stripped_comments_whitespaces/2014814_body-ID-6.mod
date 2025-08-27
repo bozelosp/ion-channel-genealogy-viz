@@ -1,0 +1,1 @@
+NEURON{SUFFIXbody}PARAMETER{b0=1.0w=0.628}STATE{b}BREAKPOINT{SOLVEstatesMETHODderivimplicit}INITIAL{b=1.0}DERIVATIVEstates{b'=-b0*w*sin(w*t)}

@@ -1,0 +1,1 @@
+NEURON{SUFFIXkmRT03}NEURON{USEIONkREADekWRITEik}ASSIGNED{ik}PARAMETER{erev=0(mV)gmax=0(mho/cm^2)vrest=0maflag=2malphaA=0.02malphaB=-5.malphaV0=-20.mbflag=1mbetaA=0.01mbetaB=-18.mbetaV0=-43.exptemp=37mq10=1mexp=1haflag=0halphaA=0halphaB=0halphaV0=0hbflag=0hbetaA=0hbetaB=0hbetaV0=0hq10=3hexp=0ek}INCLUDE"geneval_cvode.inc"PROCEDUREiassign(){i=g*(v-ek)ik=i}

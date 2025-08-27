@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSFlagALLRANGEf,a,del}UNITS{(nA)=(nanoamp)(mV)=(millivolt)}PARAMETER{adel(ms)}ASSIGNED{f}INITIAL{f=0}BREAKPOINT{at_time(del)if(t>=del){f=a}else{f=0}}

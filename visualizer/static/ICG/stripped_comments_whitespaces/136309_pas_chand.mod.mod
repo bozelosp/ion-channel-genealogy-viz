@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{SUFFIXpasChandNONSPECIFIC_CURRENTiRANGEg,e}PARAMETER{g=0.0(mho/cm2)e=-50(mV)}ASSIGNED{v(mV)i(mA/cm2)}BREAKPOINT{i=g*(v-e)}INITIAL{}

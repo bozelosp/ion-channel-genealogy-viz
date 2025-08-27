@@ -1,0 +1,1 @@
+NEURON{SUFFIXksubUSEIONkREADekWRITEikRANGEgk,ik}UNITS{(S)=(siemens)(mV)=(millivolt)(mA)=(milliamp)}PARAMETER{gk=3e-5(S/cm2)}ASSIGNED{v(mV)ek(mV)ik(mA/cm2)}BREAKPOINT{ik=gk*ninf(v)^3*(v-ek)}FUNCTIONninf(Vm(mV)){UNITSOFFninf=1/(1+exp(-(Vm+44.5)/3))UNITSON}

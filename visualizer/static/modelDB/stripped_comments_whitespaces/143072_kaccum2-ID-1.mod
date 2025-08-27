@@ -1,0 +1,1 @@
+NEURON{SUFFIXkaccum2USEIONkREADik,koWRITEkoRANGEfhspace,kk}UNITS{(molar)=(1/liter)(mV)=(millivolt)(um)=(micron)(mM)=(millimolar)(mA)=(milliamp)FARADAY=96520(coul)R=8.3134(joule/degC)}PARAMETER{kbath=4(mM)diam(um)ik(mA/cm2)fhspace=20000(angstrom)kk=0.9ko0=4(mM)}STATE{ko(mM)}INITIAL{ko=ko0}BREAKPOINT{SOLVEstateMETHODeuler}DERIVATIVEstate{ko'=ik/fhspace/FARADAY*(1e8)+(kbath-ko)/kk}

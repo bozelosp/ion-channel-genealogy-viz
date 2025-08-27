@@ -1,0 +1,1 @@
+VERBATIM#include<stdlib.h>ENDVERBATIMUNITS{(mA)=(milliamp)(mV)=(millivolt)}NEURON{SUFFIXch_leakNONSPECIFIC_CURRENTiRANGEgmax,e,iRANGEmyiTHREADSAFE}PARAMETER{g(mho/cm2)gmax(mho/cm2)e(mV)}ASSIGNED{v(mV)i(mA/cm2)myi(mA/cm2)}BREAKPOINT{g=gmaxi=g*(v-e)myi=i}

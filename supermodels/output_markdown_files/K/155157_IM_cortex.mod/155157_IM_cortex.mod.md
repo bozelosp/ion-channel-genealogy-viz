@@ -1,0 +1,68 @@
+# 155157_IM_cortex.mod
+
+## SUFFIX
+
+im
+
+## GMAX_NAME
+
+gkbar_im
+
+## G_VALS
+
+- **gkbar_im**: 1e-06
+
+## I_VALS
+
+- **37**: 9.999002833044571e-07
+- **6.3**: 9.99900021985058e-07
+
+## STATES
+
+- m
+
+## GATES
+
+- **m**: 1
+
+## ERROR_FLAGS
+
+
+## RATES
+
+- True
+
+## Q10_TAU
+
+2.299989496944801
+
+## Q10_G
+
+1.0000000851288289
+
+## RATE_VALS
+
+![m Plot](/Users/pbozelos/Dropbox/icg-Chai-Panos/supermodels/output_markdown_files/K/155157_IM_cortex.mod/images/m.png)
+
+## SM1_FIT
+
+- True
+
+## RATE_VALS_V
+
+## SM2_FIT
+
+- True
+
+## SM3_FIT
+
+- True
+
+## SM4_FIT
+
+- True
+
+## SM5_FIT
+
+- True
+

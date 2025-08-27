@@ -1,0 +1,1 @@
+UNITS{(molar)=(1/liter)}UNITS{(mV)=(millivolt)(mA)=(milliamp)(mM)=(millimolar)}NEURON{SUFFIXkcaUSEIONcaREADcaiUSEIONkREADekWRITEikRANGEgbar,gkcaRANGEtot}PARAMETER{celsius(degC)v(mV)gbar=.001(mho/cm2)Kd=0.5(mM)}ASSIGNED{ik(mA/cm2)tot(mA/cm2)gkca(mho/cm2)ek(mV)cai(mM)}INITIAL{gkca=gbar*cai/(Kd+cai)}BREAKPOINT{gkca=gbar*cai/(Kd+cai)tot=gkca*(v-ek)ik=gkca*(v-ek)}

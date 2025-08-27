@@ -1,0 +1,1 @@
+NEURON{SUFFIXDUSEIONcaREADicaRANGED}UNITS{(mA)=(milliamp)}PARAMETER{G=1tau_M=500(ms)Z_M=3}ASSIGNED{Mbar(1)ica(mA/cm2)D(1)}STATE{M(1)}BREAKPOINT{SOLVEstatesMETHODcnexpD=G*M*M}INITIAL{rates(ica)M=Mbar}DERIVATIVEstates{rates(ica)M'=(Mbar-M)/tau_M}PROCEDURErates(ica(mA/cm2)){UNITSOFFMbar=1/(1+exp(Z_M+1e3*ica))UNITSON}

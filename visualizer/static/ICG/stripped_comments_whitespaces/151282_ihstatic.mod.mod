@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{SUFFIXihstaticNONSPECIFIC_CURRENTiRANGEg,e,nv,gfactor}PARAMETER{g=.001(S/cm2)<0,1e9>e=-30(mV)gfactor=1}ASSIGNED{v(mV)nv(mV)i(mA/cm2)}BREAKPOINT{i=gfactor*g*(v-e)nv=-v}

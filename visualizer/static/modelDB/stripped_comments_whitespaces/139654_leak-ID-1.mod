@@ -1,0 +1,1 @@
+NEURON{SUFFIXleakNONSPECIFIC_CURRENTiRANGEi,Er,g}PARAMETER{g=0(S/cm2)<0,1e9>Er=0(mV)}ASSIGNED{i(milliamp/cm2)v(millivolt)}BREAKPOINT{i=g*(v-Er)}

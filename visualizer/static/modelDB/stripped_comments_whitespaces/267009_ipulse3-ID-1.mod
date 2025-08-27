@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSIpulse3RANGEdur,amp,iELECTRODE_CURRENTiTHREADSAFE}UNITS{(nA)=(nanoamp)}PARAMETER{dur(ms)<0,1e9>amp(nA)}ASSIGNED{ival(nA)i(nA)on}INITIAL{on=0i=0ival=0}BREAKPOINT{i=ival}NET_RECEIVE(w){if(flag==0){if(on==0){ival=ampon=1net_send(dur,1)}}else{ival=0on=0}}

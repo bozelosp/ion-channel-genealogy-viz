@@ -1,0 +1,1 @@
+NEURON{SUFFIXoriglenRANGElengthRANGEdistance}ASSIGNED{length(micron)distance(micron)}

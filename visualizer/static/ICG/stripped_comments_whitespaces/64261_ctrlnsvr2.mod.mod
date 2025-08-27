@@ -1,0 +1,1 @@
+NEURON{ARTIFICIAL_CELLControlNSVR2RANGEtau_corrPOINTERthetastimPOINTERtchange}PROCEDUREseed(x){set_seed(x)}ASSIGNED{tchange(ms)thetastim}PARAMETER{tau_corr=20(ms)}INITIAL{tchange=tau_corr*exprand(1)net_send(tchange-1e-12,1)}NET_RECEIVE(w){if(flag==1){tchange=t+1e-12+tau_corr*exprand(1)thetastim=scop_random()net_send(tchange-t-1e-12,1)}}

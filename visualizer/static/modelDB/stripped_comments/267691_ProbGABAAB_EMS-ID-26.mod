@@ -1,0 +1,255 @@
+NEURON {
+    THREADSAFE
+	POINT_PROCESS ProbGABAAB_EMS
+	RANGE tau_r_GABAA, tau_d_GABAA, tau_r_GABAB, tau_d_GABAB 
+	RANGE Use, u, Dep, Fac, u0, Rstate, tsyn_fac, u
+	RANGE i,i_GABAA, i_GABAB, g_GABAA, g_GABAB, g, e_GABAA, e_GABAB, GABAB_ratio
+        RANGE A_GABAA_step, B_GABAA_step, A_GABAB_step, B_GABAB_step
+	NONSPECIFIC_CURRENT i
+    POINTER rng
+    RANGE synapseID, verboseLevel
+}
+
+PARAMETER {
+	tau_r_GABAA  = 0.2   (ms)  
+	tau_d_GABAA = 8   (ms)  
+    tau_r_GABAB  = 3.5   (ms)  
+	tau_d_GABAB = 260.9   (ms)  
+	Use        = 1.0   (1)   
+	Dep   = 100   (ms)  
+	Fac   = 10   (ms)  
+	e_GABAA    = -80     (mV)  
+    e_GABAB    = -97     (mV)  
+    gmax = .001 (uS) 
+    u0 = 0 
+    synapseID = 0
+    verboseLevel = 0
+	GABAB_ratio = 0.2 (1) 
+}
+
+
+   
+VERBATIM
+#include<stdlib.h>
+#include<stdio.h>
+#include<math.h>
+
+#ifndef NRN_VERSION_GTEQ_8_2_0
+double nrn_random_pick(void* r);
+void* nrn_random_arg(int argpos);
+#define RANDCAST
+#else
+#define RANDCAST (Rand*)
+#endif
+
+ENDVERBATIM
+  
+
+ASSIGNED {
+	v (mV)
+	i (nA)
+        i_GABAA (nA)
+        i_GABAB (nA)
+        g_GABAA (uS)
+        g_GABAB (uS)
+        A_GABAA_step
+        B_GABAA_step
+        A_GABAB_step
+        B_GABAB_step
+	g (uS)
+	factor_GABAA
+        factor_GABAB
+        rng
+
+       
+       
+	 
+	 
+	 
+       Rstate (1) 
+       tsyn_fac (ms) 
+       u (1) 
+
+
+}
+
+STATE {
+        A_GABAA       
+        B_GABAA       
+        A_GABAB       
+        B_GABAB       
+}
+
+INITIAL{
+
+        LOCAL tp_GABAA, tp_GABAB
+
+	Rstate=1
+	tsyn_fac=0
+	u=u0
+        
+        A_GABAA = 0
+        B_GABAA = 0
+        
+        A_GABAB = 0
+        B_GABAB = 0
+        
+        tp_GABAA = (tau_r_GABAA*tau_d_GABAA)/(tau_d_GABAA-tau_r_GABAA)*log(tau_d_GABAA/tau_r_GABAA) 
+        tp_GABAB = (tau_r_GABAB*tau_d_GABAB)/(tau_d_GABAB-tau_r_GABAB)*log(tau_d_GABAB/tau_r_GABAB) 
+        
+        factor_GABAA = -exp(-tp_GABAA/tau_r_GABAA)+exp(-tp_GABAA/tau_d_GABAA) 
+        factor_GABAA = 1/factor_GABAA
+        
+        factor_GABAB = -exp(-tp_GABAB/tau_r_GABAB)+exp(-tp_GABAB/tau_d_GABAB) 
+        factor_GABAB = 1/factor_GABAB
+        
+        A_GABAA_step = exp(dt*(( - 1.0 ) / tau_r_GABAA))
+        B_GABAA_step = exp(dt*(( - 1.0 ) / tau_d_GABAA))
+        A_GABAB_step = exp(dt*(( - 1.0 ) / tau_r_GABAB))
+        B_GABAB_step = exp(dt*(( - 1.0 ) / tau_d_GABAB))
+}
+
+BREAKPOINT {
+	SOLVE state
+	
+        g_GABAA = gmax*(B_GABAA-A_GABAA) 
+        g_GABAB = gmax*(B_GABAB-A_GABAB) 
+        g = g_GABAA + g_GABAB
+        i_GABAA = g_GABAA*(v-e_GABAA) 
+        i_GABAB = g_GABAB*(v-e_GABAB) 
+        i = i_GABAA + i_GABAB
+}
+
+PROCEDURE state() {
+        A_GABAA = A_GABAA*A_GABAA_step
+        B_GABAA = B_GABAA*B_GABAA_step
+        A_GABAB = A_GABAB*A_GABAB_step
+        B_GABAB = B_GABAB*B_GABAB_step
+}
+
+
+NET_RECEIVE (weight, weight_GABAA, weight_GABAB, Psurv, tsyn (ms)){
+    LOCAL result
+    weight_GABAA = weight
+    weight_GABAB = weight*GABAB_ratio
+    
+    
+    
+
+
+    INITIAL{
+		tsyn=t
+    }
+
+    
+    if(  !(weight > 0) ) {
+VERBATIM
+        return;
+ENDVERBATIM
+    }
+
+        
+        if (Fac > 0) {
+                u = u*exp(-(t - tsyn_fac)/Fac) 
+           } else {
+                  u = Use  
+           } 
+           if(Fac > 0){
+                  u = u + Use*(1-u) 
+           }    
+
+	   
+	   
+	   tsyn_fac = t
+
+           
+	   if (Rstate == 0) {
+	   
+	          Psurv = exp(-(t-tsyn)/Dep)
+		  result = urand()
+		  if (result>Psurv) {
+		         Rstate = 1     
+
+                         if( verboseLevel > 0 ) {
+                             printf( "Recovered! %f at time %g
+                         }
+
+		  }
+		  else {
+		         
+		         tsyn = t
+                         if( verboseLevel > 0 ) {
+                             printf( "Failed to recover! %f at time %g
+                         }
+		  }
+           }	   
+	   
+	   if (Rstate == 1) {
+   	          result = urand()
+		  if (result<u) {
+		  
+   		         tsyn = t
+			 Rstate = 0
+
+                         A_GABAA = A_GABAA + weight_GABAA*factor_GABAA
+                         B_GABAA = B_GABAA + weight_GABAA*factor_GABAA
+                         A_GABAB = A_GABAB + weight_GABAB*factor_GABAB
+                         B_GABAB = B_GABAB + weight_GABAB*factor_GABAB
+                         
+                         if( verboseLevel > 0 ) {
+                             printf( "Release! %f at time %g
+                         }
+		  		  
+		  }
+		  else {
+		         if( verboseLevel > 0 ) {
+			     printf("Failure! %f at time %g
+		         }
+
+		  }
+
+	   }
+
+        
+
+}
+
+
+PROCEDURE setRNG() {
+VERBATIM
+    {
+        
+        void** pv = (void**)(&_p_rng);
+        if( ifarg(1)) {
+            *pv = nrn_random_arg(1);
+        } else {
+            *pv = (void*)0;
+        }
+    }
+ENDVERBATIM
+}
+
+FUNCTION urand() {
+VERBATIM
+        double value;
+        if (_p_rng) {
+                
+                value = nrn_random_pick(RANDCAST _p_rng);
+                
+                return value;
+        }else{
+ENDVERBATIM
+                
+                
+                
+                
+                urand = scop_random()
+VERBATIM
+        }
+ENDVERBATIM
+        urand = value
+}
+
+FUNCTION toggleVerbose() {
+    verboseLevel = 1 - verboseLevel
+}

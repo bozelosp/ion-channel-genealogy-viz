@@ -1,0 +1,36 @@
+NEURON {
+        SUFFIX cadyn
+        USEION ca READ cai, ica WRITE cai 
+}
+
+UNITS {
+	(mM) = (milli/liter)
+	(mA) = (milliamp)
+	F    = (faraday) (coul)
+}
+
+PARAMETER {
+	depth= .1 (micron)	
+        tau= 1 (ms)		
+	cainf= 5e-5 (mM)	
+}
+
+ASSIGNED {
+	ica	(mA/cm2)
+	diam	(micron)
+	A	(/coul/cm)
+}
+
+STATE { cai (mM) <1e-5> }
+
+BREAKPOINT { 
+        SOLVE states METHOD cnexp
+}
+
+DERIVATIVE states {
+	cai'= -A* ica- (cai- cainf)/ tau
+}
+
+INITIAL {
+	A= (1e4)* diam/ (2* F* depth* (diam- depth))
+}

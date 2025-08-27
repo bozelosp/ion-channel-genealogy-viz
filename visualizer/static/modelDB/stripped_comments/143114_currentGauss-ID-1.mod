@@ -1,0 +1,94 @@
+INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+
+NEURON {
+	POINT_PROCESS  current_gauss
+	
+	NONSPECIFIC_CURRENT  in  
+	RANGE del,dur
+        
+	RANGE in
+	RANGE rand
+	RANGE mean, std0, std
+	RANGE f0  
+	RANGE N_smooth 
+	RANGE count
+	RANGE noise_seed
+	
+}
+
+
+UNITS {
+	(nA) = (nanoamp)
+	(mV) = (millivolt)
+}
+
+PARAMETER {
+	del=0 (ms)
+	dur=100 (ms) <0,1e9>
+	
+	mean=0         (nA)  
+	std0=1e-4       (nA)  
+	std=1e-4
+	noise_seed=1
+    
+	f0=4000   (1/s)   
+	
+}
+
+
+
+ASSIGNED {
+	v      (mV)
+	dt	(ms) 
+
+	in	(nA)
+	
+	rand
+	count
+        N_smooth
+	
+}
+
+PROCEDURE seed(x) {
+	set_seed(x)
+}
+
+
+BREAKPOINT {
+
+	if (t<del+dur && t>del) {
+
+		if(count/N_smooth==1){  
+			rand = normrand(mean, std)
+			in  = -rand   
+			count=0
+		}else{
+			count=count+1
+		} 
+	} else {
+	  in=0 
+	}
+
+
+
+}
+
+
+
+INITIAL {
+	
+	N_smooth=floor(1000/f0/dt)*2  
+
+		
+		
+	std=std0/sqrt(4000/f0)  
+        	
+	
+	rand = normrand(mean, std)
+	in  = -rand
+
+	count=0
+	
+	}
+
+UNITSON

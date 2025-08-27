@@ -1,0 +1,1 @@
+NEURON{SUFFIXgbarnaPOINTERF,S,DRANGEgbarna,tau,Fbar,Sbar,Dbar,A,B,CRANGEgbarna_init}UNITS{(mA)=(milliamp)}PARAMETER{Fbar=0.1(1)Sbar=0.1(1)Dbar=0.1(1)tau=5000(ms)A=1B=0C=0}ASSIGNED{F(1)S(1)D(1)gbarna_init(mA/cm2)}INITIAL{gbarna=gbarna_init}STATE{gbarna(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{gbarna'=(A*(Fbar-F)+B*(Sbar-S)+C*(Dbar-D))*gbarna/tau}

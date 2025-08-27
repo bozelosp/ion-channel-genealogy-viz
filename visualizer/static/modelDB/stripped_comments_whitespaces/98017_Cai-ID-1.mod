@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)(mM)=(milli/liter)}NEURON{SUFFIXCaiUSEIONcaREADicaWRITEcaiRANGEAlpha,tau}PARAMETER{Alpha=0.000667(mM-cm2/ms-mA)tau=240(ms)}ASSIGNED{gca(mho/cm2)ica(mA/cm2)}STATE{cai(mM)<1e-12>}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{cai'=-Alpha*ica-cai/tau}

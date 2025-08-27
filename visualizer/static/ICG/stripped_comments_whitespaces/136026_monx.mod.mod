@@ -1,0 +1,1 @@
+NEURON{SUFFIXmonxRANGEvmax,dist,surf,temp,zin,gesyn,gisyn}ASSIGNED{area(micron2)surf(micron2)v(millivolt)vmax(millivolt)tvmax(ms)dist(micron)gesyn(microsiemens)gisyn(microsiemens)zin(megohm)temp(1)}INITIAL{vmax=0tvmax=0surf=area}AFTERSOLVE{if(v>vmax){vmax=vtvmax=t}}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSRampIClampRANGEdel,dur,pkamp,biasELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)}PARAMETER{del=0(ms)dur=10000(ms)pkamp=20(nA)bias=0(nA)}ASSIGNED{i(nA)}BREAKPOINT{at_time(del)at_time(del+dur)if(t<del){i=0}else{if(t<del+dur/2){i=(2*pkamp/dur)*t+bias}else{i=-(2*pkamp/dur)*(t-dur)+bias}}}

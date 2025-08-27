@@ -1,0 +1,1 @@
+NEURON{SUFFIXxtraRANGErx,erRANGEx,y,zGLOBALisPOINTERim,ex}PARAMETER{rx=1(megohm)x=0(1)y=0(1)z=0(1)}ASSIGNED{v(millivolts)is(milliamp)ex(millivolts)im(milliamp/cm2)er(microvolts)area(micron2)}INITIAL{ex=is*rx*(1e6)er=(10)*rx*im*area}BEFOREBREAKPOINT{ex=is*rx*(1e6)}AFTERSOLVE{er=(10)*rx*im*area}

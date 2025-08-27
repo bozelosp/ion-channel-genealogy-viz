@@ -1,0 +1,1 @@
+NEURON{SUFFIXkir2_dopUSEIONkREADekWRITEikRANGEg,ninf,ik,gbarGLOBALvh,vc}UNITS{(mA)=(milliamp)(mV)=(millivolt)(S)=(siemens)}PARAMETER{gbar=1(S/cm2)ek(mV)vh=-90(mV)vc=12.1(mV)}ASSIGNED{v(mV)ninfik(mA/cm2)g(S/cm2)}STATE{}BREAKPOINT{values()g=gbar*ninfik=g*(v-ek)}INITIAL{values()}PROCEDUREvalues(){ninf=1/(1+exp((v-vh)/vc))}

@@ -1,0 +1,15 @@
+# 20212_hha_old.mod
+
+- **G_VALS**:
+  - gkbar_hha_old: 1.0
+  - gnabar_hha_old: 0.0
+- **GATES**:
+  - s: 1
+  - n: 2
+- **SUFFIX**: hha_old
+- **GMAX_NAME**: gkbar_hha_old
+- **STATES**: ['s', 'n']
+- **I_VALS**:
+  - 6.3: 0.9998420451351929
+  - 37: 0.9998420451351929
+- **ERROR_FLAGS**: []

@@ -1,0 +1,1 @@
+NEURON{SUFFIXgbarkdPOINTERF,S,DRANGEgbarkd,tau,Fbar,Sbar,Dbar,A,B,CRANGEgbarkd_init}UNITS{(mA)=(milliamp)}PARAMETER{Fbar=0.1(1)Sbar=0.1(1)Dbar=0.1(1)tau=5000(ms)A=1B=-1C=0}ASSIGNED{F(1)S(1)D(1)gbarkd_init(mA/cm2)}INITIAL{gbarkd=gbarkd_init}STATE{gbarkd(mA/cm2)}BREAKPOINT{SOLVEstateMETHODcnexp}DERIVATIVEstate{gbarkd'=(A*(Fbar-F)+B*(Sbar-S)+C*(Dbar-D))*gbarkd/tau}

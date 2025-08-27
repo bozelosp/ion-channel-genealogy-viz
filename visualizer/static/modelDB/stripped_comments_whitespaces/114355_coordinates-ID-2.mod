@@ -1,0 +1,1 @@
+NEURON{SUFFIXcoRANGEx,y,z,pt0,vdist}ASSIGNED{x(micron)y(micron)z(micron)pt0vdist(micron)}

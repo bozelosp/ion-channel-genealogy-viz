@@ -1,0 +1,13 @@
+# 144553_kvz_nature.mod
+
+- **G_VALS**:
+  - gbar_kv: 5.0
+- **GATES**:
+  - n: 1
+- **SUFFIX**: kv
+- **GMAX_NAME**: gbar_kv
+- **STATES**: ['n']
+- **I_VALS**:
+  - 6.3: 0.00012441837387434273
+  - 37: 0.0016046822135582252
+- **ERROR_FLAGS**: []

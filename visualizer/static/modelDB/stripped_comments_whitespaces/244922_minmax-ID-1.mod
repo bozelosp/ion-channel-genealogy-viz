@@ -1,0 +1,1 @@
+NEURON{SUFFIXminmaxRANGEvmax,vmin,tmax,tmin}ASSIGNED{v(millivolt)vmax(millivolt)vmin(millivolt)tmax(ms)tmin(ms)}INITIAL{vmax=vvmin=vtmax=ttmin=t}BREAKPOINT{VERBATIMif(v>vmax){vmax=v;tmax=t;}if(v<vmin){vmin=v;tmin=t;}ENDVERBATIM}

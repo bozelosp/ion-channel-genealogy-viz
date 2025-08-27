@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSPULSENONSPECIFIC_CURRENTiRANGEamp,dur}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)(mM)=(milli/liter)}PARAMETER{DELAY=0dur=0(ms)amp=0(nA)}ASSIGNED{Aoni(nA)dt}INITIAL{i=0}BREAKPOINT{i=Aon}NET_RECEIVE(weight,on,nspike){if(flag==0&&!on){nspike=nspike+1Aon=-ampnet_send(dur,nspike)}if(flag==nspike){Aon=0on=0}}

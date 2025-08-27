@@ -1,0 +1,1 @@
+NEURON{SUFFIXnadiflUSEIONnaREADinaWRITEnaiRANGED}UNITS{(mM)=(milli/liter)(um)=(micron)FARADAY=(faraday)(coulomb)PI=(pi)(1)}PARAMETER{D=.0(um2/ms)}ASSIGNED{ina(milliamp/cm2)diam(um)}STATE{nai(mM)}BREAKPOINT{SOLVEconcMETHODsparse}KINETICconc{COMPARTMENTPI*diam*diam/4{nai}LONGITUDINAL_DIFFUSIOND*PI*diam*diam/4{nai}~nai<<(-ina/(FARADAY)*PI*diam*(1e4))}

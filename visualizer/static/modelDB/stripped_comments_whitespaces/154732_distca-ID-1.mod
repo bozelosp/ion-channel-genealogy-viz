@@ -1,0 +1,1 @@
+UNITS{(mA)=(milliamp)(mV)=(millivolt)}PARAMETER{v(mV)}NEURON{SUFFIXdcaUSEIONcaREADcaiRANGEcamax}PARAMETER{cai(mM)}ASSIGNED{camax}INITIAL{camax=cai}BREAKPOINT{if(cai>camax){camax=cai}}

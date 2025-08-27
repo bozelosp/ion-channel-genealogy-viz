@@ -1,0 +1,50 @@
+NEURON {
+		SUFFIX CaPump						
+		USEION ca READ cai WRITE ica		
+		RANGE ICaPmax, KmCa, ica, icap		
+	}
+
+
+	UNITS {
+		(mA) = (milliamp)
+		(mV) = (millivolt)
+		(molar) = (1/liter)
+		(mM) = (millimolar)
+		
+	}
+
+
+	PARAMETER {
+		ICaPmax22 = 0.000859437(mA/cm2) <0,1e6> 
+		KmCa = .0005 (mM)    <0,1e6> 
+		Q10CaP = 2.30
+		Q10TempA = 22.85	(degC)		
+		Q10TempB = 10	(degC)
+	}
+
+
+	ASSIGNED {
+
+		
+		celsius (degC)
+		v (mV)
+		cai (mM)
+		ica (mA/cm2)
+		
+		
+		icap (mA/cm2)
+		ICaPmax (mA/cm2)
+	}
+
+
+	BREAKPOINT {
+		
+		icap = ICaPmax*(cai/(cai+KmCa)) 
+		
+		ica=icap
+	}
+
+
+	INITIAL {
+		ICaPmax = ICaPmax22*Q10CaP^((Q10TempA-celsius)/Q10TempB)
+	}

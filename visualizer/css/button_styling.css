@@ -1,0 +1,12 @@
+/* Default button style */
+button {
+    background-color: #CDCDCD;
+    color: white;
+    transition: background-color 170ms, color 170ms;  /* Add transition duration */
+}
+
+/* Active button style */
+button.active {
+    background-color: white;
+    color: rgba(34, 101, 136, 0.83);
+}

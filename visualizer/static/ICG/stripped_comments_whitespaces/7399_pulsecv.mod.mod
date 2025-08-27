@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSPULSENONSPECIFIC_CURRENTiRANGEamp,dur}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)(mM)=(milli/liter)}PARAMETER{dur=0(ms)amp=0(nA)}ASSIGNED{oni(nA)dt}INITIAL{on=0i=0}BREAKPOINT{if(on==1){i=-amp}else{i=0}}NET_RECEIVE(weight){if(flag==0){on=1net_send(dur,-1)}if(flag==-1){on=0}}

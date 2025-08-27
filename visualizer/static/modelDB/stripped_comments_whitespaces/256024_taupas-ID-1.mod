@@ -1,0 +1,1 @@
+UNITS{(mV)=(millivolt)(mA)=(milliamp)(S)=(siemens)}NEURON{THREADSAFESUFFIXtaupasNONSPECIFIC_CURRENTiRANGEg,tau,i}PARAMETER{g=0.0001(S/cm2)<1e-8,10>e=-65(mV)tau=30(ms)<0,1e4>}ASSIGNED{v(mV)i(mA/cm2)}STATE{lv(mV)}BREAKPOINT{SOLVEstatesMETHODcnexpif(tau<1e-3){i=g*(v-e)}else{i=g*(lv-e)}}INITIAL{lv=v}DERIVATIVEstates{lv'=(v-lv)/tau}

@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSstamRANGEd}ASSIGNED{d}FUNCTIONdraw(lambda){d=exprand(lambda)}

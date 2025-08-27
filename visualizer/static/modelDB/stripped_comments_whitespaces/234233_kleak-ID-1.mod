@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{POINT_PROCESSkleakRANGEgmaxGLOBALErevNONSPECIFIC_CURRENTi}UNITS{(nA)=(nanoamp)(mV)=(millivolt)(umho)=(micromho)}PARAMETER{gmax=0.004(umho)Erev=-100(mV)}ASSIGNED{v(mV)i(nA)}INITIAL{}BREAKPOINT{i=gmax*(v-Erev)}

@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH10(ms)}NEURON{SUFFIXrcadecayUSEIONcaREADicaWRITEcaiRANGEphi,beta}UNITS{(molar)=(1/liter)(mM)=(millimolar)(um)=(micron)(mA)=(milliamp)}PARAMETER{phi=0.13beta=0.075}ASSIGNED{ica}STATE{cai(1)}INITIAL{cai=0.0}BREAKPOINT{if(cai<0){cai=0}else{SOLVEstateMETHODcnexp}}DERIVATIVEstate{cai'=-phi*ica-beta*cai}

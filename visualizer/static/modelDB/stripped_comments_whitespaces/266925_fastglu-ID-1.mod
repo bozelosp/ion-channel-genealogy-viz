@@ -1,0 +1,1 @@
+INDEPENDENT{tFROM0TO1WITH1(ms)}NEURON{SUFFIXfastgluRANGEdur,cmax,T,Twait}UNITS{(mA)=(milliamp)(mV)=(millivolt)(mM)=(milli/liter)}PARAMETER{dur=2000(ms)cmax=1(mM)Twait=10(ms)}ASSIGNED{T(mM)}INITIAL{T=0}BREAKPOINT{if(t<Twait){T=0}if((t>=Twait)&&(t<=(Twait+dur))){T=cmax}if(t>(Twait+dur)){T=0}}

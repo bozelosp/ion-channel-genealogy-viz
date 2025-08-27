@@ -1,0 +1,1 @@
+NEURON{POINT_PROCESSIC_alternRANGEdel,dur,amp,i,freqELECTRODE_CURRENTi}UNITS{(nA)=(nanoamp)PI=(pi)(1)}PARAMETER{del(ms)dur(ms)<0,1e9>amp(nA)freq(1/s)}ASSIGNED{i(nA)}INITIAL{i=0}BREAKPOINT{at_time(del)at_time(del+dur)if(t>=del&&t<del+dur){i=amp*sin(2*PI*freq*(t-del)*(1e-3))}else{i=0}}

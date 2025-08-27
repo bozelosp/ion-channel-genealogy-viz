@@ -1,0 +1,283 @@
+VERBATIM
+# include <stdlib.h>
+# include <stdio.h>
+# include <math.h>
+ENDVERBATIM
+
+NEURON {
+	SUFFIX nothing
+}
+
+VERBATIM
+#ifndef NRN_VERSION_GTEQ_8_2_0
+#include <stdint.h>
+extern double* vector_vec();
+extern int vector_capacity();
+extern void* vector_arg();
+extern uint32_t nrnRan4int(uint32_t* idx1, uint32_t idx2);
+#endif
+extern double get_x_pos(double gid, double gmin, double BinNumX, double BinNumYZ, double binSizeX);
+extern double get_y_pos(double gid, double gmin, double BinNumY, double BinNumZ, double binSizeY);
+extern double get_z_pos(double gid, double gmin, double BinNumZ, double binSizeZ, double ZHeight);
+
+ENDVERBATIM
+
+VERBATIM
+static double repeatconn (void* vv) {
+  int repeatfinal, ny, nz, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover, reuse_conns_from_prev_step;
+  double *x, *y, *z, a, b, c, nconv, ncell, axonal_extent;
+
+	reuse_conns_from_prev_step=1;
+	
+	repeatfinal = vector_instance_px(vv, &x); 
+											
+											
+
+	ny = vector_arg_px(1, &y); 
+	nz = vector_arg_px(2, &z); 
+	
+	
+	gmin = y[0];	
+	gmax = y[1];	
+	num_pre = gmax - gmin + 1;	
+	
+	nconv = y[2];	
+	ncell = y[3];	
+	num_post = y[4];	
+	axonal_extent = y[5];	
+	steps = y[6];	
+	a = y[7];		
+	b = y[8];		
+	c = y[9];		
+	postgmin = y[24];	
+	stepover = y[26];	
+
+	myi=2;	
+			
+			
+
+	
+	double prepos [num_pre][3];
+	double postpos [num_post][3];
+	int cell;
+
+	for (cell=0; cell<num_pre; cell++) {
+		prepos [cell] [0] = get_x_pos(cell+gmin, gmin, y[10], y[11]*y[12], y[13]);
+		prepos [cell] [1] = get_y_pos(cell+gmin, gmin, y[11], y[12], y[14]);
+		prepos [cell] [2] = get_z_pos(cell+gmin, gmin, y[12], y[15], y[16]);
+	}
+
+	for (cell=0; cell<num_post; cell++) {
+		postpos [cell] [0] = get_x_pos(z[cell], postgmin, y[17], y[18]*y[19], y[20]);
+		postpos [cell] [1] = get_y_pos(z[cell], postgmin, y[18], y[19], y[21]);
+		postpos [cell] [2] = get_z_pos(z[cell], postgmin, y[19], y[22], y[23]);
+	}
+
+	   
+	double current_distance [steps], connection_distribution [steps], distribution_denominator, conndist;
+	int step, feasible_conns_this_step [steps], desired_conns_this_step [steps];
+
+	distribution_denominator = 0.0;
+	int max_fraction_step; max_fraction_step=0;
+	for (step=0; step<steps; step++) {
+		current_distance[step] = axonal_extent*1.0*(step+0.5)/(steps); 
+		
+		
+		connection_distribution[step] = exp(-a*((current_distance[step]-b)*1.0/c)*((current_distance[step]-b)*1.0/c));
+		if (connection_distribution[step]>connection_distribution[max_fraction_step]) {
+			max_fraction_step=step;
+		}
+		distribution_denominator = distribution_denominator + connection_distribution[step]; 
+	}
+	
+	
+	if (connection_distribution[max_fraction_step]/distribution_denominator*nconv < 0.5) { 
+		for (step=0; step<steps; step++) {
+			desired_conns_this_step[step] = round((2.0*connection_distribution[step]/distribution_denominator)*(nconv));
+															
+															
+			
+			
+		}
+	} else {
+		for (step=0; step<steps; step++) {
+			desired_conns_this_step[step] = round((connection_distribution[step]/distribution_denominator)*(nconv));
+															
+															
+			
+			
+		}
+	}
+
+	
+
+	   
+	int m, n, i, q, goupto, rem, extra, szr, szp [steps];
+	double distance_between;
+	u_int32_t idx1, idx2, maxidx1; 
+	maxidx1 = y[25];
+
+	for (n=0; n<num_post; n++) { 
+		int myx = (int)z[n]; 
+		idx1 = y[25]; 	
+						
+						
+						
+						
+						
+						
+		idx2 = myx;		
+		
+		
+
+		double sortedpos [num_pre][steps];
+		for (step=0; step< steps; step++) {
+			szp [step]=0; 	
+							
+							
+							
+							
+			feasible_conns_this_step[step] = desired_conns_this_step[step];		
+		}
+		
+		double dist;
+		for(m=0; m<num_pre; m++) { 
+			
+			
+			
+			
+			distance_between = sqrt((1.0*prepos[m][0] - postpos[n][0])*(prepos[m][0] - postpos[n][0])+(prepos[m][1] - postpos[n][1])*(prepos[m][1] - postpos[n][1]));
+			for (step=0; step< steps; step++) {
+				
+
+				if (distance_between<= current_distance[step]) 
+				{
+					sortedpos [szp [step]] [step] = m;	
+					szp [step]++;
+					break;
+				}
+			}
+		}
+
+		
+
+		
+		
+		
+		
+		
+			
+		rem=0;extra=0;
+		for (step=0; step<steps; step++) {	
+			szr = szp [step]; 
+			
+			if (szr < 1) { 
+				rem=feasible_conns_this_step[step]+rem-szr;
+				
+				if (step>0) {
+					for(i=1; i<=step; i++) {
+						if (reuse_conns_from_prev_step==0) {
+							if (szp [step-i] > feasible_conns_this_step[step-i]) {
+								if (szp [step-i] - feasible_conns_this_step[step-i]>rem) {
+									extra = rem;
+								} else {
+									extra = szp [step-i] - feasible_conns_this_step[step-i];
+								}
+								feasible_conns_this_step[step-i] = feasible_conns_this_step[step-i] + extra;
+								feasible_conns_this_step[step] = feasible_conns_this_step[step] - extra;
+								rem = rem - extra;				
+							}
+						} else { 
+							if (szp [step-i] > 0) {
+								extra = rem;
+								feasible_conns_this_step[step-i] = feasible_conns_this_step[step-i] + extra;
+								feasible_conns_this_step[step] = feasible_conns_this_step[step] - extra;
+								rem = rem - extra;				
+							}
+						}
+					}											
+				}
+				if (rem>0 && step<steps-1) { 
+					for(i=step+1; i<steps; i++) {				
+						if (reuse_conns_from_prev_step==0) {
+							if (szp [i] > feasible_conns_this_step[i]) {
+								if (szp [i] - feasible_conns_this_step[i]>rem) {
+									extra = rem;
+								} else {
+									extra = szp [i] - feasible_conns_this_step[i];
+								}
+								feasible_conns_this_step[i] = feasible_conns_this_step[i] + extra;
+								feasible_conns_this_step[step] = feasible_conns_this_step[step] - extra;
+								rem = rem - extra;
+							}
+						} else { 
+							if (szp [i] > 0) {
+								extra = rem;
+								feasible_conns_this_step[i] = feasible_conns_this_step[i] + extra;
+								feasible_conns_this_step[step] = feasible_conns_this_step[step] - extra;
+								rem = rem - extra;				
+							}
+						}					
+					}	
+				}
+			}
+		}
+
+		
+	
+		rem=0;
+		for (step=0; step<steps; step++) {	
+			szr = szp [step]; 
+			q=0;
+			if (feasible_conns_this_step[step]>0 && szr>0) { 
+				
+				
+				
+				
+				int r[szr]; 
+				int rout[feasible_conns_this_step[step]]; 
+				for (i=0; i< szr; i++) { 
+					r[i] =  sortedpos [i] [step]; 
+				}
+
+				
+				u_int32_t randi;
+				for (i=0; i<feasible_conns_this_step[step]; i++) {
+					randi =  nrnRan4int(&idx1, idx2) % (u_int32_t)szr; 
+					rout[i] = r[randi];
+				}
+
+				for (q=0; q<feasible_conns_this_step[step]; q++) { 	
+											
+											
+					x [myi] = (rout[q]+gmin)*1.0;				
+					x [myi+1*stepover] = (z[n])*1.0;	
+					x [myi+2*stepover] = (step+1)*1.0;	
+					myi++;
+				}
+			} 
+			
+					   
+					
+				
+			
+		}
+		if (idx1>maxidx1) { maxidx1=idx1;}
+	}
+	x [0] = myi-2;	
+					
+					
+					
+	x [1] = (double)maxidx1;
+	return repeatfinal;
+}
+ENDVERBATIM
+
+
+
+
+PROCEDURE install_repeatconn () {
+	VERBATIM
+	install_vector_method("repeatconn", repeatconn);
+	ENDVERBATIM
+}
