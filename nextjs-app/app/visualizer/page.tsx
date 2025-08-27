@@ -323,6 +323,42 @@ function extendSubgraphByConnectedNodes(linkData: Link[], subgraphNodeIds: strin
   return [...new Set(extended)]; // Remove duplicates
 }
 
+// Generate all combinations between source and target nodes
+function generateAllCombinations(sourceNodes: Node[], targetNodes: Node[]): {source: Node, target: Node}[] {
+  const combinations: {source: Node, target: Node}[] = [];
+  
+  for (const source of sourceNodes) {
+    for (const target of targetNodes) {
+      if (source.id !== target.id) {
+        combinations.push({ source, target });
+      }
+    }
+  }
+  
+  return combinations;
+}
+
+// Get selected nodes by class
+function getSelectedNodesByClass(svg: any): {sources: Node[], selected: Node[], all: Node[]} {
+  const sources: Node[] = [];
+  const selected: Node[] = [];
+  const all: Node[] = [];
+  
+  svg.selectAll('.source-node').each((d: Node) => {
+    sources.push(d);
+    all.push(d);
+  });
+  
+  svg.selectAll('.selected-node').each((d: Node) => {
+    if (!sources.find(s => s.id === d.id)) {
+      selected.push(d);
+      all.push(d);
+    }
+  });
+  
+  return { sources, selected, all };
+}
+
 export default function Visualizer() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
@@ -345,6 +381,18 @@ export default function Visualizer() {
   const [diffBoxes, setDiffBoxes] = useState<string[]>([]);
   const [currentDiffIndex, setCurrentDiffIndex] = useState<number>(0);
   const [showDiffView, setShowDiffView] = useState<boolean>(false);
+  
+  // View control
+  const [fitToViewFunction, setFitToViewFunction] = useState<(() => void) | null>(null);
+  
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{x: number, y: number, node: Node} | null>(null);
+  const [diffCombinations, setDiffCombinations] = useState<{source: Node, target: Node, html?: string}[]>([]);
+  const [currentCombinationIndex, setCurrentCombinationIndex] = useState<number>(0);
+  const [isGeneratingDiffs, setIsGeneratingDiffs] = useState<boolean>(false);
+  
+  // Group summary state
+  const [groupSummaries, setGroupSummaries] = useState<{key: string, nodeCount: number}[]>([]);
   
   // Check for mobile device and handle resize
   useEffect(() => {
@@ -374,31 +422,116 @@ export default function Visualizer() {
   // Keyboard event handler for shortcuts
   useEffect(() => {
     const handleKeyPress = async (event: KeyboardEvent) => {
-      if (event.code === 'KeyD' && sourceNodeIds.length > 0 && targetNodeIds.length > 0) {
-        // Generate diff when 'D' key is pressed
-        if (Object.keys(fetchedFiles).length > 0) {
-          const diffBoxes = await handleDiff(sourceNodeIds, targetNodeIds, fetchedFiles);
-          setDiffBoxes(diffBoxes);
-          setCurrentDiffIndex(0);
-          setShowDiffView(true);
+      if (event.code === 'KeyD') {
+        // Generate awesome diffs when 'D' key is pressed
+        if (svgRef.current) {
+          const svg = d3.select(svgRef.current);
+          const nodesByClass = getSelectedNodesByClass(svg);
+          const allSelectedNodes = nodesByClass.all;
+          
+          if (allSelectedNodes.length >= 2) {
+            await generateAwesomeDiffs(allSelectedNodes);
+          } else {
+            alert('Please select at least 2 nodes to generate diffs');
+          }
         }
-      } else if (event.code === 'ArrowLeft' && showDiffView) {
-        // Navigate to previous diff
-        setCurrentDiffIndex(prev => Math.max(0, prev - 1));
-      } else if (event.code === 'ArrowRight' && showDiffView) {
-        // Navigate to next diff
-        setCurrentDiffIndex(prev => Math.min(diffBoxes.length - 1, prev + 1));
+      } else if (event.code === 'ArrowLeft' && showDiffView && diffCombinations.length > 0) {
+        // Navigate to previous diff combination
+        setCurrentCombinationIndex(prev => Math.max(0, prev - 1));
+      } else if (event.code === 'ArrowRight' && showDiffView && diffCombinations.length > 0) {
+        // Navigate to next diff combination
+        setCurrentCombinationIndex(prev => Math.min(diffCombinations.length - 1, prev + 1));
+      } else if (event.code === 'KeyF') {
+        // Fit to view when 'F' key is pressed
+        if (fitToViewFunction) {
+          fitToViewFunction();
+        }
       } else if (event.code === 'Escape') {
-        // Close diff view
+        // Close diff view and context menu
         setShowDiffView(false);
-        setDiffBoxes([]);
-        setCurrentDiffIndex(0);
+        setDiffCombinations([]);
+        setCurrentCombinationIndex(0);
+        setContextMenu(null);
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [sourceNodeIds, targetNodeIds, fetchedFiles, showDiffView, diffBoxes]);
+  }, [showDiffView, diffCombinations]);
+
+  // Close context menu when clicking elsewhere
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    
+    if (contextMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [contextMenu]);
+
+  // Awesome diff generation function
+  const generateAwesomeDiffs = async (selectedNodes: Node[]) => {
+    if (!networkData) return;
+    
+    setIsGeneratingDiffs(true);
+    
+    // Determine source and target nodes based on selection
+    let sourceNodes: Node[] = [];
+    let targetNodes: Node[] = [];
+    
+    if (svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      const nodesByClass = getSelectedNodesByClass(svg);
+      
+      if (nodesByClass.sources.length > 0) {
+        // Use designated source nodes
+        sourceNodes = nodesByClass.sources;
+        targetNodes = nodesByClass.selected.length > 0 ? nodesByClass.selected : selectedNodes.filter(n => !sourceNodes.find(s => s.id === n.id));
+      } else {
+        // No designated sources, use all combinations
+        sourceNodes = selectedNodes;
+        targetNodes = selectedNodes;
+      }
+    }
+    
+    // Generate all combinations
+    const combinations = generateAllCombinations(sourceNodes, targetNodes);
+    
+    if (combinations.length === 0) {
+      alert('Please select at least 2 different nodes or designate source nodes with Ctrl+Click');
+      setIsGeneratingDiffs(false);
+      return;
+    }
+    
+    // Fetch source code for all involved nodes
+    const allNodeIds = [...new Set([...sourceNodes.map(n => n.id), ...targetNodes.map(n => n.id)])];
+    const updatedFiles = await fetchSourceCode(allNodeIds, networkData, fetchedFiles);
+    setFetchedFiles(updatedFiles);
+    
+    // Generate diffs for each combination
+    const combinationsWithDiffs: {source: Node, target: Node, html?: string}[] = [];
+    
+    for (const combo of combinations) {
+      const sourceCode = updatedFiles[combo.source.id]?.source_code;
+      const targetCode = updatedFiles[combo.target.id]?.source_code;
+      
+      if (sourceCode && targetCode) {
+        const diffHtml = await generateDiffHtml(sourceCode, targetCode);
+        combinationsWithDiffs.push({
+          ...combo,
+          html: diffHtml
+        });
+      } else {
+        combinationsWithDiffs.push(combo);
+      }
+    }
+    
+    setDiffCombinations(combinationsWithDiffs);
+    setCurrentCombinationIndex(0);
+    setShowDiffView(true);
+    setIsGeneratingDiffs(false);
+    setContextMenu(null);
+  };
 
   // Load data on mount
   useEffect(() => {
@@ -513,6 +646,24 @@ export default function Visualizer() {
     const uniqueFilterCombinations = getUniqueFilterCombinations(ionClass, showICG, supermodel1, supermodel2);
     const nodesGroupedByFilter = assignNodesToGroups(filteredNodes, uniqueFilterCombinations, ionClass, showICG, supermodel1, supermodel2);
     const nodeIdToLocation = sortAndPositionGroups(nodesGroupedByFilter, fixedLocationCircles);
+    
+    // Create group summaries (matching original implementation)
+    const newGroupSummaries: {key: string, nodeCount: number}[] = [];
+    Object.entries(nodesGroupedByFilter).forEach(([groupKey, groupNodes]) => {
+      if (groupNodes.length > 0) {
+        // Format the group key like the original (replace commas, format nicely)
+        let formattedKey = groupKey
+          .replace(',', ': ')
+          .replace(/,/g, ' • ')
+          .replace('Supermodel 1 • Supermodel 2', 'Supermodel 1 & 2');
+        
+        newGroupSummaries.push({
+          key: formattedKey,
+          nodeCount: groupNodes.length
+        });
+      }
+    });
+    setGroupSummaries(newGroupSummaries);
     
     // Check if we should split groups (more than one group)
     const splitVar = Object.keys(nodesGroupedByFilter).length > 1;
@@ -680,6 +831,16 @@ export default function Visualizer() {
           }
         }
       })
+      .on('contextmenu', function(event: any, d: any) {
+        event.preventDefault();
+        
+        // Get mouse position relative to the page
+        const rect = (event.target as Element).getBoundingClientRect();
+        const x = event.clientX;
+        const y = event.clientY;
+        
+        setContextMenu({ x, y, node: d });
+      })
       .call(d3.drag<any, any>()
         .on('start', dragstarted)
         .on('drag', dragged)
@@ -689,14 +850,109 @@ export default function Visualizer() {
     node.append('title')
       .text((d: Node) => `${d.name}\nClass: ${d.ion_class}\nICG: ${d.icg ? 'Yes' : 'No'}`);
 
-    // Zoom behavior
+    // Calculate bounding box of all nodes for proper zoom setup
+    const calculateBounds = () => {
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      let hasValidBounds = false;
+      
+      filteredNodes.forEach(node => {
+        const nodeRadius = calculateNodeRadius(node);
+        // Use actual node positions if available, otherwise fall back to center
+        const x = (typeof node.x === 'number' && !isNaN(node.x)) ? node.x : width / 2;
+        const y = (typeof node.y === 'number' && !isNaN(node.y)) ? node.y : height / 2;
+        
+        minX = Math.min(minX, x - nodeRadius);
+        maxX = Math.max(maxX, x + nodeRadius);
+        minY = Math.min(minY, y - nodeRadius);
+        maxY = Math.max(maxY, y + nodeRadius);
+        hasValidBounds = true;
+      });
+      
+      // If we don't have valid bounds, use reasonable defaults
+      if (!hasValidBounds || minX === Infinity) {
+        const defaultRadius = 100;
+        minX = width / 2 - defaultRadius;
+        maxX = width / 2 + defaultRadius;
+        minY = height / 2 - defaultRadius;
+        maxY = height / 2 + defaultRadius;
+      }
+      
+      return { minX, maxX, minY, maxY };
+    };
+
+    // Setup zoom behavior with proper bounds and centering
     const zoom = d3.zoom()
-      .scaleExtent([0.1, 10])
+      .scaleExtent([0.05, 20])  // Allow more zoom out and zoom in
       .on('zoom', (event) => {
         g.attr('transform', event.transform);
       });
 
     svg.call(zoom as any);
+
+    // Function to fit visualization with aesthetic margins
+    const fitToView = () => {
+      const bounds = calculateBounds();
+      const boundsWidth = bounds.maxX - bounds.minX;
+      const boundsHeight = bounds.maxY - bounds.minY;
+      
+      // Add aesthetic margins (20% of container size)
+      const margin = 0.2;
+      const marginX = width * margin;
+      const marginY = height * margin;
+      
+      // Available space for content
+      const availableWidth = width - (2 * marginX);
+      const availableHeight = height - (2 * marginY);
+      
+      // Calculate scale to fit content with margins
+      const scale = Math.min(
+        availableWidth / boundsWidth,
+        availableHeight / boundsHeight,
+        1 // Don't zoom in beyond 1:1 initially
+      );
+      
+      // Center point of the bounds
+      const centerX = (bounds.minX + bounds.maxX) / 2;
+      const centerY = (bounds.minY + bounds.maxY) / 2;
+      
+      // Calculate translation to center the content
+      const translateX = width / 2 - centerX * scale;
+      const translateY = height / 2 - centerY * scale;
+      
+      // Apply the transform smoothly
+      const transform = d3.zoomIdentity
+        .translate(translateX, translateY)
+        .scale(scale);
+        
+      svg.transition()
+        .duration(750)
+        .call(zoom.transform, transform);
+    };
+
+    // Store the fit function for keyboard access
+    setFitToViewFunction(() => fitToView);
+
+    // Initial fit after simulation settles (adaptive timing)
+    let fittingTimeout: NodeJS.Timeout;
+    const scheduleInitialFit = () => {
+      clearTimeout(fittingTimeout);
+      fittingTimeout = setTimeout(() => {
+        fitToView();
+      }, 1500);
+    };
+    
+    // Schedule initial fit and re-schedule if simulation is still active
+    scheduleInitialFit();
+    
+    // Re-schedule fit if simulation restarts (e.g., due to interactions)
+    simulation.on('end', () => {
+      setTimeout(fitToView, 300);
+    });
+
+    // Add fit-to-view functionality on double-click
+    svg.on('dblclick.zoom', null); // Remove default double-click zoom
+    svg.on('dblclick', fitToView);
 
     // Simulation tick (matching original - no boundary constraints)
     simulation.on('tick', () => {
@@ -780,7 +1036,7 @@ export default function Visualizer() {
             </h1>
             <a
               href="/"
-              className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Back to Home
             </a>
@@ -802,7 +1058,7 @@ export default function Visualizer() {
                   <button
                     key={cls}
                     onClick={() => setIonClass(cls)}
-                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-sm rounded-md transition-colors cursor-pointer ${
                       ionClass === cls
                         ? 'bg-blue-600 text-white'
                         : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
@@ -822,7 +1078,7 @@ export default function Visualizer() {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setSimilarityScore(Math.max(0, similarityScore - 5))}
-                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center"
+                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center cursor-pointer"
                 >
                   −
                 </button>
@@ -832,11 +1088,11 @@ export default function Visualizer() {
                   max="100"
                   value={similarityScore}
                   onChange={(e) => setSimilarityScore(Number(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 cursor-pointer"
                 />
                 <button
                   onClick={() => setSimilarityScore(Math.min(100, similarityScore + 5))}
-                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center"
+                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center cursor-pointer"
                 >
                   +
                 </button>
@@ -849,21 +1105,21 @@ export default function Visualizer() {
                 Supermodels
               </h3>
               <div className="space-y-2">
-                <label className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={supermodel1}
                     onChange={(e) => setSupermodel1(e.target.checked)}
-                    className="rounded"
+                    className="rounded cursor-pointer"
                   />
                   <span className="text-sm text-slate-600 dark:text-slate-400">Supermodel 1</span>
                 </label>
-                <label className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={supermodel2}
                     onChange={(e) => setSupermodel2(e.target.checked)}
-                    className="rounded"
+                    className="rounded cursor-pointer"
                   />
                   <span className="text-sm text-slate-600 dark:text-slate-400">Supermodel 2</span>
                 </label>
@@ -878,7 +1134,7 @@ export default function Visualizer() {
                 </span>
                 <button
                   onClick={() => setShowICG(!showICG)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
                     showICG ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
@@ -939,21 +1195,34 @@ export default function Visualizer() {
             {/* Keyboard Shortcuts */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-                Keyboard Shortcuts
+                Interaction Guide
               </h3>
-              <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
-                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Shift+Click</kbd> Select subgraph</div>
-                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Ctrl+Click</kbd> Toggle source node</div>
-                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">D</kbd> Generate code diff</div>
-                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">←/→</kbd> Navigate diffs</div>
-                <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd> Close diff view</div>
+              <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
+                <div className="space-y-1">
+                  <div className="font-medium text-slate-700 dark:text-slate-300">Node Selection:</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Click</kbd> Select/deselect</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Shift+Click</kbd> Select subgraph</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Ctrl+Click</kbd> Toggle source</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Right-Click</kbd> Context menu</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-slate-700 dark:text-slate-300">Code Comparison:</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">D</kbd> Generate all combinations</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">←/→</kbd> Navigate combinations</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd> Close diff view</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-medium text-slate-700 dark:text-slate-300">View Control:</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">F</kbd> Fit to view</div>
+                  <div><kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Double-Click</kbd> Fit to view</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Visualization Area */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 relative">
           <div className="flex-1 bg-white dark:bg-slate-800 m-4 rounded-lg shadow-lg p-4 min-h-0">
             <svg 
               ref={svgRef} 
@@ -961,58 +1230,286 @@ export default function Visualizer() {
               style={{ background: 'linear-gradient(to br, #fafafa, #f3f4f6)' }}
             ></svg>
           </div>
+
+          {/* Group Summary Boxes (matching original position and styling) */}
+          {groupSummaries.length > 1 && (
+            <div 
+              className="absolute overflow-y-auto rounded-md"
+              style={{
+                right: '10px',
+                top: '282px', 
+                width: '354px',
+                maxHeight: 'calc(100vh - 320px)'
+              }}
+            >
+                {groupSummaries.map((group, index) => (
+                  <div 
+                    key={index}
+                    className="group-summary-box"
+                  >
+                    <span className="group-summary-box-title">
+                      {group.key}
+                    </span>
+                    <br />
+                    <span className="group-summary-box-node-count">
+                      {group.nodeCount} nodes
+                    </span>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Diff View Overlay */}
-      {showDiffView && diffBoxes.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-            {/* Diff Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-              <div className="flex items-center space-x-4">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Source Code Comparison
-                </h3>
-                <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {currentDiffIndex + 1} / {diffBoxes.length}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
+      {/* Context Menu */}
+      {contextMenu && (
+        <div 
+          className="fixed z-50 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-2 min-w-48"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+            transform: 'translate(-50%, -10px)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
+            <div className="text-sm font-semibold text-slate-900 dark:text-white">
+              {contextMenu.node.name || contextMenu.node.id}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              {contextMenu.node.ion_class} • {contextMenu.node.icg ? 'ICG' : 'ModelDB'}
+            </div>
+          </div>
+          
+          <button
+            className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center space-x-2 cursor-pointer"
+            onClick={async () => {
+              if (svgRef.current) {
+                const svg = d3.select(svgRef.current);
+                const nodesByClass = getSelectedNodesByClass(svg);
+                const allSelectedNodes = [...nodesByClass.all, contextMenu.node];
+                await generateAwesomeDiffs(allSelectedNodes);
+              }
+            }}
+            disabled={isGeneratingDiffs}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>{isGeneratingDiffs ? 'Generating...' : 'Compare with selected nodes'}</span>
+          </button>
+          
+          <button
+            className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center space-x-2 cursor-pointer"
+            onClick={() => {
+              setContextMenu(null);
+              // Toggle node selection
+              if (svgRef.current) {
+                const svg = d3.select(svgRef.current);
+                const targetNode = svg.selectAll('circle').filter((d: any) => d.id === contextMenu.node.id);
+                const isSelected = targetNode.classed('selected-node');
+                
+                if (isSelected) {
+                  targetNode.classed('selected-node', false)
+                             .attr('fill', '#00BFFF')
+                             .attr('stroke', '#aaa')
+                             .attr('stroke-width', 1);
+                } else {
+                  targetNode.classed('selected-node', true)
+                             .attr('fill', '#00BFFF')
+                             .attr('stroke', '#215885')
+                             .attr('stroke-width', 2);
+                }
+              }
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Toggle selection</span>
+          </button>
+
+          <button
+            className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center space-x-2 cursor-pointer"
+            onClick={() => {
+              setContextMenu(null);
+              // Toggle source node
+              if (svgRef.current) {
+                const svg = d3.select(svgRef.current);
+                const targetNode = svg.selectAll('circle').filter((d: any) => d.id === contextMenu.node.id);
+                const isSource = targetNode.classed('source-node');
+                
+                if (isSource) {
+                  targetNode.classed('source-node', false)
+                             .attr('fill', '#00BFFF')
+                             .attr('stroke', '#aaa')
+                             .attr('stroke-width', 1);
+                } else {
+                  targetNode.classed('source-node', true)
+                             .attr('fill', '#ffd700')
+                             .attr('stroke', '#215885')
+                             .attr('stroke-width', 2);
+                }
+              }
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            <span>Toggle as source</span>
+          </button>
+        </div>
+      )}
+
+      {/* Awesome Diff View Overlay */}
+      {showDiffView && diffCombinations.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden border border-slate-200 dark:border-slate-700">
+            {/* Awesome Diff Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Code Comparison Matrix</h3>
+                    <p className="text-blue-100 text-sm">
+                      Exploring {diffCombinations.length} unique combinations
+                    </p>
+                  </div>
+                </div>
                 <button
-                  onClick={() => setCurrentDiffIndex(Math.max(0, currentDiffIndex - 1))}
-                  disabled={currentDiffIndex === 0}
-                  className="px-3 py-1.5 text-sm rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    setShowDiffView(false);
+                    setDiffCombinations([]);
+                    setCurrentCombinationIndex(0);
+                  }}
+                  className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-2 transition-all duration-200 cursor-pointer"
                 >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentDiffIndex(Math.min(diffBoxes.length - 1, currentDiffIndex + 1))}
-                  disabled={currentDiffIndex === diffBoxes.length - 1}
-                  className="px-3 py-1.5 text-sm rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-                <button
-                  onClick={() => setShowDiffView(false)}
-                  className="px-3 py-1.5 text-sm rounded-md bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
-                >
-                  Close
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             </div>
 
-            {/* Diff Content */}
-            <div className="p-4 overflow-auto max-h-[calc(90vh-80px)]">
+            {/* Current Comparison Info */}
+            <div className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500"></div>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Source:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400 font-mono">
+                      {diffCombinations[currentCombinationIndex]?.source.name || diffCombinations[currentCombinationIndex]?.source.id}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">
+                      {diffCombinations[currentCombinationIndex]?.source.ion_class}
+                    </span>
+                  </div>
+                  <div className="text-slate-400">→</div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-cyan-500"></div>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Target:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400 font-mono">
+                      {diffCombinations[currentCombinationIndex]?.target.name || diffCombinations[currentCombinationIndex]?.target.id}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">
+                      {diffCombinations[currentCombinationIndex]?.target.ion_class}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {currentCombinationIndex + 1} of {diffCombinations.length}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    <button
+                      onClick={() => setCurrentCombinationIndex(Math.max(0, currentCombinationIndex - 1))}
+                      disabled={currentCombinationIndex === 0}
+                      className="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setCurrentCombinationIndex(Math.min(diffCombinations.length - 1, currentCombinationIndex + 1))}
+                      disabled={currentCombinationIndex === diffCombinations.length - 1}
+                      className="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="bg-slate-100 dark:bg-slate-800 h-1">
               <div 
-                className="diff-container prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: diffBoxes[currentDiffIndex] }}
-                style={{ 
-                  fontFamily: 'monospace',
-                  fontSize: '12px',
-                  lineHeight: '1.4'
-                }}
+                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ease-out"
+                style={{ width: `${((currentCombinationIndex + 1) / diffCombinations.length) * 100}%` }}
               />
+            </div>
+
+            {/* Diff Content */}
+            <div className="flex-1 overflow-auto max-h-[calc(95vh-200px)]">
+              {diffCombinations[currentCombinationIndex]?.html ? (
+                <div className="p-6">
+                  <div 
+                    className="diff-container prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: diffCombinations[currentCombinationIndex].html }}
+                    style={{ 
+                      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                      fontSize: '13px',
+                      lineHeight: '1.6'
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-slate-600 dark:text-slate-400">Loading comparison...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Navigation */}
+            <div className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-4">
+              <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center space-x-4">
+                  <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-xs">←</kbd>
+                  <span>Previous</span>
+                  <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-xs">→</kbd>
+                  <span>Next</span>
+                  <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-xs">Esc</kbd>
+                  <span>Close</span>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs">Jump to:</span>
+                  <select
+                    value={currentCombinationIndex}
+                    onChange={(e) => setCurrentCombinationIndex(Number(e.target.value))}
+                    className="text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded px-2 py-1"
+                  >
+                    {diffCombinations.map((combo, index) => (
+                      <option key={index} value={index}>
+                        {combo.source.name || combo.source.id} → {combo.target.name || combo.target.id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
