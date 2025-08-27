@@ -150,7 +150,7 @@ export default function Home() {
                 ModelDB
               </a>
               <a
-                href="http://channelpedia.epfl.ch"
+                href="https://icg.neurotheory.ox.ac.uk/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
