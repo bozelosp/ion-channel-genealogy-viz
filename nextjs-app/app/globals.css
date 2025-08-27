@@ -92,3 +92,27 @@ body {
   stroke: #aaa;
   stroke-opacity: 0.8;
 }
+
+/* Group Summary Boxes (matching original implementation) */
+.group-summary-box {
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: left;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 17px;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  backdrop-filter: blur(3.25px);
+  background: linear-gradient(rgba(0, 0, 0, 0.515), rgba(0, 0, 0, 0.2));
+}
+
+.group-summary-box-title {
+  color: #ffc42c;
+}
+
+.group-summary-box-node-count {
+  color: #ffffff;
+  margin-top: 9px;
+  display: inline-block;
+}

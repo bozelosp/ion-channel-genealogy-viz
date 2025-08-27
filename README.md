@@ -111,6 +111,22 @@ The visualizer includes powerful source code analysis features:
 - Professional modal interface with navigation controls
 - Shows current diff index (e.g., "1 / 3" for multiple comparisons)
 
+#### **Zoom & Navigation**
+
+- **Mouse Wheel/Trackpad**: Zoom in and out
+- **Click and Drag on Background**: Pan the visualization
+- **Double-Click on Background**: Fit all nodes in view
+- **`F` key**: Fit all nodes in view with optimal zoom
+- **Minimum Zoom Constraint**: Prevents zooming out beyond 80% of fit-to-view scale
+- **No Auto-Zoom**: Network stays at default zoom on load (user controls zoom manually)
+
+#### **Theme Support**
+
+- **Light Mode**: Clean, bright interface
+- **Dark Mode**: Eye-friendly dark theme
+- **System Mode**: Follows OS theme preference
+- Theme switcher in header with sun/moon/computer icons
+
 #### **Advanced Workflows**
 
 1. **Compare Individual Models**:
@@ -145,6 +161,62 @@ Place the following JSON files in the `public/` directory:
 - Modern browsers supporting ES6+ and SVG
 - Desktop/tablet recommended (768px+ width)
 - Mobile users see responsive warning message
+
+## Technical Implementation Notes
+
+### Force-Directed Graph Configuration
+
+The visualization uses D3.js force simulation with the following exact configuration from the original visualizer:
+
+#### **Force Constants**
+```javascript
+LINK_DISTANCE = 12              // Fixed distance between linked nodes
+CHARGE_STRENGTH_MULTIPLIER = -0.5   // Multiplier for charge calculation
+CHARGE_STRENGTH_CONSTANT = -10.575  // Base charge strength
+FORCE_STRENGTH = 0.1675         // Strength for X/Y positioning forces
+```
+
+#### **Force Setup**
+
+1. **Link Force**: 
+   - Fixed distance of 12 pixels between connected nodes
+   - Uses node IDs for linking
+
+2. **Charge Force**:
+   - Repulsion between nodes based on `num_of_identicals`
+   - Formula: `(multiplier * Math.pow(num_of_identicals, 1.125) + constant) + (multiplier * Math.pow(num_of_identicals, 1.1275) + constant)`
+   - Creates natural spacing based on node importance
+
+3. **Positioning Forces**:
+   - **When groups are split**: 
+     - X force: Positions to `nodeIdToLocation[d.id][0] * width` with strength 0.1675
+     - Y force: Positions to `nodeIdToLocation[d.id][1] * height` with strength 0.1675
+   - **Single group (no split)**:
+     - X force: Centers at `width / 2`
+     - Y force: Centers at `height / 2`
+
+4. **Simulation Order** (critical for proper behavior):
+   ```javascript
+   d3.forceSimulation()
+     .nodes(filteredNodes)
+     .force('charge', chargeForce)
+     .force('links', linkForce)
+     .force('x', forceX)
+     .force('y', forceY)
+   ```
+
+### Centering & Zoom Behavior
+
+- **Network Centering**: Uses X/Y forces to maintain center of gravity at canvas center
+- **No Center Force**: Unlike some implementations, does not use `d3.forceCenter()` in the simulation
+- **Zoom Constraints**: Minimum zoom = 80% of fit-to-view scale (prevents tiny blob issue)
+- **Manual Zoom Control**: No auto-zoom on load - users control their view
+
+### Important Notes
+
+- The force configuration is **exactly matched** to the original `visualizer/js/` implementation
+- Force order and values are critical - changing them affects network behavior
+- The X/Y forces handle both centering and group splitting dynamically
 
 ## License
 

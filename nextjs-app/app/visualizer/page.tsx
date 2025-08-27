@@ -40,8 +40,8 @@ function calculateNodeRadius(node: Node): number {
   return radius;
 }
 
-// Group splitting constants
-const ION_CLASS_NAMES = ['K', 'Na', 'Ca', 'IH', 'KCa', 'Other'];
+// Group splitting constants (matching original)
+const ION_CLASS_NAMES = ['K', 'Na', 'Ca', 'Ih', 'KCa', 'Other'];
 const FORCE_STRENGTH = 0.1675;
 
 // Get all combinations of array elements
@@ -57,16 +57,18 @@ function getCombinations(arr: string[]): string[][] {
   return result;
 }
 
-// Get unique filter combinations based on active filters
-function getUniqueFilterCombinations(ionClass: string, showICG: boolean, supermodel1: boolean, supermodel2: boolean): string[][] {
-  // Get active filters
+// Get unique filter combinations based on active filters (matching original)
+function getUniqueFilterCombinations(selectedIonClasses: Set<string>, showICG: boolean, supermodel1: boolean, supermodel2: boolean): string[][] {
+  // Get active filters (only if actually active)
   const activeFilters: string[] = [];
   if (supermodel1) activeFilters.push('Supermodel 1');
   if (supermodel2) activeFilters.push('Supermodel 2');
   if (showICG) activeFilters.push('ICG entry');
 
   // Get active ion classes
-  const activeIonClasses = ionClass === 'all' ? ['All'] : [ionClass];
+  const activeIonClasses = selectedIonClasses.has('all') 
+    ? ['All'] 
+    : Array.from(selectedIonClasses);
 
   // Initialize list for unique combinations
   let uniqueFilterCombinations: string[][] = [];
@@ -74,15 +76,24 @@ function getUniqueFilterCombinations(ionClass: string, showICG: boolean, supermo
   // Generate all unique combinations of active filters
   const filterCombinations = getCombinations(activeFilters);
 
-  // Combine each filter combination with each ion class
-  for (const ionCls of activeIonClasses) {
+  // Combine each filter combination with each ion class (matching original)
+  for (const ionClass of activeIonClasses) {
     for (const filterCombo of filterCombinations) {
-      uniqueFilterCombinations.push([ionCls, ...filterCombo]);
+      uniqueFilterCombinations.push([ionClass, ...filterCombo]);
     }
   }
 
-  // Add single ion classes as their own group
+  // Add single ion classes as their own group (this is the key from original line 43!)
   uniqueFilterCombinations = [...uniqueFilterCombinations, ...activeIonClasses.map(c => [c])];
+
+  // Remove duplicates if any
+  const seen = new Set();
+  uniqueFilterCombinations = uniqueFilterCombinations.filter(combo => {
+    const key = combo.join(',');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
   return uniqueFilterCombinations;
 }
@@ -91,7 +102,7 @@ function getUniqueFilterCombinations(ionClass: string, showICG: boolean, supermo
 function assignNodesToGroups(
   nodes: Node[], 
   uniqueFilterCombinations: string[][], 
-  ionClass: string,
+  selectedIonClasses: Set<string>,
   showICG: boolean,
   supermodel1: boolean,
   supermodel2: boolean
@@ -102,12 +113,14 @@ function assignNodesToGroups(
     const groupKey = filterCombination.join(',');
 
     nodes.forEach(node => {
-      const nodeIonClass = node.ion_class || node.original_model?.ion_class;
+      // Use original_model fields consistently (matching original implementation)
+      const nodeIonClass = node.original_model?.ion_class || node.ion_class;
       const nodeSm1 = node.supermodel === 1;
       const nodeSm2 = node.supermodel === 2;
-      const nodeIcg = node.icg || node.original_model?.ICG || false;
+      const nodeIcg = node.original_model?.ICG || false;
 
-      const ionClassMatch = ionClass === 'all' || filterCombination.includes(nodeIonClass || '') || filterCombination.includes('All');
+      // Match original logic: filter_state['All']?.filter_value || filter_combination.includes(ion_class)
+      const ionClassMatch = selectedIonClasses.has('all') || filterCombination.includes(nodeIonClass || '');
 
       let status = true;
 
@@ -193,11 +206,17 @@ function positionCircles(groups: any[], fixedLocationCircles: any): [number, num
   return myCirclePositions.map((d: any) => [avoidBorders(d[1]), avoidBorders(d[2])]);
 }
 
-// Sort and position groups
+// Sort and position groups (matching original implementation)
 function sortAndPositionGroups(
   nodesGroupedByFilter: { [key: string]: Node[] },
   fixedLocationCircles: any
 ): { [key: string]: [number, number] } {
+  // If only one group, return empty object (no positioning needed)
+  const numberOfGroups = Object.keys(nodesGroupedByFilter).length;
+  if (numberOfGroups <= 1) {
+    return {};
+  }
+
   const groups: any[] = [];
   
   for (const key in nodesGroupedByFilter) {
@@ -208,10 +227,10 @@ function sortAndPositionGroups(
     }
   }
 
-  // Sort groups by size
+  // Sort groups by size (ascending)
   groups.sort((a, b) => a[1] - b[1]);
 
-  // Position the groups
+  // Position the groups using fixed locations
   const groupCirclePositions = positionCircles(groups, fixedLocationCircles);
 
   const nodeIdToLocation: { [key: string]: [number, number] } = {};
@@ -363,9 +382,9 @@ export default function Visualizer() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const [fixedLocationCircles, setFixedLocationCircles] = useState<any>(null);
-  const [ionClass, setIonClass] = useState<string>('all');
+  const [selectedIonClasses, setSelectedIonClasses] = useState<Set<string>>(new Set(['all']));
   const [similarityScore, setSimilarityScore] = useState<number>(95);
-  const [copiesNumber, setCopiesNumber] = useState<number>(1);
+  const [copiesNumber, setCopiesNumber] = useState<number>(2);
   const [showICG, setShowICG] = useState<boolean>(false);
   const [supermodel1, setSupermodel1] = useState<boolean>(true);
   const [supermodel2, setSupermodel2] = useState<boolean>(true);
@@ -373,6 +392,10 @@ export default function Visualizer() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [containerDimensions, setContainerDimensions] = useState<{width: number, height: number}>({width: 0, height: 0});
+  
+  // Theme state
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   
   // Source code comparison states
   const [sourceNodeIds, setSourceNodeIds] = useState<string[]>([]);
@@ -393,7 +416,40 @@ export default function Visualizer() {
   
   // Group summary state
   const [groupSummaries, setGroupSummaries] = useState<{key: string, nodeCount: number}[]>([]);
+  const [isGroupSplit, setIsGroupSplit] = useState<boolean>(false);
   
+  // Theme detection and management
+  useEffect(() => {
+    const updateResolvedTheme = () => {
+      if (theme === 'system') {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        setResolvedTheme(systemTheme);
+      } else {
+        setResolvedTheme(theme);
+      }
+    };
+
+    updateResolvedTheme();
+
+    // Listen for system theme changes when in system mode
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => updateResolvedTheme();
+      
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (resolvedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [resolvedTheme]);
+
   // Check for mobile device and handle resize
   useEffect(() => {
     const checkMobile = () => {
@@ -625,12 +681,26 @@ export default function Visualizer() {
 
     const g = svg.append('g');
 
-    // Filter data based on current filters
+    // Filter data based on current filters (matching original logic)
     const filteredNodes = networkData.nodes.filter(node => {
-      if (ionClass !== 'all' && node.ion_class !== ionClass) return false;
-      if (!showICG && node.icg) return false;
+      // Get ion class from original_model (matching original implementation)
+      const nodeIonClass = node.original_model?.ion_class || node.ion_class;
+      
+      // Check ion class filter
+      if (!selectedIonClasses.has('all') && !selectedIonClasses.has(nodeIonClass)) {
+        return false;
+      }
+      
+      // Check ICG entry - must have ICG in original_model
+      if (showICG && !node.original_model?.ICG) return false;
+      
+      // Check supermodels
       if (!supermodel1 && node.supermodel === 1) return false;
       if (!supermodel2 && node.supermodel === 2) return false;
+      
+      // Check num_of_identicals for copies filter
+      if (node.num_of_identicals < copiesNumber) return false;
+      
       return true;
     });
 
@@ -639,34 +709,46 @@ export default function Visualizer() {
       const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
       const targetId = typeof link.target === 'object' ? link.target.id : link.target;
       const linkWeight = link.weight || link.value || 0;
-      return nodeIds.has(sourceId) && nodeIds.has(targetId) && linkWeight >= similarityScore;
+      // Use > not >= to match original implementation
+      return nodeIds.has(sourceId) && nodeIds.has(targetId) && linkWeight > similarityScore;
     });
 
     // Group nodes based on filters
-    const uniqueFilterCombinations = getUniqueFilterCombinations(ionClass, showICG, supermodel1, supermodel2);
-    const nodesGroupedByFilter = assignNodesToGroups(filteredNodes, uniqueFilterCombinations, ionClass, showICG, supermodel1, supermodel2);
+    const uniqueFilterCombinations = getUniqueFilterCombinations(selectedIonClasses, showICG, supermodel1, supermodel2);
+    const nodesGroupedByFilter = assignNodesToGroups(filteredNodes, uniqueFilterCombinations, selectedIonClasses, showICG, supermodel1, supermodel2);
     const nodeIdToLocation = sortAndPositionGroups(nodesGroupedByFilter, fixedLocationCircles);
-    
-    // Create group summaries (matching original implementation)
-    const newGroupSummaries: {key: string, nodeCount: number}[] = [];
-    Object.entries(nodesGroupedByFilter).forEach(([groupKey, groupNodes]) => {
-      if (groupNodes.length > 0) {
-        // Format the group key like the original (replace commas, format nicely)
-        let formattedKey = groupKey
-          .replace(',', ': ')
-          .replace(/,/g, ' • ')
-          .replace('Supermodel 1 • Supermodel 2', 'Supermodel 1 & 2');
-        
-        newGroupSummaries.push({
-          key: formattedKey,
-          nodeCount: groupNodes.length
-        });
-      }
-    });
-    setGroupSummaries(newGroupSummaries);
     
     // Check if we should split groups (more than one group)
     const splitVar = Object.keys(nodesGroupedByFilter).length > 1;
+    setIsGroupSplit(splitVar);
+    
+    // Create group summaries when groups are split
+    if (splitVar) {
+      const newGroupSummaries: {key: string, nodeCount: number}[] = [];
+      Object.entries(nodesGroupedByFilter).forEach(([groupKey, groupNodes]) => {
+        if (groupNodes.length > 0) {
+          // Format the group key
+          let formattedKey = groupKey;
+          
+          // Only format if it has multiple parts
+          if (groupKey.includes(',')) {
+            formattedKey = groupKey
+              .replace(',', ': ')
+              .replace(/,/g, ' • ')
+              .replace('Supermodel 1 • Supermodel 2', 'Supermodel 1 & 2');
+          }
+          
+          newGroupSummaries.push({
+            key: formattedKey,
+            nodeCount: groupNodes.length
+          });
+        }
+      });
+      setGroupSummaries(newGroupSummaries);
+    } else {
+      // Clear summaries when not splitting
+      setGroupSummaries([]);
+    }
 
     // Force simulation constants (from original)
     const LINK_DISTANCE = 12;
@@ -685,9 +767,10 @@ export default function Visualizer() {
                (CHARGE_STRENGTH_MULTIPLIER * Math.pow(numIdenticals, 1.1275) + CHARGE_STRENGTH_CONSTANT);
       });
     
+    // Center force (from original setup_forces.js)
     const centerForce = d3.forceCenter(width / 2, height / 2);
     
-    // Setup X and Y forces based on whether we're splitting groups
+    // Setup forces exactly as in original simulation.js
     const forceX = splitVar ? 
       d3.forceX((d: any) => nodeIdToLocation[d.id] ? nodeIdToLocation[d.id][0] * width : width / 2).strength(FORCE_STRENGTH) :
       d3.forceX(width / 2);
@@ -696,11 +779,12 @@ export default function Visualizer() {
       d3.forceY((d: any) => nodeIdToLocation[d.id] ? nodeIdToLocation[d.id][1] * height : height / 2).strength(FORCE_STRENGTH) :
       d3.forceY(height / 2);
     
-    // Create simulation with original force configuration
-    const simulation = d3.forceSimulation(filteredNodes)
-      .force('links', linkForce)
+    // Create simulation exactly as in original - note center force is not used in simulation.js
+    // but keeping X and Y forces as they handle centering
+    const simulation = d3.forceSimulation()
+      .nodes(filteredNodes)
       .force('charge', chargeForce)
-      .force('center', centerForce)
+      .force('links', linkForce)
       .force('x', forceX)
       .force('y', forceY);
 
@@ -711,8 +795,8 @@ export default function Visualizer() {
       .data(filteredLinks)
       .enter().append('line')
       .attr('class', 'graph-link')
-      .attr('stroke', '#aaa')
-      .attr('stroke-opacity', 0.8);
+      .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
+      .attr('stroke-opacity', resolvedTheme === 'dark' ? 0.6 : 0.8);
 
     // Create nodes with dynamic radius based on num_of_identicals
     const node = g.append('g')
@@ -722,10 +806,21 @@ export default function Visualizer() {
       .enter().append('circle')
       .attr('r', (d: Node) => calculateNodeRadius(d))
       .attr('class', 'graph-node')
-      .attr('fill', '#00BFFF')  // DeepSkyBlue - matching original
-      .attr('stroke', '#aaa')
+      .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')  // DeepSkyBlue - matching original
+      .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
+      .on('mouseover', function(event: any, d: any) {
+        // Update selected node on hover for immediate feedback
+        setSelectedNode(d);
+      })
+      .on('mouseout', function(event: any, d: any) {
+        // Keep the node selected even after mouseout
+        // This allows the user to read the information
+      })
       .on('click', async function(event: any, d: any) {
         const currentNode = d3.select(this);
+        
+        // Update selected node for information panel
+        setSelectedNode(d);
 
         if (event.shiftKey) {
           // Shift+Click: Select subgraph and find source node
@@ -743,7 +838,9 @@ export default function Visualizer() {
           
           // Reset all node classes
           node.classed('selected-node', false).classed('source-node', false)
-              .attr('fill', '#00BFFF').attr('stroke', '#aaa').attr('stroke-width', 1);
+              .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+              .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
+              .attr('stroke-width', 1);
           
           // Get nodes in subgraph
           const nodesInSubgraph = node.filter((nodeData: any) => subgraphNodeIds.includes(nodeData.id));
@@ -778,8 +875,8 @@ export default function Visualizer() {
           const sourceIds = originalNodes.map((nodeData: any) => nodeData.id);
           node.filter((nodeData: any) => sourceIds.includes(nodeData.id))
               .classed('source-node', true)
-              .attr('fill', '#ffd700')
-              .attr('stroke', '#215885')
+              .attr('fill', resolvedTheme === 'dark' ? '#fbbf24' : '#ffd700')
+              .attr('stroke', resolvedTheme === 'dark' ? '#1e40af' : '#215885')
               .attr('stroke-width', 2);
           
           // Set state for diff generation
@@ -802,13 +899,13 @@ export default function Visualizer() {
           
           if (isSourceNode) {
             currentNode.classed('source-node', false)
-                       .attr('fill', '#00BFFF')
-                       .attr('stroke', '#aaa')
+                       .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                       .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
                        .attr('stroke-width', 1);
           } else {
             currentNode.classed('source-node', true)
-                       .attr('fill', '#ffd700')
-                       .attr('stroke', '#215885')
+                       .attr('fill', resolvedTheme === 'dark' ? '#fbbf24' : '#ffd700')
+                       .attr('stroke', resolvedTheme === 'dark' ? '#1e40af' : '#215885')
                        .attr('stroke-width', 2);
           }
           
@@ -818,14 +915,14 @@ export default function Visualizer() {
           
           if (isSelectedNode) {
             currentNode.classed('selected-node', false)
-                       .attr('fill', '#00BFFF')
-                       .attr('stroke', '#aaa')
+                       .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                       .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
                        .attr('stroke-width', 1);
             setSelectedNode(null);
           } else {
             currentNode.classed('selected-node', true)
-                       .attr('fill', '#00BFFF')
-                       .attr('stroke', '#215885')
+                       .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                       .attr('stroke', resolvedTheme === 'dark' ? '#1e40af' : '#215885')
                        .attr('stroke-width', 2);
             setSelectedNode(d);
           }
@@ -881,38 +978,83 @@ export default function Visualizer() {
       return { minX, maxX, minY, maxY };
     };
 
-    // Setup zoom behavior with proper bounds and centering
+    // Calculate dynamic zoom constraints
+    const calculateMinScale = () => {
+      const bounds = calculateBounds();
+      const boundsWidth = bounds.maxX - bounds.minX;
+      const boundsHeight = bounds.maxY - bounds.minY;
+      
+      // Calculate scale that fits all nodes with margin
+      return Math.min(
+        width / boundsWidth * 0.85,  // 85% to ensure all nodes visible
+        height / boundsHeight * 0.85
+      );
+    };
+    
+    // Enhanced zoom behavior with progressive centering
     const zoom = d3.zoom()
-      .scaleExtent([0.05, 20])  // Allow more zoom out and zoom in
+      .scaleExtent([0.01, 10])  // Start with very permissive range
       .on('zoom', (event) => {
-        g.attr('transform', event.transform);
+        let { x, y, k } = event.transform;
+        const bounds = calculateBounds();
+        
+        // Calculate center of bounds (center of gravity)
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+        
+        // Calculate minimum scale dynamically
+        const minScale = calculateMinScale();
+        
+        // Progressive centering as zoom approaches minimum
+        if (k <= minScale * 1.5) {
+          // Calculate ideal centered position
+          const idealX = width / 2 - centerX * k;
+          const idealY = height / 2 - centerY * k;
+          
+          if (k <= minScale) {
+            // Hard constraint at minimum zoom
+            k = minScale;
+            x = idealX;
+            y = idealY;
+          } else {
+            // Progressive centering between minScale and minScale * 1.5
+            // The closer to minScale, the stronger the centering force
+            const centeringFactor = 1 - ((k - minScale) / (minScale * 0.5));
+            const smoothFactor = Math.pow(centeringFactor, 2); // Smooth curve
+            
+            // Blend current position with ideal centered position
+            x = x * (1 - smoothFactor) + idealX * smoothFactor;
+            y = y * (1 - smoothFactor) + idealY * smoothFactor;
+          }
+          
+          const constrainedTransform = d3.zoomIdentity
+            .translate(x, y)
+            .scale(k);
+          
+          g.attr('transform', constrainedTransform);
+          svg.property('__zoom', constrainedTransform);
+        } else {
+          // Normal zoom behavior when well above minimum
+          g.attr('transform', event.transform);
+        }
       });
 
     svg.call(zoom as any);
+    
 
-    // Function to fit visualization with aesthetic margins
+    // Function to fit visualization to view
     const fitToView = () => {
       const bounds = calculateBounds();
       const boundsWidth = bounds.maxX - bounds.minX;
       const boundsHeight = bounds.maxY - bounds.minY;
       
-      // Add aesthetic margins (20% of container size)
-      const margin = 0.2;
-      const marginX = width * margin;
-      const marginY = height * margin;
-      
-      // Available space for content
-      const availableWidth = width - (2 * marginX);
-      const availableHeight = height - (2 * marginY);
-      
-      // Calculate scale to fit content with margins
+      // Use same calculation as minimum scale for consistency
       const scale = Math.min(
-        availableWidth / boundsWidth,
-        availableHeight / boundsHeight,
-        1 // Don't zoom in beyond 1:1 initially
+        width / boundsWidth * 0.85,
+        height / boundsHeight * 0.85
       );
       
-      // Center point of the bounds
+      // Calculate center of bounds (center of gravity)
       const centerX = (bounds.minX + bounds.maxX) / 2;
       const centerY = (bounds.minY + bounds.maxY) / 2;
       
@@ -920,7 +1062,7 @@ export default function Visualizer() {
       const translateX = width / 2 - centerX * scale;
       const translateY = height / 2 - centerY * scale;
       
-      // Apply the transform smoothly
+      // Apply the transform
       const transform = d3.zoomIdentity
         .translate(translateX, translateY)
         .scale(scale);
@@ -932,23 +1074,6 @@ export default function Visualizer() {
 
     // Store the fit function for keyboard access
     setFitToViewFunction(() => fitToView);
-
-    // Initial fit after simulation settles (adaptive timing)
-    let fittingTimeout: NodeJS.Timeout;
-    const scheduleInitialFit = () => {
-      clearTimeout(fittingTimeout);
-      fittingTimeout = setTimeout(() => {
-        fitToView();
-      }, 1500);
-    };
-    
-    // Schedule initial fit and re-schedule if simulation is still active
-    scheduleInitialFit();
-    
-    // Re-schedule fit if simulation restarts (e.g., due to interactions)
-    simulation.on('end', () => {
-      setTimeout(fitToView, 300);
-    });
 
     // Add fit-to-view functionality on double-click
     svg.on('dblclick.zoom', null); // Remove default double-click zoom
@@ -988,7 +1113,7 @@ export default function Visualizer() {
     return () => {
       simulation.stop();
     };
-  }, [networkData, fixedLocationCircles, ionClass, similarityScore, showICG, supermodel1, supermodel2, copiesNumber, containerDimensions]);
+  }, [networkData, fixedLocationCircles, selectedIonClasses, similarityScore, showICG, supermodel1, supermodel2, copiesNumber, containerDimensions, resolvedTheme]);
 
   if (isLoading) {
     return (
@@ -1034,32 +1159,104 @@ export default function Visualizer() {
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
               Ion Channel Network Visualizer
             </h1>
-            <a
-              href="/"
-              className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            >
-              Back to Home
-            </a>
+            <div className="flex items-center space-x-3">
+              {/* Theme Switcher */}
+              <div className="flex rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
+                <button
+                  onClick={() => setTheme('light')}
+                  className={`p-2 rounded-md transition-colors cursor-pointer ${
+                    theme === 'light' 
+                      ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' 
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Light mode"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setTheme('dark')}
+                  className={`p-2 rounded-md transition-colors cursor-pointer ${
+                    theme === 'dark' 
+                      ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' 
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Dark mode"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setTheme('system')}
+                  className={`p-2 rounded-md transition-colors cursor-pointer ${
+                    theme === 'system' 
+                      ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' 
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="System theme"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+              <a
+                href="/"
+                className="px-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Back to Home
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="flex h-[calc(100vh-57px)]">
-        {/* Control Panel */}
-        <div className="w-80 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
+        {/* Left Control Panel */}
+        <div className="w-80 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 overflow-y-auto flex-shrink-0">
           <div className="p-4 space-y-6">
             {/* Ion Channel Class Filter */}
             <div>
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
                 Ion Channel Class
+                {!selectedIonClasses.has('all') && selectedIonClasses.size > 0 && (
+                  <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400">
+                    ({selectedIonClasses.size} selected)
+                  </span>
+                )}
               </h3>
               <div className="grid grid-cols-3 gap-2">
-                {['all', 'K', 'Na', 'Ca', 'IH', 'KCa', 'Other'].map((cls) => (
+                {['all', 'K', 'Na', 'Ca', 'Ih', 'KCa', 'Other'].map((cls) => (
                   <button
                     key={cls}
-                    onClick={() => setIonClass(cls)}
+                    onClick={() => {
+                      const newSelection = new Set(selectedIonClasses);
+                      if (cls === 'all') {
+                        // If 'all' is clicked, clear selection and select only 'all'
+                        setSelectedIonClasses(new Set(['all']));
+                      } else {
+                        // Toggle the specific class
+                        if (newSelection.has(cls)) {
+                          newSelection.delete(cls);
+                          // If nothing is selected, default to 'all'
+                          if (newSelection.size === 0 || (newSelection.size === 1 && newSelection.has('all'))) {
+                            setSelectedIonClasses(new Set(['all']));
+                          }
+                        } else {
+                          // Remove 'all' when selecting specific classes
+                          newSelection.delete('all');
+                          newSelection.add(cls);
+                        }
+                        setSelectedIonClasses(newSelection);
+                      }
+                    }}
                     className={`px-3 py-1.5 text-sm rounded-md transition-colors cursor-pointer ${
-                      ionClass === cls
+                      selectedIonClasses.has(cls)
                         ? 'bg-blue-600 text-white'
                         : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                     }`}
@@ -1067,6 +1264,38 @@ export default function Visualizer() {
                     {cls === 'all' ? 'All' : cls}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Number of Copies Filter */}
+            <div>
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                Minimum Copies: {copiesNumber}
+              </h3>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setCopiesNumber(Math.max(1, copiesNumber - 1))}
+                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center cursor-pointer"
+                >
+                  −
+                </button>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={copiesNumber}
+                  onChange={(e) => setCopiesNumber(Number(e.target.value))}
+                  className="flex-1 cursor-pointer"
+                />
+                <button
+                  onClick={() => setCopiesNumber(Math.min(10, copiesNumber + 1))}
+                  className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center cursor-pointer"
+                >
+                  +
+                </button>
+                <span className="text-sm text-slate-600 dark:text-slate-400 min-w-[20px] text-center">
+                  {copiesNumber}
+                </span>
               </div>
             </div>
 
@@ -1227,12 +1456,16 @@ export default function Visualizer() {
             <svg 
               ref={svgRef} 
               className="w-full h-full border-2 border-slate-200 dark:border-slate-600 rounded"
-              style={{ background: 'linear-gradient(to br, #fafafa, #f3f4f6)' }}
+              style={{ 
+                background: resolvedTheme === 'dark' 
+                  ? 'linear-gradient(to br, #1e293b, #0f172a)' 
+                  : 'linear-gradient(to br, #fafafa, #f3f4f6)' 
+              }}
             ></svg>
           </div>
 
-          {/* Group Summary Boxes (matching original position and styling) */}
-          {groupSummaries.length > 1 && (
+          {/* Group Summary Boxes - only show when groups are actually split with mixed filters */}
+          {isGroupSplit && groupSummaries.length > 0 && (
             <div 
               className="absolute overflow-y-auto rounded-md"
               style={{
@@ -1258,6 +1491,153 @@ export default function Visualizer() {
                 ))}
             </div>
           )}
+        </div>
+        
+        {/* Right Information Panel */}
+        <div className="w-80 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 overflow-y-auto flex-shrink-0">
+          <div className="p-4 space-y-4">
+            {/* Node Details Box */}
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-amber-500 mb-3">
+                Node Details
+              </h3>
+              {selectedNode ? (
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <span className="text-amber-500 font-medium">ModelDB ID: </span>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {selectedNode.original_model?.unique_modelDB_mod_id || selectedNode.id}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-amber-500 font-medium">Ion Class: </span>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {selectedNode.original_model?.ion_class || selectedNode.ion_class || 'Unknown'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-amber-500 font-medium">Self + Identicals: </span>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {selectedNode.num_of_identicals || 1}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-amber-500 font-medium">Year: </span>
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {selectedNode.original_model?.Year || 'N/A'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-amber-500 font-medium">Authors: </span>
+                    <span className="text-slate-700 dark:text-slate-300 text-xs">
+                      {selectedNode.original_model?.Authors || 'N/A'}
+                    </span>
+                  </div>
+                  {selectedNode.original_model?.ICG && (
+                    <div>
+                      <span className="text-amber-500 font-medium">ICG Entry: </span>
+                      <span className="text-green-500">Yes</span>
+                    </div>
+                  )}
+                  {selectedNode.supermodel && (
+                    <div>
+                      <span className="text-amber-500 font-medium">Supermodel: </span>
+                      <span className="text-slate-700 dark:text-slate-300">
+                        {selectedNode.supermodel}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400 italic">
+                  Click on a node to view details
+                </p>
+              )}
+            </div>
+
+            {/* Identical Models Box */}
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-amber-500 mb-3">
+                Identical Models
+              </h3>
+              {selectedNode?.identical_models && selectedNode.identical_models.length > 0 ? (
+                <div className="max-h-48 overflow-y-auto space-y-1">
+                  {selectedNode.identical_models.map((model: any, idx: number) => (
+                    <div key={idx} className="text-sm text-slate-700 dark:text-slate-300">
+                      {model.unique_modelDB_mod_id || model}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400 italic">
+                  {selectedNode ? 'No identical models' : 'Select a node to view identical models'}
+                </p>
+              )}
+            </div>
+
+            {/* Statistics Box */}
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-amber-500 mb-3">
+                Network Statistics
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-amber-500 font-medium">Total Nodes: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {networkData?.nodes.length || 0}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-amber-500 font-medium">Filtered Nodes: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {containerDimensions.width > 0 ? document.querySelectorAll('.graph-node').length : 0}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-amber-500 font-medium">Total Links: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {networkData?.links.length || 0}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-amber-500 font-medium">Filtered Links: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {containerDimensions.width > 0 ? document.querySelectorAll('.graph-link').length : 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Selection Info Box */}
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-amber-500 mb-3">
+                Selection Info
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-amber-500 font-medium">Selected: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {containerDimensions.width > 0 ? document.querySelectorAll('.selected-node').length : 0} nodes
+                  </span>
+                </div>
+                <div>
+                  <span className="text-amber-500 font-medium">Source Nodes: </span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    {containerDimensions.width > 0 ? document.querySelectorAll('.source-node').length : 0} nodes
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <strong>Tips:</strong><br/>
+                  • Click: Select node<br/>
+                  • Ctrl+Click: Mark as source<br/>
+                  • Shift+Click: Select subgraph<br/>
+                  • D: Generate diff
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1311,13 +1691,13 @@ export default function Visualizer() {
                 
                 if (isSelected) {
                   targetNode.classed('selected-node', false)
-                             .attr('fill', '#00BFFF')
-                             .attr('stroke', '#aaa')
+                             .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                             .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
                              .attr('stroke-width', 1);
                 } else {
                   targetNode.classed('selected-node', true)
-                             .attr('fill', '#00BFFF')
-                             .attr('stroke', '#215885')
+                             .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                             .attr('stroke', resolvedTheme === 'dark' ? '#1e40af' : '#215885')
                              .attr('stroke-width', 2);
                 }
               }
@@ -1341,13 +1721,13 @@ export default function Visualizer() {
                 
                 if (isSource) {
                   targetNode.classed('source-node', false)
-                             .attr('fill', '#00BFFF')
-                             .attr('stroke', '#aaa')
+                             .attr('fill', resolvedTheme === 'dark' ? '#3b82f6' : '#00BFFF')
+                             .attr('stroke', resolvedTheme === 'dark' ? '#475569' : '#aaa')
                              .attr('stroke-width', 1);
                 } else {
                   targetNode.classed('source-node', true)
-                             .attr('fill', '#ffd700')
-                             .attr('stroke', '#215885')
+                             .attr('fill', resolvedTheme === 'dark' ? '#fbbf24' : '#ffd700')
+                             .attr('stroke', resolvedTheme === 'dark' ? '#1e40af' : '#215885')
                              .attr('stroke-width', 2);
                 }
               }
