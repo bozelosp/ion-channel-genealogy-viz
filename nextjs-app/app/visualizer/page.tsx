@@ -133,12 +133,23 @@ export default function Visualizer() {
       return nodeIds.has(sourceId) && nodeIds.has(targetId) && link.value >= similarityScore;
     });
 
-    // Create force simulation
+    // Create force simulation with better containment
+    const nodeRadius = 8;
+    const padding = 20; // Padding from edges
+    
     const simulation = d3.forceSimulation(filteredNodes)
-      .force('link', d3.forceLink(filteredLinks).id((d: any) => d.id).distance(50))
-      .force('charge', d3.forceManyBody().strength(-100))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(15));
+      .force('link', d3.forceLink(filteredLinks)
+        .id((d: any) => d.id)
+        .distance(30)
+        .strength(0.5))
+      .force('charge', d3.forceManyBody()
+        .strength(-150)
+        .distanceMax(200))
+      .force('center', d3.forceCenter(width / 2, height / 2).strength(0.05))
+      .force('x', d3.forceX(width / 2).strength(0.1))
+      .force('y', d3.forceY(height / 2).strength(0.1))
+      .force('collision', d3.forceCollide().radius(nodeRadius + 5).strength(0.7))
+      .velocityDecay(0.3);
 
     // Create links
     const link = g.append('g')
@@ -191,8 +202,14 @@ export default function Visualizer() {
 
     svg.call(zoom as any);
 
-    // Simulation tick
+    // Simulation tick with boundary constraints
     simulation.on('tick', () => {
+      // Apply boundary constraints to nodes
+      filteredNodes.forEach((d: any) => {
+        d.x = Math.max(nodeRadius + padding, Math.min(width - nodeRadius - padding, d.x));
+        d.y = Math.max(nodeRadius + padding, Math.min(height - nodeRadius - padding, d.y));
+      });
+
       link
         .attr('x1', (d: any) => d.source.x)
         .attr('y1', (d: any) => d.source.y)
@@ -212,8 +229,8 @@ export default function Visualizer() {
     }
 
     function dragged(event: any, d: any) {
-      d.fx = event.x;
-      d.fy = event.y;
+      d.fx = Math.max(nodeRadius + padding, Math.min(width - nodeRadius - padding, event.x));
+      d.fy = Math.max(nodeRadius + padding, Math.min(height - nodeRadius - padding, event.y));
     }
 
     function dragended(event: any, d: any) {
@@ -424,7 +441,11 @@ export default function Visualizer() {
         {/* Visualization Area */}
         <div className="flex-1 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-4">
-            <svg ref={svgRef}></svg>
+            <svg 
+              ref={svgRef} 
+              className="border-2 border-slate-200 dark:border-slate-600 rounded"
+              style={{ background: 'linear-gradient(to br, #fafafa, #f3f4f6)' }}
+            ></svg>
           </div>
         </div>
       </div>
