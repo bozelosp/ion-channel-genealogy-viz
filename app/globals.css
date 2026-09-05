@@ -1,0 +1,288 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button:not(:disabled),
+[type="button"]:not(:disabled),
+[type="submit"]:not(:disabled),
+[type="reset"]:not(:disabled),
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled,
+[type="reset"]:disabled {
+  cursor: not-allowed;
+}
+
+/* Utility: hide scrollbars but keep scroll behavior */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Visualizer left panel font scaling: affects text sizes only */
+.viz-left-panel {
+  --viz-scale: 1;
+  font-size: calc(1rem * var(--viz-scale));
+}
+.viz-left-panel .text-xs { font-size: calc(0.75rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-sm { font-size: calc(0.875rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-base { font-size: calc(1rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-lg { font-size: calc(1.125rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-xl { font-size: calc(1.25rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-2xl { font-size: calc(1.5rem * var(--viz-scale)) !important; }
+.viz-left-panel .text-\[11px\] { font-size: calc(11px * var(--viz-scale)) !important; }
+
+/* Hide Next.js dev activity spinner/indicator in development */
+#__next-build-watcher,
+nextjs-portal {
+  display: none !important;
+}
+
+/* Diff styles matching original implementation */
+.diff-container table.diff {
+  font-family: 'Courier New', Courier, monospace;
+  border: medium;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.diff-container .diff_header {
+  background-color: #e0e0e0;
+}
+
+.diff-container td.diff_header {
+  text-align: right;
+  font-weight: bold;
+  padding: 2px 4px;
+}
+
+.diff-container .diff_next {
+  background-color: #c0c0c0;
+}
+
+.diff-container .diff_add {
+  background-color: #aaffaa;
+}
+
+.diff-container .diff_chg {
+  background-color: #ffff77;
+}
+
+.diff-container .diff_sub {
+  background-color: #ffaaaa;
+}
+
+.diff-container td {
+  padding: 1px 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  vertical-align: top;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Source and selected node styles */
+.source-node {
+  fill: #ffd700 !important;
+  stroke: #215885 !important;
+  stroke-width: 2 !important;
+}
+
+.selected-node {
+  fill: #00BFFF !important;
+  stroke: #000000 !important; /* black border for selected nodes */
+  stroke-width: 2 !important;
+}
+
+/* When a node is a search hit, override inner color to green (wins over selected-node) */
+.graph-node.search-override {
+  fill: #22c55e !important; /* green-500 */
+  stroke: #15803d !important; /* green-700 */
+}
+
+.graph-node {
+  fill: #00BFFF;
+  stroke: #aaa;
+  stroke-width: 1;
+  z-index: 99999;
+  cursor: pointer;
+}
+
+.graph-link {
+  stroke: #aaa;
+  stroke-opacity: 0.8;
+}
+
+/* Brush selection visuals */
+.brush .selection {
+  stroke: #0f172a; /* slate-900 */
+  stroke-width: 1.25px;
+  fill: rgba(15, 23, 42, 0.08); /* very light fill */
+}
+.brush .overlay {
+  cursor: crosshair;
+}
+
+/* Breathing green glow for search hits */
+@keyframes breathe-green {
+  0%, 100% {
+    /* +25% intensity vs previous */
+    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.31)) drop-shadow(0 0 22px rgba(34, 197, 94, 0.15));
+  }
+  50% {
+    /* +30% prominence vs current (0.75 -> ~0.98, 0.56 -> ~0.73) */
+    filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.98)) drop-shadow(0 0 40px rgba(34, 197, 94, 0.73));
+  }
+}
+
+.glow-halo.search-breathe, .graph-node.search-breathe {
+  animation: breathe-green 2.8s ease-in-out infinite;
+}
+
+/* Group Summary Boxes (matching original implementation) */
+.group-summary-box {
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: left;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 17px;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  backdrop-filter: blur(3.25px);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.group-summary-box-title {
+  color: #ffc42c;
+}
+
+.group-summary-box-node-count {
+  color: #ffffff;
+  margin-top: 9px;
+  display: inline-block;
+}
+
+.markdown-body {
+  color: inherit;
+  line-height: 1.7;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-weight: 700;
+  margin-top: 1.6em;
+  margin-bottom: 0.8em;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 2rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.6rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.35rem;
+}
+
+.markdown-body p {
+  margin: 0.75em 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.4rem;
+  margin: 0.75em 0;
+}
+
+.markdown-body li {
+  margin: 0.35em 0;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.95rem;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 0.6em 0.75em;
+  text-align: left;
+}
+
+.markdown-body thead th {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.markdown-body pre {
+  background: rgba(15, 23, 42, 0.9);
+  color: #f8fafc;
+  padding: 1em;
+  border-radius: 0.75rem;
+  overflow: auto;
+  font-size: 0.9rem;
+}
+
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, SFMono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.9em;
+}
+
+.markdown-body code:not(pre code) {
+  background: rgba(148, 163, 184, 0.25);
+  padding: 0.15em 0.35em;
+  border-radius: 0.35rem;
+}
+
+.markdown-body a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-decoration-color: rgba(37, 99, 235, 0.4);
+  text-decoration-thickness: 2px;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 0.75rem;
+  margin: 1.5em auto;
+  display: block;
+}

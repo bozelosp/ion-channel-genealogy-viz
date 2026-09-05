@@ -1,0 +1,78 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js build output
+/.next/
+/out/
+/.static-excluded/
+/.static-build.lock*/
+
+# testing
+/coverage
+test-results/
+playwright-report/
+
+# misc
+.DS_Store
+*.pem
+*.log
+*.tmp
+*.bak
+*.tsbuildinfo
+next-env.d.ts
+.env*
+.vercel
+
+# local notes
+*.local.md
+**/settings.local.json
+.idea/
+.vscode/
+.tmp/
+tmp/
+
+# local research overlays (developed outside this repository)
+/proxy.ts
+/app/figure6/
+/app/api/save-figure/
+/lib/loopbackRequest.ts
+/public/data/figures/
+/public/figure6*
+
+# local data artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.parquet
+*.h5
+*.hdf5
+*.mat
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# local data mirrors
+/nextjs-app/
+/ICG/
+/process_ICG_data/
+/process_modelDB_ion_channel_models/
+/supermodels/
+/visualizer/
+/thesis_figures/
+/combine_modelDB_wth_ICG_data/
+/compute_levenshtein_ratio/
+/create_network_representation/
+
+# macOS/Dropbox workspace noise
+.dropbox.attr
+.dropboxignore
+Icon?

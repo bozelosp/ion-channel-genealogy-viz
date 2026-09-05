@@ -1,0 +1,35 @@
+{
+  "generated_at": "2025-09-23T13:26:41.438Z",
+  "summary": [
+    {
+      "ion_class": "K",
+      "nodes_count": 619,
+      "copies_total": 2048
+    },
+    {
+      "ion_class": "Na",
+      "nodes_count": 378,
+      "copies_total": 1023
+    },
+    {
+      "ion_class": "Ca",
+      "nodes_count": 325,
+      "copies_total": 945
+    },
+    {
+      "ion_class": "Ih",
+      "nodes_count": 128,
+      "copies_total": 380
+    },
+    {
+      "ion_class": "KCa",
+      "nodes_count": 154,
+      "copies_total": 456
+    },
+    {
+      "ion_class": "Other",
+      "nodes_count": 3216,
+      "copies_total": 6527
+    }
+  ]
+}
