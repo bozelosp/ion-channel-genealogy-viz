@@ -54,13 +54,15 @@ and **the supply chain** (what ships must be exactly the reviewed source).
 
 ## Review references
 
-Retrieved 2026-09-05: [OWASP ASVS 5.0.0](https://owasp.org/www-project-application-security-verification-standard/)
-(application verification; released 2025-05-30),
-[NIST SSDF 1.1 / SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final)
-(final, 2022-02-03), [Next.js security release](https://nextjs.org/blog/august-2026-security-release)
-(16.3.3, 2026-08-25), and [Node.js security release](https://nodejs.org/en/blog/vulnerability/july-2026-security-releases)
-(22.23.2, 2026-07-29). Review official advisories as well as registry audit
-results: a clean dependency audit alone does not establish security.
+Security baselines: [OWASP ASVS 5.0.0](https://owasp.org/www-project-application-security-verification-standard/)
+and [NIST SSDF 1.1 / SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final).
+Dependency review on 2026-10-21 covered the
+[Node.js October security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases),
+[Next.js advisories](https://github.com/vercel/next.js/security/advisories), and
+[React advisories](https://github.com/react/react/security/advisories).
+Exact runtime and dependency versions are recorded in `package.json` and
+`package-lock.json`. Review vendor advisories alongside registry audit
+results, which can lag newly published findings.
 
 ## Reporting
 
