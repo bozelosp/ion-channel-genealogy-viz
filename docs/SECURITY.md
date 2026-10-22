@@ -41,8 +41,8 @@ and **the supply chain** (what ships must be exactly the reviewed source).
   the unused server-side image optimizer is disabled in every build mode.
 
 **Build and supply chain.**
-- Installs use `npm ci --ignore-scripts` against the committed lockfile;
-  the Node version is pinned.
+- Installs use `npm ci` against the committed lockfile; `.npmrc` disables
+  package lifecycle scripts. The Node version is pinned.
 - The static export checks required files and report/index counts against
   the canonical data. Its restoration and concurrency behavior is described
   in [Architecture](ARCHITECTURE.md#static-export-constraints).
