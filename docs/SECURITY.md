@@ -56,7 +56,10 @@ and **the supply chain** (what ships must be exactly the reviewed source).
 
 Security baselines: [OWASP ASVS 5.0.0](https://owasp.org/www-project-application-security-verification-standard/)
 and [NIST SSDF 1.1 / SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final).
-Dependency review on 2026-10-21 covered the
+Dependency review on 2026-10-23 removed the vulnerable
+`eslint-config-next → fast-glob → micromatch → braces` development-only
+chain while retaining ESLint's JavaScript, TypeScript, React, hooks, and
+accessibility rules. The review also covered the
 [Node.js October security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases),
 [Next.js advisories](https://github.com/vercel/next.js/security/advisories), and
 [React advisories](https://github.com/react/react/security/advisories).

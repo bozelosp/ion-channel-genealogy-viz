@@ -130,7 +130,6 @@ export function OmnimodelGeneratedReport({ report, imageUrls = [] }: OmnimodelGe
             {imageUrls.map((src) => (
               <figure key={src} className="rounded-md border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
                 {/* Scientific plots retain their native aspect ratio and load only near the viewport. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={src}
                   alt={`Generated plot for ${report.title}`}
