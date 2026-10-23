@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { spawnSync } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -12,17 +11,17 @@ import {
   resolveWithin,
   safePathSegment,
 } from './path-safety.mjs';
+import { loadSupermodelJson } from './load-supermodel-json.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const DEFAULT_SOURCE = path.resolve(projectRoot, 'supermodels', 'supermodel_data.pkl');
+const DEFAULT_SOURCE = path.resolve(projectRoot, 'supermodels', 'supermodel_data.json');
 const DEFAULT_MARKDOWN_ROOT = path.join(projectRoot, 'public', 'data', 'omnimodels');
 const DEFAULT_GENERATED_DATA = path.join(projectRoot, 'public', 'data', 'omnimodel-index.json');
 const DEFAULT_REPORTS_ROOT = path.join(projectRoot, 'public', 'data', 'omnimodel-reports');
 const GENERATED_DATA_ROOT = path.join(projectRoot, 'public', 'data');
-const PICKLE_LOADER = path.join(__dirname, 'load-supermodel-json.py');
 
 function formatDuration(seconds) {
   if (!Number.isFinite(seconds)) return '?:??';
@@ -96,31 +95,13 @@ function printUsage() {
   console.log(`Usage: node scripts/generate-omnimodels.mjs [options]
 
 Options:
-  --source <path>         Path to supermodel_data.pkl (default: ${DEFAULT_SOURCE})
+  --source <path>         Path to supermodel_data.json (default: ${DEFAULT_SOURCE})
   --out-markdown <path>   Directory to write markdown output (default: ${DEFAULT_MARKDOWN_ROOT})
   --out-data <path>       Path to compact generated index JSON (default: ${DEFAULT_GENERATED_DATA})
   --out-reports <path>    Directory for per-model report JSON (default: ${DEFAULT_REPORTS_ROOT})
   --clean                 Remove previously generated data file before writing a new one
   -h, --help              Show this help message
 `);
-}
-
-function runPythonExtraction(sourcePath) {
-  const result = spawnSync('python3', [PICKLE_LOADER, sourcePath], {
-    encoding: 'utf-8',
-    maxBuffer: 128 * 1024 * 1024,
-    timeout: 60_000,
-  });
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  if (result.status !== 0) {
-    throw new Error(`Python exited with status ${result.status}: ${result.stderr}`);
-  }
-
-  return JSON.parse(result.stdout);
 }
 
 function formatHeading(key) {
@@ -380,7 +361,7 @@ function validateGeneratorDataset(data) {
 
 async function main() {
   const options = parseArgs();
-  const data = runPythonExtraction(options.source);
+  const data = loadSupermodelJson(options.source);
   const channelKeys = validateGeneratorDataset(data);
 
   if (options.cleanData) {

@@ -46,11 +46,12 @@ and **the supply chain** (what ships must be exactly the reviewed source).
 - The static export checks required files and report/index counts against
   the canonical data. Its restoration and concurrency behavior is described
   in [Architecture](ARCHITECTURE.md#static-export-constraints).
-- Data-generation scripts that read binary research artifacts use a
-  restricted, NumPy-only unpickler with conversion budgets, and a shared
-  path-safety module (symlink-refusing, root-contained writes). Operators
-  must establish input-artifact provenance before running them. Conversion
-  budgets apply after unpickling; this is not a sandbox for hostile pickles.
+- Omnimodel data-generation scripts share a loader that accepts only regular,
+  non-symlink JSON files capped at 32 MiB; executable pickle/object
+  deserialization is not supported. Generated path components and writes use
+  the shared path-safety module (symlink-refusing, root-contained writes).
+  Operators must still establish input-artifact provenance before publishing
+  regenerated scientific outputs.
 
 ## Review references
 

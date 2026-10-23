@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,17 +10,17 @@ import {
   resolveWithin,
   safePathSegment,
 } from './path-safety.mjs';
+import { loadSupermodelJson } from './load-supermodel-json.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
-const PICKLE_LOADER = path.join(__dirname, 'load-supermodel-json.py');
 
 function printUsage() {
   console.log(`Usage: node scripts/render-omnimodel-plots.mjs [options]
 
 Options:
-  --source <path>         Path to supermodel_data.pkl (default: supermodels/supermodel_data.pkl)
+  --source <path>         Path to supermodel_data.json (default: supermodels/supermodel_data.json)
   --out-markdown <path>   Markdown root (default: public/data/omnimodels)
   --states <list>         Comma-separated list of gates to render (e.g., m,h)
   --overwrite             Re-render plots even if files exist
@@ -32,7 +32,7 @@ Options:
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
-    source: path.resolve(projectRoot, 'supermodels', 'supermodel_data.pkl'),
+    source: path.resolve(projectRoot, 'supermodels', 'supermodel_data.json'),
     markdownDir: path.join(projectRoot, 'public', 'data', 'omnimodels'),
     statesFilter: null,
     overwrite: false,
@@ -135,24 +135,6 @@ function createProgressTracker(total, label) {
     }
   }
   return { update };
-}
-
-function runPythonRenderer(payload) {
-  const result = spawnSync('python3', [PICKLE_LOADER, payload.source], {
-    encoding: 'utf-8',
-    maxBuffer: 128 * 1024 * 1024,
-    timeout: 60_000,
-  });
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  if (result.status !== 0) {
-    throw new Error(`Failed to load pickle: ${result.stderr}`);
-  }
-
-  return JSON.parse(result.stdout);
 }
 
 function runPythonPlotter(payload) {
@@ -317,7 +299,7 @@ if states:
 
 async function main() {
   const options = parseArgs();
-  const dataset = runPythonRenderer({ source: options.source });
+  const dataset = loadSupermodelJson(options.source);
   const markdownRoot = await ensureRealDirectory(options.markdownDir, 'markdown root');
 
   const targetStates = options.statesFilter;
