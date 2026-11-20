@@ -30,6 +30,9 @@ is served by **one exported client shell** (`/omnimodels/report`):
 
 The listing pages are cheap and real: the index and the five channel pages
 are genuinely prerendered, and every model grid paginates 60 cards at a time.
+Links to an individual report use document navigation because both model URL
+forms share one HTML shell. Only the listing and shell pages have their own
+exported navigation payloads.
 
 ## The source-code route
 

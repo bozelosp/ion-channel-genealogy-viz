@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 60;
@@ -71,10 +70,9 @@ export function StaticModelBrowser({ models }: { models: StaticModelListItem[] }
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((item) => (
-          <Link
+          <a
             key={`${item.channel}/${item.routeSlug}`}
             href={`/omnimodels/static/${item.channel.toLowerCase()}/${item.routeSlug}`}
-            prefetch={false}
             className="rounded-lg border border-slate-200 bg-white p-4 text-sm shadow-sm transition hover:border-blue-400 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
           >
             <div className="font-semibold text-slate-800 dark:text-slate-100">{item.title}</div>
@@ -84,7 +82,7 @@ export function StaticModelBrowser({ models }: { models: StaticModelListItem[] }
             <div className="text-xs text-slate-500 dark:text-slate-400">
               States: {item.states.length ? item.states.join(", ") : "n/a"}
             </div>
-          </Link>
+          </a>
         ))}
       </div>
 

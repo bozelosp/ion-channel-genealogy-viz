@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 60;
@@ -65,10 +64,9 @@ export function ModelGrid({ channel, models }: ModelGridProps) {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((model) => (
-          <Link
+          <a
             key={model.slug}
             href={`/omnimodels/${encodeURIComponent(channel)}/${encodeURIComponent(model.slug)}`}
-            prefetch={false}
             className="group rounded-lg border border-slate-200 bg-white p-4 text-sm shadow-sm transition hover:border-blue-400 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
           >
             <div className="flex items-center justify-between">
@@ -79,7 +77,7 @@ export function ModelGrid({ channel, models }: ModelGridProps) {
                 {model.slug}
               </span>
             </div>
-          </Link>
+          </a>
         ))}
       </div>
 

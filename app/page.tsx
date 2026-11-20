@@ -46,9 +46,9 @@ function ActivationPlot() {
       <text x="252" y="237" textAnchor="middle">Membrane voltage (mV)</text>
     </svg>
     <div className={styles.legend}>{models.map(m =>
-      <Link key={m.id} href={'/omnimodels/K/' + m.report.originalSlug} style={{color:m.color}}>
+      <a key={m.id} href={'/omnimodels/K/' + m.report.originalSlug} style={{color:m.color}}>
         <i style={{borderTopStyle:m.id === '101629' ? 'dashed' : 'solid'}} />ModelDB {m.id} · {m.year}
-      </Link>)}</div>
+      </a>)}</div>
   </figure>;
 }
 
