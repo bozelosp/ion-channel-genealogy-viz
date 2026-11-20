@@ -42,6 +42,15 @@ immutable stored objects. Anything else — other prefixes, traversal,
 other extensions — is a true 404. Responses are plain text with
 `X-Content-Type-Options: nosniff`.
 
+## Shared comparisons
+
+The exported `/compare` page uses the `left` and `right` query parameters to
+identify two source files in order. It fetches those files directly from
+the source-code route and renders the same sandboxed worker diff used by the
+graph. The link opens independently of graph filters and does not load the
+network dataset. Changed lines retain the line numbers of each original
+file. Readers can show unchanged lines or open either complete source.
+
 ## Static-export constraints
 
 `output: 'export'` cannot contain middleware, non-static route handlers, or

@@ -2,6 +2,9 @@
 'use client';
 
 import NextLink from 'next/link';
+import { ComparisonLinkButton } from '@/components/ComparisonLinkButton';
+import { fetchModelSource } from '@/lib/comparison';
+import { generateDiffHtml } from './generateDiffHtml';
 import { useEffect, useRef, useState, useMemo, useCallback, useDeferredValue } from 'react';
 import * as d3 from 'd3';
 import {
@@ -640,12 +643,7 @@ async function fetchSourceCode(
         failures.push({ nodeId, name: (nodeData as any).name || nodeData.id, error: 'No unique_modelDB_mod_id' });
         return;
       }
-      // Use path param form so the CDN forwards it to the origin
-      const response = await fetch(`/api/source-code/${encodeURIComponent(uniqueId)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const sourceCode = await response.text();
+      const sourceCode = await fetchModelSource(uniqueId);
       updatedFetchedFiles[nodeId] = { source_code: sourceCode };
     } catch (error) {
       const nodeId = String(rawId);
@@ -664,29 +662,6 @@ async function fetchSourceCode(
 }
 
 // Generate bounded diff HTML away from the main UI thread.
-type DiffWorkerReply = { id: number; html?: string; error?: string };
-type PendingDiff = {
-  resolve: (html: string) => void;
-  timeout: ReturnType<typeof setTimeout>;
-};
-
-const DIFF_WORKER_TIMEOUT_MS = 8_000;
-const MAX_DIFF_SOURCE_CHARACTERS = 64 * 1024;
-let diffWorker: Worker | null = null;
-let nextDiffRequestId = 1;
-const pendingDiffs = new Map<number, PendingDiff>();
-
-function diffErrorDocument(message: string): string {
-  const escaped = message.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  })[character] as string);
-  return `<!doctype html><html><body><div style="padding:16px;border:1px solid #fecaca;border-radius:8px;background:#fef2f2;color:#b91c1c;font-family:system-ui,sans-serif">Diff unavailable: ${escaped}</div></body></html>`;
-}
-
 function diffPlaceholderDocument(message: string, theme: 'light' | 'dark'): string {
   const escaped = message.replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
@@ -696,68 +671,6 @@ function diffPlaceholderDocument(message: string, theme: 'light' | 'dark'): stri
     "'": '&#039;',
   })[character] as string);
   return `<!doctype html><html data-theme="${theme}"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>:root{--bg:#fff;--text:#0f172a;--border:#e2e8f0}:root[data-theme='dark']{--bg:#0f172a;--text:#e2e8f0;--border:#334155}html,body{margin:0;padding:16px;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif}.card{border:1px solid var(--border);border-radius:8px;padding:16px}.title{font-weight:700;margin-bottom:8px}.muted{opacity:.8}</style></head><body><div class="card"><div class="title">Diff unavailable</div><div class="muted">${escaped}</div></div></body></html>`;
-}
-
-function resetDiffWorker(message: string): void {
-  const errorHtml = diffErrorDocument(message);
-  for (const { resolve, timeout } of pendingDiffs.values()) {
-    clearTimeout(timeout);
-    resolve(errorHtml);
-  }
-  pendingDiffs.clear();
-  diffWorker?.terminate();
-  diffWorker = null;
-}
-
-function getDiffWorker(): Worker {
-  if (diffWorker) return diffWorker;
-
-  const worker = new Worker(new URL('./diff.worker.ts', import.meta.url), { type: 'module' });
-  worker.onmessage = (event: MessageEvent<DiffWorkerReply>) => {
-    const pending = pendingDiffs.get(event.data.id);
-    if (!pending) return;
-
-    clearTimeout(pending.timeout);
-    pendingDiffs.delete(event.data.id);
-    pending.resolve(
-      event.data.html ?? diffErrorDocument(event.data.error ?? 'Diff generation failed'),
-    );
-  };
-  worker.onerror = () => resetDiffWorker('Diff worker failed');
-  diffWorker = worker;
-  return worker;
-}
-
-async function generateDiffHtml(
-  sourceCode: string,
-  targetCode: string,
-  theme: 'light' | 'dark' = 'light',
-): Promise<string> {
-  if (
-    sourceCode.length > MAX_DIFF_SOURCE_CHARACTERS ||
-    targetCode.length > MAX_DIFF_SOURCE_CHARACTERS
-  ) {
-    return diffErrorDocument('A source file exceeds the 64 KiB comparison limit');
-  }
-
-  try {
-    const worker = getDiffWorker();
-    const id = nextDiffRequestId;
-    nextDiffRequestId += 1;
-
-    return await new Promise<string>((resolve) => {
-      const timeout = setTimeout(() => {
-        if (pendingDiffs.has(id)) {
-          resetDiffWorker('Diff generation exceeded the 8-second limit');
-        }
-      }, DIFF_WORKER_TIMEOUT_MS);
-
-      pendingDiffs.set(id, { resolve, timeout });
-      worker.postMessage({ id, source: sourceCode, target: targetCode, theme });
-    });
-  } catch (error) {
-    return diffErrorDocument(error instanceof Error ? error.message : 'Diff generation failed');
-  }
 }
 
 // Extend subgraph by connected nodes
@@ -3590,19 +3503,29 @@ export default function Visualizer() {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setShowDiffView(false);
-                    setDiffCombinations([]);
-                    setCurrentCombinationIndex(0);
-                    inFlightDiffKeysRef.current.clear();
-                  }}
-                  className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-2 transition-all duration-200 cursor-pointer"
-                >
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <div className="flex items-center gap-3">
+                  {currentDiffCombination && (
+                    <ComparisonLinkButton
+                      key={currentCombinationIndex}
+                      left={getNodeUniqueId(currentDiffCombination.source)}
+                      right={getNodeUniqueId(currentDiffCombination.target)}
+                    />
+                  )}
+                  <button
+                    aria-label="Close comparison"
+                    onClick={() => {
+                      setShowDiffView(false);
+                      setDiffCombinations([]);
+                      setCurrentCombinationIndex(0);
+                      inFlightDiffKeysRef.current.clear();
+                    }}
+                    className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-2 transition-all duration-200 cursor-pointer"
+                  >
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -3614,7 +3537,7 @@ export default function Visualizer() {
                     <div className="w-3 h-3 rounded-full bg-amber-500"></div>
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Source:</span>
                     <span className="text-sm text-slate-600 dark:text-slate-400 font-mono">
-                      {diffCombinations[currentCombinationIndex]?.source.name || diffCombinations[currentCombinationIndex]?.source.id}
+                      {getNodeUniqueId(currentDiffCombination?.source) || currentDiffCombination?.source.id}
                     </span>
                     {currentSourceIonClass && currentSourceIonClass !== '—' && (
                       <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">
@@ -3627,7 +3550,7 @@ export default function Visualizer() {
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Target:</span>
                     <span className="text-sm text-slate-600 dark:text-slate-400 font-mono">
-                      {diffCombinations[currentCombinationIndex]?.target.name || diffCombinations[currentCombinationIndex]?.target.id}
+                      {getNodeUniqueId(currentDiffCombination?.target) || currentDiffCombination?.target.id}
                     </span>
                     {currentTargetIonClass && currentTargetIonClass !== '—' && (
                       <span className="text-xs text-slate-500 dark:text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">

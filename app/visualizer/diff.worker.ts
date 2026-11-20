@@ -9,6 +9,7 @@ type DiffRequest = {
   source: string;
   target: string;
   theme: 'light' | 'dark';
+  changesOnly: boolean;
 };
 
 type DiffResponse = {
@@ -41,7 +42,7 @@ function validateSource(source: string, label: string): void {
   }
 }
 
-function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark'): string {
+function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark', changesOnly: boolean): string {
   validateSource(source, 'Source');
   validateSource(target, 'Target');
 
@@ -58,7 +59,9 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
     rows.push(row);
   };
 
-  for (const part of diffLines(source, target)) {
+  const parts = diffLines(source, target);
+  const hasChanges = parts.some((part) => part.added || part.removed);
+  for (const part of parts) {
     const lines = part.value.split('\n');
     if (lines.at(-1) === '') lines.pop();
 
@@ -70,6 +73,11 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
         pushRow(`<tr><td class="diff_header">${sourceLine}</td><td class="diff_sub">-&nbsp;${escapeHtml(line)}</td><td class="diff_header"></td><td></td></tr>`);
         sourceLine += 1;
       } else {
+        if (changesOnly && hasChanges) {
+          sourceLine += 1;
+          targetLine += 1;
+          continue;
+        }
         const escaped = escapeHtml(line);
         pushRow(`<tr><td class="diff_header">${sourceLine}</td><td>&nbsp;${escaped}</td><td class="diff_header">${targetLine}</td><td>&nbsp;${escaped}</td></tr>`);
         sourceLine += 1;
@@ -85,7 +93,7 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Code Diff</title>
   <style>
-    :root{--bg:#fff;--text:#0f172a;--border:#e2e8f0;--header:#e5e7eb;--add:#aaffaa;--sub:#ffaaaa;--hi:#111827}
+    :root{--bg:#fff;--text:#0f172a;--border:#e2e8f0;--header:#f1f3ef;--add:#d9efdf;--sub:#f9e3db;--hi:#192b23}
     :root[data-theme='dark']{--bg:#0f172a;--text:#e2e8f0;--border:#334155;--header:#1f2937;--add:#14532d;--sub:#7f1d1d;--hi:#f8fafc}
     html,body{background:var(--bg);color:var(--text);margin:0;padding:12px;min-height:100%;overflow:auto}
     table{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;border:1px solid var(--border);border-collapse:collapse;width:100%;font-size:13px}
@@ -96,6 +104,7 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
   </style>
 </head>
 <body>
+  ${changesOnly && !hasChanges ? '<p style="font-family:system-ui">The two source files are identical.</p>' : ''}
   <table class="diff">
     <thead><tr><th colspan="2">Source Code 1</th><th colspan="2">Source Code 2</th></tr></thead>
     <tbody>${rows.join('')}</tbody>
@@ -105,14 +114,14 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
 }
 
 workerScope.onmessage = (event: MessageEvent<DiffRequest>) => {
-  const { id, source, target, theme } = event.data;
+  const { id, source, target, theme, changesOnly } = event.data;
   const response: DiffResponse = { id };
 
   try {
     if (typeof source !== 'string' || typeof target !== 'string') {
       throw new Error('Comparison inputs must be strings');
     }
-    response.html = generateHtmlDiff(source, target, theme === 'dark' ? 'dark' : 'light');
+    response.html = generateHtmlDiff(source, target, theme === 'dark' ? 'dark' : 'light', changesOnly);
   } catch (error) {
     response.error = error instanceof Error ? error.message : 'Diff generation failed';
   }

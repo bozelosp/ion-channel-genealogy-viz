@@ -1,8 +1,18 @@
 # Ion Channel Genealogy Visualizer
 
-An interactive web application for exploring the source code similarity relationships between Hodgkin-Huxley ion channel models deposited in [ModelDB](https://modeldb.science) and catalogued by the [Ion Channel Genealogy](https://icg.neurotheory.ox.ac.uk/) project. The visualizer renders a force-directed network graph where nodes represent individual channel model files (.mod) and edges encode pairwise code similarity (Levenshtein ratio), letting users filter by ion class (K, Na, Ca, Ih, KCa), adjust similarity thresholds, select connected subgraphs with a single click, and generate side-by-side source-code diffs to trace how models have been reused and modified across publications. A companion Omnimodels section provides per-model parameter summaries with fitted steady-state and time-constant curves.
+Explore source-code similarity across 4,820 Hodgkin–Huxley ion-channel models from [ModelDB](https://modeldb.science) and the [Ion Channel Genealogy project](https://icg.neurotheory.ox.ac.uk/).
 
-Live at [icg-explorer.org](https://icg-explorer.org).
+## What changed in `kaprox.mod`?
+
+Two potassium-channel files in ModelDB entries [2796](https://modeldb.science/2796) and [101629](https://modeldb.science/101629) score **98.75%** on the graph's Levenshtein similarity measure. The second file adds a parameter, `sh = 24`, and uses it to shift the voltage terms in the gating equations.
+
+**[Open this comparison →](https://icg-explorer.org/compare?left=2796_kaprox-ID-1&right=101629_kaprox-ID-1)**
+
+[![Source comparison of kaprox.mod showing the added voltage shift](docs/kaprox-comparison.jpg)](https://icg-explorer.org/compare?left=2796_kaprox-ID-1&right=101629_kaprox-ID-1)
+
+[Explore the similarity graph](https://icg-explorer.org/visualizer) to filter by ion class, change the threshold, and compare model files. **Copy comparison link** shares the displayed pair in left–right order. The [Omnimodel library](https://icg-explorer.org/omnimodels) contains 3,524 reports with fitted parameters, steady states and time constants.
+
+Panos Bozelos co-developed the explorer and applied source-code similarity analysis to ion-channel models in his doctoral research. The underlying model collections are credited to ModelDB and the Ion Channel Genealogy project.
 
 ## How it works
 
@@ -16,6 +26,8 @@ fail-closed throughout: if data cannot be loaded and verified, the
 application shows an explicit error rather than substitute content.
 Source-code diffs run in a browser worker with bounded input, output, and
 execution time, rendered inside a unique-origin sandbox.
+
+The default graph loads only models meeting the initial two-copy threshold. In the measured default view, this reduced transferred graph data from 1,087,261 to 176,684 bytes (84%). Lowering the threshold loads the full graph.
 
 Design details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 Security model: [docs/SECURITY.md](docs/SECURITY.md)

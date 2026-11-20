@@ -1,12 +1,11 @@
+import { isModelSourceId } from '@/lib/comparison';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
 const SOURCE_CODE_BASE = 'https://ion-channels.s3.eu-west-1.amazonaws.com/static/modelDB';
-const MAX_UNIQUE_ID_LENGTH = 64;
 const MAX_SOURCE_BYTES = 256 * 1024;
 const UPSTREAM_TIMEOUT_MS = 8_000;
-const UNIQUE_ID_PATTERN = /^\d{1,9}_[0-9A-Za-z_.+-]{1,48}-ID-\d{1,6}$/;
 
 class UpstreamBodyTooLargeError extends Error {}
 
@@ -49,7 +48,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ un
   if (!uniqueId) {
     return NextResponse.json({ error: 'uniqueId is required' }, { status: 400 });
   }
-  if (uniqueId.length > MAX_UNIQUE_ID_LENGTH || !UNIQUE_ID_PATTERN.test(uniqueId)) {
+  if (!isModelSourceId(uniqueId)) {
     return NextResponse.json({ error: 'Invalid uniqueId' }, { status: 400 });
   }
 
