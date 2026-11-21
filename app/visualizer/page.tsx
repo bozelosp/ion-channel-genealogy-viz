@@ -761,6 +761,31 @@ export default function Visualizer() {
   const [containerDimensions, setContainerDimensions] = useState<{width: number, height: number}>({width: 0, height: 0});
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchMatches, setSearchMatches] = useState<Set<string>>(new Set());
+  // Deep links: ?q= fills the search box and ?copies= sets the minimum-copies
+  // filter (models with fewer copies are otherwise hidden from search).
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const query = url.searchParams.get('q')?.trim();
+      if (query && query.length <= 128) setSearchTerm(query);
+      const copiesParam = url.searchParams.get('copies');
+      if (copiesParam) {
+        const num = parseInt(copiesParam, 10);
+        if (!Number.isNaN(num) && num >= 1 && num <= 10) setCopiesNumber(num);
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const query = searchTerm.trim();
+      if (query) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      if (copiesNumber === INITIAL_MINIMUM_COPIES) url.searchParams.delete('copies');
+      else url.searchParams.set('copies', String(copiesNumber));
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
+  }, [searchTerm, copiesNumber]);
   const [visibleNodeIds, setVisibleNodeIds] = useState<Set<string>>(new Set());
   const [selectionState, setSelectionState] = useState<SelectionState>({ selectedIds: [], sourceIds: [], anchorId: null });
   const selectionStateRef = useRef<SelectionState>(selectionState);

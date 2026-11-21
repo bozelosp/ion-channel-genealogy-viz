@@ -54,6 +54,21 @@ graph. The link opens independently of graph filters and does not load the
 network dataset. Changed lines retain the line numbers of each original
 file. Readers can show unchanged lines or open either complete source.
 
+## Landing lineage
+
+The landing page prerenders the `kaprox.mod` lineage from the network
+dataset at build time (`lib/lineage.ts`). Each dated file in the family is
+linked to its most similar strictly earlier file; a file with no earlier
+relative starts its own lineage, and undated or unlinked files are left out.
+Identifiers, copy counts and link weights are validated and the expected
+origin is required: any deviation throws, so a changed dataset fails the
+build instead of rendering a different lineage. Radius encodes the year of
+the ModelDB entry.
+
+The visualizer reads `q` (search text) and `copies` (minimum-copies filter,
+1–10) from the query string and keeps them in the address bar alongside
+`sim`, so a graph view can be linked.
+
 ## Static-export constraints
 
 `output: 'export'` cannot contain middleware, non-static route handlers, or
