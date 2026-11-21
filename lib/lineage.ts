@@ -6,6 +6,7 @@
 // rendering a different lineage.
 
 import { isModelSourceId } from './comparison';
+import { graphIonClass, shouldSuppressIonClass } from './ionClasses';
 
 export interface LineageNode {
   id: string;
@@ -22,6 +23,7 @@ export interface LineageNode {
   copies: number;
   descendants: number;
   hasChildren: boolean;
+  visibleInGraph: boolean;
 }
 
 export interface Lineage {
@@ -49,6 +51,7 @@ interface Member {
   parent: number | null;
   simParent: number | null;
   children: number[];
+  visibleInGraph: boolean;
 }
 
 function record(value: unknown): Record<string, unknown> | null {
@@ -81,6 +84,7 @@ export function buildLineage(data: unknown, file: string, primaryOrigin: string)
     family.set(node.id, {
       key: node.id, id: id as string, modelDb: match[1], variant: Number(match[2]), year, copies,
       parent: null, simParent: null, children: [],
+      visibleInGraph: !shouldSuppressIonClass(graphIonClass(model.ion_class, node.ion_class, node.ion_channel_class)),
     });
   }
 
@@ -153,6 +157,7 @@ export function buildLineage(data: unknown, file: string, primaryOrigin: string)
       copies: member.copies,
       descendants: 0,
       hasChildren: member.children.length > 0,
+      visibleInGraph: member.visibleInGraph,
     });
   });
   for (let i = nodes.length - 1; i >= 0; i -= 1) {

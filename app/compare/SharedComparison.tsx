@@ -40,7 +40,7 @@ function PairDiff({ left, right }: { left: string; right: string }) {
         <input type="checkbox" checked={full} onChange={(event) => setFull(event.target.checked)} />
         Show unchanged lines
       </label>
-      <ComparisonLinkButton left={left} right={right} />
+      {files && <ComparisonLinkButton left={left} right={right} />}
     </div>
     <div className="grid grid-cols-2 gap-3 py-4 font-mono text-xs sm:text-sm">
       {[left, right].map(id => <a className="break-all underline underline-offset-4" key={id} href={'/api/source-code/' + encodeURIComponent(id)}>{id}</a>)}

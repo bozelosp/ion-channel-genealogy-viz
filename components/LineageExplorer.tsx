@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { comparisonPath } from '@/lib/comparison';
 import type { Lineage, LineageLayout, LineageNode } from '@/lib/lineage';
 
@@ -35,6 +35,7 @@ export default function LineageExplorer({
   const linkThreshold = formatThreshold(lineage.linkThreshold);
   const [selected, setSelected] = useState(() => Math.max(0, nodes.findIndex((node) => node.id === initialId)));
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const chart = useRef<HTMLDivElement>(null);
 
   const chain: number[] = [];
   for (let i = selected; i >= 0; i = nodes[i].parent) chain.unshift(i);
@@ -58,6 +59,27 @@ export default function LineageExplorer({
   function select(index: number) {
     setSelected(index);
     buttons.current[index]?.focus();
+  }
+
+  function onNodeClick(event: MouseEvent<HTMLButtonElement>, index: number) {
+    if (event.detail === 0 || !chart.current) {
+      select(index);
+      return;
+    }
+    // Touch targets can overlap. Resolve the pointer in the plot's coordinate system.
+    const bounds = chart.current.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) * layout.size / bounds.width;
+    const y = (event.clientY - bounds.top) * layout.size / bounds.height;
+    let nearest = index;
+    let shortest = Infinity;
+    layout.points.forEach((point, i) => {
+      const distance = (point.x - x) ** 2 + (point.y - y) ** 2;
+      if (distance < shortest) {
+        nearest = i;
+        shortest = distance;
+      }
+    });
+    select(nearest);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
@@ -89,7 +111,7 @@ export default function LineageExplorer({
 
       <div className="flex flex-wrap">
         <div className="flex min-w-0 flex-[1_1_540px] justify-center border-b border-slate-200 p-3 dark:border-slate-800 lg:border-b-0 lg:border-r">
-          <div role="radiogroup" aria-label={`Variants of ${file}`} className="relative aspect-square w-full max-w-[540px]">
+          <div ref={chart} role="radiogroup" aria-label={`Variants of ${file}`} className="relative aspect-square w-full max-w-[540px]">
             <svg viewBox={`0 0 ${layout.size} ${layout.size}`} aria-hidden="true" className="absolute inset-0 h-full w-full">
               {layout.rings.map((ring) => (
                 <g key={ring.year}>
@@ -115,7 +137,7 @@ export default function LineageExplorer({
                   aria-checked={isSelected}
                   aria-label={`${n.id}, ${n.year}`}
                   tabIndex={isSelected ? 0 : -1}
-                  onClick={() => select(i)}
+                  onClick={(event) => onNodeClick(event, i)}
                   onKeyDown={onKeyDown}
                   className="absolute flex -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 dark:focus-visible:outline-blue-400"
                   style={{ left: toPercent(x), top: toPercent(y), width: Math.max(24, size + 6), height: Math.max(24, size + 6) }}
@@ -205,9 +227,13 @@ export default function LineageExplorer({
                 Compare with parent
               </Link>
             )}
-            <Link href={`/visualizer?${graphQuery}`} className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-4 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">
-              Show in graph
-            </Link>
+            {node.visibleInGraph ? (
+              <Link href={`/visualizer?${graphQuery}`} className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-4 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">
+                Show in graph
+              </Link>
+            ) : (
+              <span className="self-center text-sm text-slate-600 dark:text-slate-400">This variant’s ion class is hidden in the graph.</span>
+            )}
           </div>
 
           <ul className="m-0 flex list-none flex-wrap gap-x-3.5 gap-y-1.5 border-t border-slate-200 p-0 pt-3.5 text-xs text-slate-600 dark:border-slate-800 dark:text-slate-400">

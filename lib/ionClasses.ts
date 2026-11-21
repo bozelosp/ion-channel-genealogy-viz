@@ -22,6 +22,10 @@ export function isOtherIonClass(value: unknown): boolean {
   return normalised.toLowerCase() === OTHER_ION_CLASS_LABEL.toLowerCase();
 }
 
+export function graphIonClass(originalClass: unknown, nodeClass: unknown, legacyClass: unknown): string {
+  return normaliseIonClass(originalClass) ?? normaliseIonClass(nodeClass) ?? normaliseIonClass(legacyClass) ?? OTHER_ION_CLASS_LABEL;
+}
+
 export function shouldSuppressIonClass(value?: string | null): boolean {
   return !SHOW_OTHER_ION_CLASS && isOtherIonClass(value);
 }

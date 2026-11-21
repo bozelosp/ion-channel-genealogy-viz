@@ -3,6 +3,7 @@
 
 import NextLink from 'next/link';
 import { ComparisonLinkButton } from '@/components/ComparisonLinkButton';
+import { searchGraph } from '@/lib/graphSearch';
 import { fetchModelSource } from '@/lib/comparison';
 import { generateDiffHtml } from './generateDiffHtml';
 import { useEffect, useRef, useState, useMemo, useCallback, useDeferredValue } from 'react';
@@ -11,7 +12,7 @@ import {
   formatIonClassForDisplay,
   getVisibleIonClassOptions,
   shouldSuppressIonClass,
-  OTHER_ION_CLASS_LABEL,
+  graphIonClass,
 } from '@/lib/ionClasses';
 
 const ION_CLASS_NAMES = getVisibleIonClassOptions();
@@ -118,7 +119,7 @@ function processNetworkDataset(value: unknown): NetworkData {
   return {
     nodes: rawData.nodes.map((node: any) => ({
       ...node,
-      ion_class: node.ion_class || node.original_model?.ion_class || node.ion_channel_class || OTHER_ION_CLASS_LABEL,
+      ion_class: graphIonClass(node.original_model?.ion_class, node.ion_class, node.ion_channel_class),
       icg: typeof node.icg === 'boolean' ? node.icg : !!node.original_model?.ICG,
       omnimodel1: toBooleanFlag(node.omnimodel1 ?? node[LEGACY_MODEL_FIELD_1] ?? node.original_model?.[LEGACY_MODEL_KEY_1]),
       omnimodel2: toBooleanFlag(node.omnimodel2 ?? node[LEGACY_MODEL_FIELD_2] ?? node.original_model?.[LEGACY_MODEL_KEY_2]),
@@ -345,16 +346,6 @@ function parseNumeric(value: unknown): number | null {
   return null;
 }
 
-// Normalize free-text queries: trim and right-strip a trailing .mod
-function normalizeQueryTerm(raw: string): string {
-  const trimmed = (raw || '').trim();
-  let lower = trimmed.toLowerCase();
-  if (lower.endsWith('.mod')) {
-    lower = lower.slice(0, -4);
-  }
-  return lower;
-}
-
 function getCandidateYear(node: Node, fallback?: Record<string, unknown>): number {
   const yearFromNode = parseNumeric(node.original_model?.Year);
   if (yearFromNode !== null) return yearFromNode;
@@ -445,7 +436,7 @@ function assignNodesToGroups(
 
     nodes.forEach(node => {
       // Use original_model fields consistently (matching original implementation)
-      const nodeIonClass = node.original_model?.ion_class || node.ion_class;
+      const nodeIonClass = node.ion_class;
       if (shouldSuppressIonClass(nodeIonClass)) {
         return;
       }
@@ -506,7 +497,7 @@ function filterNetworkNodes(
   minimumCopies: number,
 ): Node[] {
   return nodes.filter((node) => {
-    const nodeIonClass = node.original_model?.ion_class || node.ion_class;
+    const nodeIonClass = node.ion_class;
     if (shouldSuppressIonClass(nodeIonClass)) return false;
     if (!selectedIonClasses.has('all') && (!nodeIonClass || !selectedIonClasses.has(nodeIonClass))) {
       return false;
@@ -612,16 +603,11 @@ async function runLimited<T>(items: T[], limit: number, worker: (item: T) => Pro
   await Promise.all(workers);
 }
 
-async function fetchSourceCode(
-  nodeIds: string[],
-  networkData: NetworkData,
-  fetchedFiles: { [key: string]: { source_code: string } }
-): Promise<{
-  files: { [key: string]: { source_code: string } },
-  failures: { nodeId: string, uniqueId?: string, name?: string, error?: string }[]
-}> {
-  const updatedFetchedFiles = { ...fetchedFiles };
-  const failures: { nodeId: string, uniqueId?: string, name?: string, error?: string }[] = [];
+type SourceFiles = Record<string, { source_code: string }>;
+type SourceFailure = { nodeId: string; uniqueId?: string; name?: string; error?: string };
+
+async function fetchSourceCode(nodeIds: string[], networkData: NetworkData, cache: SourceFiles): Promise<SourceFailure[]> {
+  const failures: SourceFailure[] = [];
   const nodeById = new Map(networkData.nodes.map((node) => [String(node.id), node]));
 
   const uniqueNodeIds = Array.from(new Set(nodeIds));
@@ -630,7 +616,7 @@ async function fetchSourceCode(
   await runLimited(uniqueNodeIds, concurrency, async (rawId) => {
     try {
       const nodeId = String(rawId);
-      if (updatedFetchedFiles[nodeId]) return;
+      if (cache[nodeId]) return;
       const nodeData = nodeById.get(nodeId);
       if (!nodeData) {
         console.warn(`Node with ID ${nodeId} not found.`);
@@ -644,7 +630,7 @@ async function fetchSourceCode(
         return;
       }
       const sourceCode = await fetchModelSource(uniqueId);
-      updatedFetchedFiles[nodeId] = { source_code: sourceCode };
+      cache[nodeId] = { source_code: sourceCode };
     } catch (error) {
       const nodeId = String(rawId);
       console.error(`Error fetching file for node ${nodeId}:`, error);
@@ -658,19 +644,7 @@ async function fetchSourceCode(
     }
   });
 
-  return { files: updatedFetchedFiles, failures };
-}
-
-// Generate bounded diff HTML away from the main UI thread.
-function diffPlaceholderDocument(message: string, theme: 'light' | 'dark'): string {
-  const escaped = message.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  })[character] as string);
-  return `<!doctype html><html data-theme="${theme}"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>:root{--bg:#fff;--text:#0f172a;--border:#e2e8f0}:root[data-theme='dark']{--bg:#0f172a;--text:#e2e8f0;--border:#334155}html,body{margin:0;padding:16px;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif}.card{border:1px solid var(--border);border-radius:8px;padding:16px}.title{font-weight:700;margin-bottom:8px}.muted{opacity:.8}</style></head><body><div class="card"><div class="title">Diff unavailable</div><div class="muted">${escaped}</div></div></body></html>`;
+  return failures;
 }
 
 // Extend subgraph by connected nodes
@@ -760,7 +734,6 @@ export default function Visualizer() {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [containerDimensions, setContainerDimensions] = useState<{width: number, height: number}>({width: 0, height: 0});
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchMatches, setSearchMatches] = useState<Set<string>>(new Set());
   // Deep links: ?q= fills the search box and ?copies= sets the minimum-copies
   // filter (models with fewer copies are otherwise hidden from search).
   useEffect(() => {
@@ -801,11 +774,12 @@ export default function Visualizer() {
   }, []);
   
   // Source code comparison states
-  const fetchedFilesRef = useRef<{[key: string]: {source_code: string}}>({});
+  const sourceCache = useRef<SourceFiles>({});
+  const [fetchedFiles, setFetchedFiles] = useState<SourceFiles>({});
   const [showDiffView, setShowDiffView] = useState<boolean>(false);
   const [sourceView, setSourceView] = useState<SourceViewState | null>(null);
   // Failed source fetches banner state
-  const [failedNodes, setFailedNodes] = useState<{nodeId: string, uniqueId?: string, name?: string, error?: string}[]>([]);
+  const [failedNodes, setFailedNodes] = useState<SourceFailure[]>([]);
   const [showFailureBanner, setShowFailureBanner] = useState<boolean>(true);
   const [isFailureExpanded, setIsFailureExpanded] = useState<boolean>(false);
   const [retryingFailed, setRetryingFailed] = useState<boolean>(false);
@@ -839,8 +813,11 @@ export default function Visualizer() {
   // Group summary state
   const [groupSummaries, setGroupSummaries] = useState<{key: string, nodeCount: number}[]>([]);
 
-  const storeFetchedFiles = useCallback((files: {[key: string]: {source_code: string}}) => {
-    fetchedFilesRef.current = files;
+  const loadSources = useCallback(async (ids: string[], data: NetworkData) => {
+    const files = sourceCache.current;
+    const failures = await fetchSourceCode(ids, data, files);
+    setFetchedFiles({ ...files });
+    return { files, failures };
   }, []);
 
   const closeSourceView = useCallback(() => {
@@ -865,10 +842,9 @@ export default function Visualizer() {
     setSourceView({ node, status: 'loading' });
 
     try {
-      const { files, failures } = await fetchSourceCode([nodeId], networkData, fetchedFilesRef.current);
+      const { files, failures } = await loadSources([nodeId], networkData);
       if (sourceFetchRequestIdRef.current !== requestId) return;
 
-      storeFetchedFiles(files);
       if (failures.length > 0) {
         setFailedNodes((previous) => [
           ...previous.filter((failure) => failure.nodeId !== nodeId),
@@ -899,7 +875,7 @@ export default function Visualizer() {
         error: error instanceof Error ? error.message : 'Source code could not be loaded.',
       });
     }
-  }, [networkData, storeFetchedFiles]);
+  }, [networkData, loadSources]);
 
   const sourceViewNodeId = sourceView ? String(sourceView.node.id) : null;
   useEffect(() => {
@@ -1023,6 +999,9 @@ export default function Visualizer() {
   const [availableOmnimodelKeys, setAvailableOmnimodelKeys] = useState<Set<string> | null>(null);
   const selectedNodeDisplayName = useMemo(() => getNodeDisplayName(selectedNode), [selectedNode]);
   const currentDiffCombination = diffCombinations[currentCombinationIndex] ?? null;
+  const sourceCode = currentDiffCombination && fetchedFiles[currentDiffCombination.source.id]?.source_code;
+  const targetCode = currentDiffCombination && fetchedFiles[currentDiffCombination.target.id]?.source_code;
+  const sourcesLoaded = typeof sourceCode === 'string' && typeof targetCode === 'string';
   const currentSourceIonClass = currentDiffCombination?.source
     ? formatIonClassForDisplay(currentDiffCombination.source.original_model?.ion_class || currentDiffCombination.source.ion_class)
     : null;
@@ -1309,8 +1288,7 @@ export default function Visualizer() {
     try {
       setRetryingFailed(true);
       const ids = failedNodes.map(f => f.nodeId);
-      const { files, failures } = await fetchSourceCode(ids, networkData, fetchedFilesRef.current);
-      storeFetchedFiles(files);
+      const { failures } = await loadSources(ids, networkData);
       setFailedNodes(failures);
       if (failures.length === 0) setShowFailureBanner(false);
     } finally {
@@ -1417,8 +1395,7 @@ export default function Visualizer() {
     const allNodeIds = Array.from(new Set(
       combinations.flatMap(({ source, target }) => [String(source.id), String(target.id)])
     ));
-    const { files: updatedFiles, failures } = await fetchSourceCode(allNodeIds, networkData, fetchedFilesRef.current);
-    storeFetchedFiles(updatedFiles);
+    const { failures } = await loadSources(allNodeIds, networkData);
     setFailedNodes(failures);
     if (failures.length > 0) setShowFailureBanner(true);
 
@@ -1431,32 +1408,20 @@ export default function Visualizer() {
     setContextMenu(null);
 
     setIsGeneratingDiffs(false);
-  }, [networkData, selectionBuckets, storeFetchedFiles, findAncestorNode]);
+  }, [networkData, selectionBuckets, loadSources, findAncestorNode]);
 
   // Generate only the comparison being viewed. This keeps large matrices responsive and bounded in memory.
   useEffect(() => {
     if (!showDiffView) return;
     const combo = diffCombinations[currentCombinationIndex];
-    if (!combo || combo.html) return;
+    if (!combo || combo.html || !sourcesLoaded) return;
 
     const key = `${String(combo.source.id)}->${String(combo.target.id)}`;
     if (inFlightDiffKeysRef.current.has(key)) return;
     inFlightDiffKeysRef.current.add(key);
     setIsGeneratingDiffs(true);
 
-    const sourceCode = fetchedFilesRef.current[String(combo.source.id)]?.source_code;
-    const targetCode = fetchedFilesRef.current[String(combo.target.id)]?.source_code;
-    const createHtml = async () => {
-      if (sourceCode && targetCode) {
-        return generateDiffHtml(sourceCode, targetCode, resolvedTheme);
-      }
-      const missing: string[] = [];
-      if (!sourceCode) missing.push(`${combo.source.name || combo.source.id}`);
-      if (!targetCode) missing.push(`${combo.target.name || combo.target.id}`);
-      return diffPlaceholderDocument(`Missing source code for: ${missing.join(' and ')}`, resolvedTheme);
-    };
-
-    void createHtml()
+    void generateDiffHtml(sourceCode, targetCode, resolvedTheme)
       .then((html) => {
         setDiffCombinations((previous) => {
           const current = previous[currentCombinationIndex];
@@ -1472,7 +1437,7 @@ export default function Visualizer() {
         inFlightDiffKeysRef.current.delete(key);
         setIsGeneratingDiffs(false);
       });
-  }, [currentCombinationIndex, diffCombinations, resolvedTheme, showDiffView]);
+  }, [currentCombinationIndex, diffCombinations, resolvedTheme, showDiffView, sourceCode, targetCode, sourcesLoaded]);
 
   // Keyboard event handler for shortcuts
   useEffect(() => {
@@ -2299,8 +2264,7 @@ export default function Visualizer() {
       // Fetch source code for all nodes in subgraph
       if (networkData) {
         const allNodeIds = [...newSourceIds, ...newTargetIds];
-        const { files: updatedFetchedFiles, failures } = await fetchSourceCode(allNodeIds, networkData, fetchedFilesRef.current);
-        storeFetchedFiles(updatedFetchedFiles);
+        const { failures } = await loadSources(allNodeIds, networkData);
         setFailedNodes(failures);
         if (failures.length > 0) setShowFailureBanner(true);
       }
@@ -2365,66 +2329,12 @@ export default function Visualizer() {
         svgElement.removeEventListener('pointerdown', handlePointerDown, { capture: true } as any);
       }
     };
-  }, [networkData, fixedLocationCircles, groupedLayoutCount, selectedIonClasses, deferredSimilarityScore, showICG, omnimodel1, omnimodel2, deferredCopiesNumber, containerDimensions, resolvedTheme, commitSelectionState, syncSelectionToDom, storeFetchedFiles]);
+  }, [networkData, fixedLocationCircles, groupedLayoutCount, selectedIonClasses, deferredSimilarityScore, showICG, omnimodel1, omnimodel2, deferredCopiesNumber, containerDimensions, resolvedTheme, commitSelectionState, syncSelectionToDom, loadSources]);
 
-  useEffect(() => {
-    if (!networkData) {
-      setSearchMatches((prev) => (prev.size === 0 ? prev : new Set()));
-      return;
-    }
-
-    const term = normalizeQueryTerm(searchTerm);
-    if (term.length < 3) {
-      setSearchMatches((prev) => (prev.size === 0 ? prev : new Set()));
-      return;
-    }
-
-    const visibleIds = visibleNodeIds;
-    const restrictToVisible = visibleIds.size > 0;
-    const matches = new Set<string>();
-
-    for (const node of networkData.nodes) {
-      const nodeId = String(node.id);
-      if (restrictToVisible && !visibleIds.has(nodeId)) continue;
-
-      const displayName = getNodeDisplayName(node);
-      const uniqueId = getNodeUniqueId(node);
-      const label = typeof node.label === 'string' ? node.label : null;
-      const nodeName = typeof node.name === 'string' ? node.name : null;
-      const modFilename = typeof node.original_model?.mod_filename === 'string' ? node.original_model.mod_filename : null;
-      const modFilepath = typeof node.original_model?.mod_filepath === 'string' ? node.original_model.mod_filepath : null;
-      const identicalEntries = Array.isArray(node.identical_models) ? node.identical_models : [];
-
-      const haystacks = [
-        nodeId,
-        label,
-        nodeName,
-        displayName,
-        uniqueId,
-        modFilename,
-        modFilepath,
-        ...identicalEntries.flatMap((entry) => {
-          if (!entry || typeof entry !== 'object') return [];
-          const castEntry = entry as Record<string, unknown>;
-          const parts: string[] = [];
-          const id = castEntry.unique_modelDB_mod_id;
-          const filename = castEntry.mod_filename;
-          const filepath = castEntry.mod_filepath;
-          if (typeof id === 'string') parts.push(id);
-          if (typeof filename === 'string') parts.push(filename);
-          if (typeof filepath === 'string') parts.push(filepath);
-          return parts;
-        }),
-      ].filter((value): value is string => Boolean(value))
-       .map((value) => value.toLowerCase());
-
-      if (haystacks.some((field) => field.includes(term))) {
-        matches.add(nodeId);
-      }
-    }
-
-    setSearchMatches((prev) => (areSetsEqual(prev, matches) ? prev : matches));
-  }, [searchTerm, networkData, visibleNodeIds]);
+  const searchMatches = useMemo(
+    () => searchGraph(networkData?.nodes ?? [], visibleNodeIds, searchTerm),
+    [networkData, visibleNodeIds, searchTerm],
+  );
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -2617,11 +2527,11 @@ export default function Visualizer() {
                 {searchTerm.length > 0 && (
                   <div className="absolute inset-y-0 right-2 flex items-center gap-2">
                     <span className="pointer-events-none select-none rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                      {searchMatches.size === 0
-                        ? 'No hits'
-                        : searchMatches.size === 1
-                          ? '1 hit'
-                          : `${searchMatches.size} hits`}
+                      {copiesNumber < INITIAL_MINIMUM_COPIES && !hasFullNetworkData
+                        ? 'Searching…'
+                        : searchMatches.size === 0
+                          ? 'No hits'
+                          : `${searchMatches.size} ${searchMatches.size === 1 ? 'hit' : 'hits'}`}
                     </span>
                     <button
                       type="button"
@@ -2697,8 +2607,7 @@ export default function Visualizer() {
                           if (!networkData) return;
                           setRetryingFailed(true);
                           try {
-                            const { files, failures } = await fetchSourceCode([f.nodeId], networkData, fetchedFilesRef.current);
-                            storeFetchedFiles(files);
+                            const { failures } = await loadSources([f.nodeId], networkData);
                             const stillFailed = failures.find(ff => ff.nodeId === f.nodeId);
                             setFailedNodes(prev => {
                               const others = prev.filter(p => p.nodeId !== f.nodeId);
@@ -3529,7 +3438,7 @@ export default function Visualizer() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  {currentDiffCombination && (
+                  {currentDiffCombination && sourcesLoaded && (
                     <ComparisonLinkButton
                       key={currentCombinationIndex}
                       left={getNodeUniqueId(currentDiffCombination.source)}
@@ -3619,7 +3528,14 @@ export default function Visualizer() {
 
             {/* Diff Content */}
             <div className="flex-1 overflow-hidden">
-              {diffCombinations[currentCombinationIndex]?.html ? (
+              {currentDiffCombination && !sourcesLoaded ? (
+                <p role="alert" className="p-4 text-sm text-red-700 dark:text-red-300">
+                  Source unavailable for {[
+                    sourceCode == null && getNodeUniqueId(currentDiffCombination.source),
+                    targetCode == null && getNodeUniqueId(currentDiffCombination.target),
+                  ].filter(Boolean).join(' and ')}.
+                </p>
+              ) : currentDiffCombination?.html ? (
                 <div className="h-full p-4">
                   <iframe
                     title="Code diff"
@@ -3627,7 +3543,7 @@ export default function Visualizer() {
                     sandbox=""
                     referrerPolicy="no-referrer"
                     // Render escaped diff markup in a unique-origin sandbox.
-                    srcDoc={diffCombinations[currentCombinationIndex].html}
+                    srcDoc={currentDiffCombination.html}
                   />
                 </div>
               ) : (

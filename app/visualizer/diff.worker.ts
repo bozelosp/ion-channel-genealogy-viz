@@ -73,7 +73,7 @@ function generateHtmlDiff(source: string, target: string, theme: 'light' | 'dark
         pushRow(`<tr><td class="diff_header">${sourceLine}</td><td class="diff_sub">-&nbsp;${escapeHtml(line)}</td><td class="diff_header"></td><td></td></tr>`);
         sourceLine += 1;
       } else {
-        if (changesOnly && hasChanges) {
+        if (changesOnly) {
           sourceLine += 1;
           targetLine += 1;
           continue;

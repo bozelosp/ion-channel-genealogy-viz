@@ -52,7 +52,8 @@ identify two source files in order. It fetches those files directly from
 the source-code route and renders the same sandboxed worker diff used by the
 graph. The link opens independently of graph filters and does not load the
 network dataset. Changed lines retain the line numbers of each original
-file. Readers can show unchanged lines or open either complete source.
+file. The copy-link control appears once both sources load. Identical files
+show a summary in changes-only mode, and readers can reveal every line.
 
 ## Landing lineage
 
@@ -67,7 +68,9 @@ the ModelDB entry.
 
 The visualizer reads `q` (search text) and `copies` (minimum-copies filter,
 1–10) from the query string and keeps them in the address bar alongside
-`sim`, so a graph view can be linked.
+`sim`, so a graph view can be linked. Homepage searches include one-copy
+models. A bare `.mod` filename matches original and identical-copy filenames
+exactly, ignoring case. The lineage offers graph links for visible ion classes.
 
 ## Static-export constraints
 

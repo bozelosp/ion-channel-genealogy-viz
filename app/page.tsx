@@ -72,6 +72,7 @@ export default async function Home() {
                   <path d="M20 20l-4-4" />
                 </svg>
                 <label htmlFor="landing-search" className="sr-only">ModelDB ID or .mod file name</label>
+                <input type="hidden" name="copies" value="1" />
                 <input
                   id="landing-search"
                   name="q"
@@ -91,7 +92,7 @@ export default async function Home() {
                 {EXAMPLE_QUERIES.map((query) => (
                   <Link
                     key={query}
-                    href={`/visualizer?${new URLSearchParams({ q: query })}`}
+                    href={`/visualizer?${new URLSearchParams({ q: query, copies: '1' })}`}
                     className="rounded-md border border-slate-200 px-2 py-0.5 font-mono text-slate-700 hover:border-slate-400 dark:border-slate-800 dark:text-slate-300 dark:hover:border-slate-600"
                   >
                     {query}
